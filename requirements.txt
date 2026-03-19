@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+langgraph
+langchain
+langchain-openai
+python-dotenv
+pydantic
+redis
+chromadb
+neo4j
+python-multipart
+aiosqlite
+pydantic-settings
