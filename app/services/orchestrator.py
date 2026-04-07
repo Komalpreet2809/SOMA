@@ -35,8 +35,9 @@ INTERNAL REFLECTION:"""
         reflection = "Processing intent through neural pathways..."
         
     return {"reflection": reflection}
-    # Phase 1: Perception (Implicit in state["input"])
-    
+
+def retrieve(state: AgentState):
+    """Memory retrieval phase: Sensory and Semantic recall."""
     # Phase 2: Recall (Sensory Memory)
     context = retrieve_context(state["input"])
     
