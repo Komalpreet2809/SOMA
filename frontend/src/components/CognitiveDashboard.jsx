@@ -124,6 +124,13 @@ function CognitiveDashboard({ brainState, setBrainState }) {
             <h3 className="label-mono" style={{ fontSize: '0.65rem', marginBottom: '10px' }}>Neural Status</h3>
             <div className="label-mono" style={{ color: 'var(--accent-primary)', fontSize: '0.6rem', marginBottom: '10px' }}>{brainState.statusMessage}</div>
             
+            {brainState.reflection && (
+              <div className="internal-monologue label-mono">
+                <span className="label-mono" style={{ fontSize: '0.5rem', opacity: 0.5, display: 'block', marginBottom: '4px' }}>// INTERNAL REFLECTION</span>
+                {brainState.reflection}
+              </div>
+            )}
+
             <CognitiveTrace traces={brainState.traces} />
 
             {ingestStatus && (

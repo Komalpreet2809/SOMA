@@ -11,9 +11,29 @@ class AgentState(TypedDict):
     chat_history: List[dict]
     context: List[str]
     graph_context: List[str]
+    reflection: str
     response: str
 
-def retrieve(state: AgentState):
+def reflect(state: AgentState):
+    """Initial cognitive phase: Internal reflection on the user intent."""
+    api_key = settings.GROQ_API_KEY if settings.GROQ_API_KEY else "dummy_key"
+    llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
+    
+    prompt = f"""You are the internal monologue of Soma, a cognitive AI.
+Briefly reflect on the user's input. What is their core intent? 
+What cognitive connections should we prioritize?
+Keep it under 30 words. Express it as a raw, internal thought.
+
+USER INPUT: {state["input"]}
+INTERNAL REFLECTION:"""
+
+    try:
+        response = llm.invoke([HumanMessage(content=prompt)])
+        reflection = response.content.strip()
+    except:
+        reflection = "Processing intent through neural pathways..."
+        
+    return {"reflection": reflection}
     # Phase 1: Perception (Implicit in state["input"])
     
     # Phase 2: Recall (Sensory Memory)
@@ -80,13 +100,15 @@ def create_graph():
     workflow = StateGraph(AgentState)
     
     # Add nodes
+    workflow.add_node("reflect", reflect)
     workflow.add_node("retrieve", retrieve)
     workflow.add_node("call_model", call_model)
     
     # Set entry point
-    workflow.set_entry_point("retrieve")
+    workflow.set_entry_point("reflect")
     
     # Add edges
+    workflow.add_edge("reflect", "retrieve")
     workflow.add_edge("retrieve", "call_model")
     workflow.add_edge("call_model", END)
     

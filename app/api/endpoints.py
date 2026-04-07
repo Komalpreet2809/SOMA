@@ -167,6 +167,7 @@ async def process_query_stream(request: QueryRequest):
                 "chat_history": history,
                 "context": [],
                 "graph_context": [],
+                "reflection": "",
                 "response": ""
             }
 
@@ -180,7 +181,13 @@ async def process_query_stream(request: QueryRequest):
             # For simplicity in this demo, we use the stream directly
             for output in orchestrator.stream(state_input):
                 for node_name, node_output in output.items():
-                    if node_name == "retrieve":
+                    if node_name == "reflect":
+                        # Send Internal Reflection Trace
+                        reflection = node_output.get("reflection", "")
+                        yield f"event: reflection\ndata: {json.dumps({'message': reflection})}\n\n"
+                        await asyncio.sleep(0.3)  # Give user time to read the 'thought'
+                    
+                    elif node_name == "retrieve":
                         # Send Recall & Association Trace
                         trace_data = node_output.get("trace_data", {})
                         recall_msg = f"Found {trace_data.get('sensory_count')} sensory memories."
