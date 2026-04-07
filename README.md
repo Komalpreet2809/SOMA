@@ -124,10 +124,4 @@ Run systems tests to ensure cognitive layers are healthy:
 python -m pytest tests/test_phase2.py
 ```
 
----
-
-## 📜 License
-MIT License. See `LICENSE` for details (if applicable).
-
----
 *Inspired by the synergy of biological cognition and digital intelligence.*
