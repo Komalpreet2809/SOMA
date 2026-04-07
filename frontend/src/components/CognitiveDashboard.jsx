@@ -140,6 +140,25 @@ function CognitiveDashboard({ brainState, setBrainState }) {
             )}
          </div>
       </div>
+
+      <div className="dashboard-section">
+        <h3 className="label-mono" style={{ fontSize: '0.65rem' }}>Neural Sparks (Subsurface)</h3>
+        <div className="sparks-container">
+          {brainState.sparks.length === 0 ? (
+            <div className="label-mono" style={{ opacity: 0.3, fontSize: '0.6rem' }}>Subconscious idle...</div>
+          ) : (
+            brainState.sparks.map((spark, idx) => (
+              <div key={idx} className="spark-item label-mono">
+                <span className="spark-time">[{new Date(spark.timestamp).toLocaleTimeString()}]</span>
+                <p className="spark-content">{spark.content}</p>
+                <div className="spark-entities">
+                  {spark.entities.map(e => <span key={e} className="spark-tag">#{e}</span>)}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
