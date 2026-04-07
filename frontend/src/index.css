@@ -277,3 +277,30 @@ button:disabled {
   from { top: 0%; }
   to   { top: 100%; }
 }
+
+/* ── Cognitive State Themes ── */
+.state-overloaded {
+  --accent-primary: #ff3e3e;
+  --accent-secondary: #ff8e3e;
+  --accent-glow: rgba(255, 62, 62, 0.3);
+  --border-active: rgba(255, 62, 62, 0.5);
+}
+
+.state-overloaded .pulse-active {
+  animation: overloaded-glow 0.8s infinite alternate;
+}
+
+@keyframes overloaded-glow {
+  from { border-color: #ff3e3e; box-shadow: 0 0 5px rgba(255, 62, 62, 0.2); }
+  to   { border-color: #ff8e3e; box-shadow: 0 0 20px rgba(255, 62, 62, 0.5); }
+}
+
+.state-focused {
+  --accent-primary: #7effa8;
+  --accent-secondary: #3d7a46;
+  --accent-glow: rgba(126, 255, 168, 0.3);
+}
+
+.state-idle {
+  --accent-secondary: #1a2e20;
+}

@@ -36,8 +36,21 @@ def get_brain_vitals(user_id: str = "default_user"):
             
     # 3. Working Memory (SQLite)
     try:
-        vitals["working"] = get_message_count(user_id)
+        count = get_message_count(user_id)
+        vitals["working"] = count
+        
+        # 4. Cognitive State (Mood)
+        if count > 12:
+            vitals["state"] = "OVERLOADED"
+        elif count > 7:
+            vitals["state"] = "FOCUSED"
+        elif count > 0:
+            vitals["state"] = "ACTIVE"
+        else:
+            vitals["state"] = "IDLE"
+            
     except Exception as e:
         print(f"Vitals: Working fetch failed: {e}")
+        vitals["state"] = "UNKNOWN"
         
     return vitals

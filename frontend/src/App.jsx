@@ -15,6 +15,7 @@ function App() {
     reflection: "",
     highlightedNodes: [],
     sparks: [],
+    cognitiveState: "IDLE",
     traces: []
   })
   const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
@@ -30,6 +31,7 @@ function App() {
           sensoryDocuments: data.sensory,
           graphRelations: data.semantic.nodes + data.semantic.edges,
           workingMemory: data.working,
+          cognitiveState: data.state || 'IDLE'
         }));
       } catch (err) {
         console.error("Failed to fetch brain vitals:", err);
@@ -59,17 +61,15 @@ function App() {
   }, []);
 
   return (
-    <div className="app-container">
+    <div className={`app-container state-${brainState.cognitiveState.toLowerCase()}`}>
       <header className="app-header">
         <div className="logo-section">
           <h1 style={{ fontSize: '1.2rem' }}>SOMA AI CORE</h1>
         </div>
         
-
-
         <div className="status-indicator">
           <span className={`dot ${brainState.isLoading ? 'thinking' : 'idle'}`}></span>
-          <span className="label-mono">System Optimal</span>
+          <span className="label-mono">System {brainState.cognitiveState}</span>
           <span className="label-mono ephemeral-pill">Ephemeral Mode</span>
         </div>
       </header>
