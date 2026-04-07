@@ -14,6 +14,14 @@ def init_session_db():
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS neural_sparks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                content TEXT,
+                entities TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
         db.commit()
 
 def add_message(session_id: str, role: str, content: str):
@@ -70,4 +78,33 @@ def prune_old_messages(session_id: str, keep_recent: int = 10):
         ''', (session_id, session_id, keep_recent))
         db.commit()
         
+        
     return get_message_count(session_id)
+
+def add_spark(content: str, entities: list):
+    """Save a spontaneous neural spark."""
+    import json
+    with sqlite3.connect(DB_PATH) as db:
+        db.execute(
+            'INSERT INTO neural_sparks (content, entities) VALUES (?, ?)',
+            (content, json.dumps(entities))
+        )
+        db.commit()
+
+def get_recent_sparks(limit: int = 5):
+    """Retrieve the latest neural sparks."""
+    import json
+    with sqlite3.connect(DB_PATH) as db:
+        cursor = db.execute(
+            'SELECT content, entities, timestamp FROM neural_sparks ORDER BY timestamp DESC LIMIT ?',
+            (limit,)
+        )
+        rows = cursor.fetchall()
+    
+    return [
+        {
+            "content": r[0], 
+            "entities": json.loads(r[1]), 
+            "timestamp": r[2]
+        } for r in rows
+    ]

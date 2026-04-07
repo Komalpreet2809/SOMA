@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.endpoints import router as api_router
 from app.db.session import init_session_db
+from app.services.dreaming import idle_brain_cycle
+import asyncio
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -13,6 +15,8 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     init_session_db()
+    # Start the Dreaming Subconscious in the background
+    asyncio.create_task(idle_brain_cycle())
 
 # Set up CORS
 app.add_middleware(
