@@ -12,6 +12,7 @@ function App() {
     workingMemory: 0,
     statusMessage: "Brain idle.",
     isLoading: false,
+    reflection: "",
     traces: []
   })
   const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
