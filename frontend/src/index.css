@@ -1,0 +1,216 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* ── Green Palette (dark → light) ── */
+  --green-950:  #080B09;   /* near-black */
+  --green-900:  #111C16;   /* deepest forest */
+  --green-800:  #1A2E20;   /* dark forest */
+  --green-700:  #1D3228;   /* forest */
+  --green-600:  #2E5C40;   /* mid forest */
+  --green-500:  #3D7A55;   /* medium green */
+  --green-400:  #5A9E74;   /* muted sage */
+  --green-300:  #7EB898;   /* sage */
+  --green-200:  #A8D4B8;   /* light sage */
+  --green-100:  #C5E8C5;   /* mint */
+  --green-50:   #E6F5E6;   /* pale mint */
+
+  /* ── Semantic Tokens ── */
+  --bg-dark:        var(--green-950);
+  --bg-panel:       var(--green-900);
+  --bg-sidebar:     #0C1610;   /* slightly lighter than bg-dark */
+
+  --accent-primary:   var(--green-300);     /* #7EB898 – sage */
+  --accent-secondary: var(--green-500);     /* #3D7A55 – medium green */
+  --accent-hover:     var(--green-200);     /* #A8D4B8 */
+  --accent-glow:      rgba(126, 184, 152, 0.25);
+  --accent-error:     #E57373;             /* warm red – doesn't clash */
+
+  --text-primary:   var(--green-50);       /* #E6F5E6 */
+  --text-secondary: var(--green-300);      /* #7EB898 */
+  --text-dim:       var(--green-500);      /* #3D7A55 */
+
+  --border-subtle:  rgba(126, 184, 152, 0.10);
+  --border-active:  rgba(126, 184, 152, 0.35);
+
+  --panel-shadow:   0 4px 24px rgba(0, 0, 0, 0.5), 0 0 1px var(--border-subtle);
+
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  /* subtle dark-green grid */
+  background-image:
+    linear-gradient(rgba(126, 184, 152, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 184, 152, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+#root {
+  height: 100%;
+}
+
+/* ── Glassmorphism utilities ── */
+.glass-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--panel-shadow);
+}
+
+h1, h2, h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(126, 184, 152, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(126, 184, 152, 0.35);
+}
+
+/* ── Base Button ── */
+button {
+  background-color: var(--green-600);
+  color: var(--green-50);
+  border: 1px solid var(--border-active);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: var(--font-main);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--green-500);
+  box-shadow: 0 0 12px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  background-color: var(--green-800);
+  color: var(--text-dim);
+  border-color: var(--border-subtle);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Brain Vitals HUD ── */
+.vitals-hud {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 2px solid var(--accent-secondary);
+}
+
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.vital-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.vital-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.vital-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.vital-value.purple {
+  color: #a88eff;
+}
+
+.vital-value.warning {
+  color: var(--accent-error);
+  animation: text-pulse 1.5s infinite;
+}
+
+.warning-text {
+  color: var(--accent-error);
+  opacity: 0.8;
+}
+
+/* ── Neural Pulse Animations ── */
+.pulse-active {
+  animation: box-glow 2s infinite alternate;
+}
+
+@keyframes box-glow {
+  from { border-color: var(--border-active); box-shadow: 0 0 5px rgba(126, 184, 152, 0.1); }
+  to   { border-color: var(--accent-primary); box-shadow: 0 0 15px rgba(126, 184, 152, 0.3); }
+}
+
+@keyframes text-pulse {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+.neural-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  animation: scan-move 2s linear infinite;
+  z-index: 10;
+  opacity: 0.5;
+}
+
+@keyframes scan-move {
+  from { top: 0%; }
+  to   { top: 100%; }
+}

@@ -2,7 +2,7 @@ fastapi
 uvicorn
 langgraph
 langchain
-langchain-openai
+langchain-groq
 python-dotenv
 pydantic
 redis
@@ -11,3 +11,6 @@ neo4j
 python-multipart
 aiosqlite
 pydantic-settings
+sentence-transformers
+langchain-huggingface
+langchain-community

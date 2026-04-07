@@ -1,0 +1,182 @@
+/* ── Cognitive Dashboard Panel ── */
+.dashboard-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 6px;
+}
+
+.cognitive-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Metric bars ── */
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.metric-bar-bg {
+  height: 2px;
+  background: var(--green-900);
+  width: 100%;
+  margin-top: 6px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-600), var(--green-300));
+  box-shadow: 0 0 8px rgba(126, 184, 152, 0.4);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ── Cluster Nodes ── */
+.cluster-node {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.node-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.node-active {
+  background: var(--green-300);
+  box-shadow: 0 0 6px rgba(126, 184, 152, 0.6);
+}
+
+.node-fail {
+  background: var(--accent-error);
+  box-shadow: 0 0 5px rgba(229, 115, 115, 0.5);
+}
+
+/* ── Inner glass card ── */
+.glass-panel-inner {
+  background: rgba(17, 28, 22, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ── Section headings ── */
+h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-family: var(--font-mono);
+}
+
+/* ── Status text ── */
+.status-text {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* ── Actions ── */
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.description-text {
+  margin: 0 0 10px 0;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* ── Ingest form ── */
+.ingest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ingest-input {
+  background: var(--green-950);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ingest-input:focus {
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 3px rgba(126, 184, 152, 0.08);
+}
+
+.ingest-input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.action-btn {
+  align-self: flex-start;
+}
+
+/* ── Consolidation / sleep button ── */
+.sleep-btn {
+  background: linear-gradient(135deg, var(--green-700), var(--green-600)) !important;
+  border: 1px solid var(--border-active) !important;
+  color: var(--green-100) !important;
+  font-weight: 600;
+  width: 100%;
+  padding: 12px;
+  letter-spacing: 0.1em;
+  transition: all 0.25s ease !important;
+}
+
+.sleep-btn:hover {
+  background: linear-gradient(135deg, var(--green-600), var(--green-500)) !important;
+  box-shadow: 0 0 20px rgba(126, 184, 152, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Feedback message ── */
+.status-msg {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--green-300);
+  letter-spacing: 0.06em;
+}
