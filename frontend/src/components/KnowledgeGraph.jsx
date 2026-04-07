@@ -37,10 +37,12 @@ const COLORS = {
   bg:             '#080808',
   gridLine:       'rgba(255, 255, 255, 0.03)',
   particleColor:  'rgba(71, 191, 255, 0.6)',
+  nodeHighlight:  'rgba(255, 215, 0, 0.8)',
+  nodeHighlightGlow: 'rgba(255, 215, 0, 0.3)',
 };
 
 
-function KnowledgeGraph() {
+function KnowledgeGraph({ highlightedNodes = [] }) {
   const canvasRef      = useRef(null);
   const animFrameRef   = useRef(null);
   const nodesRef       = useRef([]);
@@ -55,6 +57,7 @@ function KnowledgeGraph() {
   const isPanningRef   = useRef(false);
   const panStartRef    = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
   const showLabelsRef  = useRef(true);
+  const highlightedRef = useRef([]);
 
   const [graphData, setGraphData]     = useState({ nodes: [], edges: [] });
   const [loading, setLoading]         = useState(true);
@@ -318,12 +321,36 @@ function KnowledgeGraph() {
       ctx.fill();
 
       // Node circle
+      const isHighlighted = highlightedRef.current.includes(node.id) || highlightedRef.current.includes(node.label);
+      
+      // Node circle
       ctx.beginPath();
       ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? COLORS.nodeHover : COLORS.nodeFill;
+      
+      if (isHighlighted) {
+         // High-intensity highlight
+         ctx.fillStyle = COLORS.nodeHighlight;
+         // Extra glow for highlighted nodes
+         const pulse = 1 + Math.sin(Date.now() / 150) * 0.2;
+         const hGlow = ctx.createRadialGradient(node.x, node.y, r * 0.5, node.x, node.y, r * 4 * pulse);
+         hGlow.addColorStop(0, COLORS.nodeHighlightGlow);
+         hGlow.addColorStop(1, 'transparent');
+         ctx.save();
+         ctx.globalCompositeOperation = 'screen';
+         ctx.fillStyle = hGlow;
+         ctx.beginPath();
+         ctx.arc(node.x, node.y, r * 4 * pulse, 0, Math.PI * 2);
+         ctx.fill();
+         ctx.restore();
+         
+         ctx.fillStyle = COLORS.nodeHighlight; 
+      } else {
+         ctx.fillStyle = isHovered ? COLORS.nodeHover : COLORS.nodeFill;
+      }
+      
       ctx.fill();
-      ctx.strokeStyle = COLORS.nodeStroke;
-      ctx.lineWidth = (isHovered ? 2 : 1) / zoom;
+      ctx.strokeStyle = isHighlighted ? COLORS.nodeHighlight : COLORS.nodeStroke;
+      ctx.lineWidth = (isHovered || isHighlighted ? 2 : 1) / zoom;
       ctx.stroke();
 
       // Inner highlight
@@ -513,6 +540,10 @@ function KnowledgeGraph() {
   useEffect(() => {
     showLabelsRef.current = showLabels;
   }, [showLabels]);
+
+  useEffect(() => {
+    highlightedRef.current = highlightedNodes;
+  }, [highlightedNodes]);
 
   // ── Render ──────────────────────────────────────────────────
   return (

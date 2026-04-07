@@ -69,22 +69,31 @@ Example output:
 def retrieve_graph_context(query: str):
     """
     Search the Knowledge Graph for entities mentioned in the query.
+    Returns (context_strings, touched_entities)
     """
     if not neo4j_db.driver:
-        return []
+        return [], []
         
     # Naive keyword matching: if any node name is in the query, pull its connections.
     cypher = """
     MATCH (n:Entity)-[r]->(m:Entity)
     WHERE toLower($query) CONTAINS toLower(n.name) OR toLower($query) CONTAINS toLower(m.name)
-    RETURN n.name + ' [' + type(r) + '] ' + m.name AS connection
+    RETURN n.name AS s, type(r) AS rel, m.name AS o
     LIMIT 15
     """
     try:
         results = neo4j_db.query(cypher, {"query": query})
         if not results:
-            return []
-        return [res["connection"] for res in results]
+            return [], []
+        
+        context = []
+        touched = set()
+        for res in results:
+            context.append(f"{res['s']} [{res['rel']}] {res['o']}")
+            touched.add(res['s'])
+            touched.add(res['o'])
+            
+        return context, list(touched)
     except Exception as e:
         print(f"Error retrieving from Neocortex: {e}")
-        return []
+        return [], []

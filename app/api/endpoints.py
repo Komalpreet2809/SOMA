@@ -195,7 +195,7 @@ async def process_query_stream(request: QueryRequest):
                         
                         yield f"event: trace\ndata: {json.dumps({'phase': 'recall', 'message': recall_msg, 'data': node_output.get('context')})}\n\n"
                         await asyncio.sleep(0.2)
-                        yield f"event: trace\ndata: {json.dumps({'phase': 'association', 'message': assoc_msg, 'data': node_output.get('graph_context')})}\n\n"
+                        yield f"event: trace\ndata: {json.dumps({'phase': 'association', 'message': assoc_msg, 'data': node_output.get('graph_context'), 'touched': trace_data.get('touched')})}\n\n"
                         await asyncio.sleep(0.2)
                     
                     elif node_name == "call_model":
