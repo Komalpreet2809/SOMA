@@ -1,0 +1,187 @@
+/* ── Chat Panel ── */
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  background: transparent;
+  padding: 20px;
+}
+
+/* ── Chat Header ── */
+.chat-header-scifi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.chat-header-scifi h2 {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+}
+
+/* ── Message list ── */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+  animation: msg-in 0.25s ease-out both;
+}
+
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message-wrapper.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message-wrapper.soma {
+  align-self: flex-start;
+}
+
+/* ── Message label ── */
+.message-wrapper .label-mono {
+  font-size: 0.58rem;
+  margin-bottom: 5px;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+}
+
+/* ── Bubbles ── */
+.message-bubble {
+  padding: 12px 18px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  border-radius: 10px;
+  word-break: break-word;
+}
+
+.user .message-bubble {
+  background: rgba(46, 92, 64, 0.35);
+  border: 1px solid rgba(126, 184, 152, 0.18);
+  color: var(--text-primary);
+  border-bottom-right-radius: 3px;
+}
+
+.soma .message-bubble {
+  background: rgba(17, 28, 22, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-left: 2px solid var(--accent-primary);
+  color: var(--text-primary);
+  border-bottom-left-radius: 3px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Empty state ── */
+.empty-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  opacity: 0.5;
+}
+
+/* ── Quick-action buttons above input ── */
+.quick-action-btn {
+  font-family: var(--font-mono) !important;
+  font-size: 0.6rem !important;
+  background: var(--green-900) !important;
+  color: var(--text-dim) !important;
+  border: 1px solid var(--border-subtle) !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease !important;
+}
+
+.quick-action-btn:hover {
+  background: rgba(126, 184, 152, 0.08) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-active) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Input form ── */
+.chat-input-form {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-input-form:focus-within {
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 3px rgba(126, 184, 152, 0.08);
+}
+
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 0;
+}
+
+.chat-input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+/* ── Send button ── */
+.chat-input-form button[type="submit"] {
+  background: var(--green-600);
+  color: var(--green-50);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chat-input-form button[type="submit"]:hover {
+  background: var(--green-500);
+  box-shadow: 0 0 14px rgba(126, 184, 152, 0.2);
+  transform: none;
+}
+
+.chat-input-form button[type="submit"]:disabled {
+  background: var(--green-800);
+  color: var(--text-dim);
+  cursor: not-allowed;
+  box-shadow: none;
+}

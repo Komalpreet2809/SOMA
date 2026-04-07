@@ -14,18 +14,23 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     
     # Working Memory (Redis)
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
     
     # Episodic Memory (ChromaDB)
-    CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "./chroma_db")
+    CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", os.path.join(os.getcwd(), "data", "chroma_db"))
     
     # Semantic Memory (Neo4j)
     NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     NEO4J_USER: str = os.getenv("NEO4J_USER", "neo4j")
     NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "password")
+    NEO4J_DATABASE: str = os.getenv("NEO4J_DATABASE", "neo4j")
+    
+    # SQLite Path
+    SQLITE_DB_PATH: str = os.getenv("SQLITE_DB_PATH", os.path.join(os.getcwd(), "data", "soma_sessions.db"))
 
     model_config = SettingsConfigDict(case_sensitive=True)
 

@@ -1,0 +1,362 @@
+/* ── Knowledge Graph Visualizer ─────────────────────────────── */
+
+.graph-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+
+/* Ambient green radial glow */
+.graph-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(46, 92, 64, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 60%, rgba(126, 184, 152, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  z-index: 1;
+  position: relative;
+}
+
+.graph-canvas:active {
+  cursor: grabbing;
+}
+
+/* ── Header Bar ── */
+.graph-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, rgba(8,11,9,0.96) 0%, transparent 100%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.graph-header > * {
+  pointer-events: all;
+}
+
+.graph-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.graph-title h2 {
+  font-size: 0.75rem;
+  margin: 0;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+}
+
+/* Animated pulse ring — green */
+.graph-title .pulse-ring {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow:
+    0 0 8px var(--accent-glow),
+    0 0 18px rgba(126, 184, 152, 0.2);
+  animation: graph-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes graph-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--accent-glow), 0 0 18px rgba(126, 184, 152, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(126, 184, 152, 0.5), 0 0 30px rgba(126, 184, 152, 0.25);
+  }
+}
+
+.graph-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── Graph Buttons ── */
+.graph-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(126, 184, 152, 0.18);
+  background: rgba(8, 11, 9, 0.82);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.22s ease;
+  backdrop-filter: blur(6px);
+}
+
+.graph-btn:hover {
+  background: rgba(126, 184, 152, 0.08);
+  border-color: var(--border-active);
+  color: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(126, 184, 152, 0.12);
+  transform: none;
+}
+
+.graph-btn:active {
+  transform: scale(0.97);
+}
+
+.graph-btn.active {
+  background: rgba(126, 184, 152, 0.12);
+  border-color: var(--border-active);
+  color: var(--accent-primary);
+}
+
+/* ── Stats Overlay (bottom-left) ── */
+.graph-stats-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+}
+
+.stat-chip {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  padding: 5px 12px;
+  background: rgba(8, 11, 9, 0.88);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+}
+
+.stat-chip .stat-value {
+  color: var(--accent-primary);
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.stat-chip .stat-value.secondary {
+  color: var(--green-200);
+}
+
+/* ── Tooltip ── */
+.graph-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  background: rgba(12, 22, 16, 0.94);
+  border: 1px solid var(--border-active);
+  border-radius: 6px;
+  padding: 10px 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(126, 184, 152, 0.08);
+  min-width: 150px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.graph-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-name {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+
+.tooltip-detail {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.tooltip-relations {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.tooltip-relation-item {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+}
+
+.tooltip-relation-item .rel-arrow {
+  color: var(--green-400);
+  margin: 0 4px;
+}
+
+/* ── Empty State ── */
+.graph-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.empty-brain-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(126, 184, 152, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  animation: empty-pulse 3s ease-in-out infinite;
+}
+
+@keyframes empty-pulse {
+  0%, 100% { border-color: rgba(126, 184, 152, 0.12); }
+  50%       { border-color: rgba(126, 184, 152, 0.30); box-shadow: 0 0 20px rgba(126,184,152,0.08); }
+}
+
+.empty-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.empty-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--green-700);
+  letter-spacing: 0.1em;
+  max-width: 300px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* ── Loading scan line ── */
+.graph-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  background: rgba(8, 11, 9, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.graph-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  animation: scan-line 1.8s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+  0%   { top: 0;    opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent-primary);
+  animation: blink-text 1s step-end infinite;
+}
+
+@keyframes blink-text {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* ── Legend (bottom-right) ── */
+.graph-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+  background: rgba(8, 11, 9, 0.88);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 14px;
+  backdrop-filter: blur(6px);
+}
+
+.legend-title {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--green-700);
+  margin-bottom: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-dot.primary {
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px rgba(126, 184, 152, 0.5);
+}
+
+.legend-dot.secondary {
+  background: var(--green-200);
+  box-shadow: 0 0 6px rgba(168, 212, 184, 0.4);
+}
+
+.legend-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
