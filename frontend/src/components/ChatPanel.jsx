@@ -29,6 +29,7 @@ function ChatPanel({ messages, setMessages, setBrainState, isLoading }) {
       isLoading: true, 
       statusMessage: 'Initiating neural handshake...', 
       reflection: '',
+      highlightedNodes: [],
       traces: [] 
     }));
 
@@ -63,7 +64,8 @@ function ChatPanel({ messages, setMessages, setBrainState, isLoading }) {
               setBrainState(prev => ({
                 ...prev,
                 statusMessage: data.message,
-                traces: [...prev.traces, data]
+                traces: [...prev.traces, data],
+                highlightedNodes: data.touched || prev.highlightedNodes
               }));
             } else if (eventType === 'reflection') {
               setBrainState(prev => ({

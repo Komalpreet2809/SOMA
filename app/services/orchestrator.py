@@ -11,6 +11,7 @@ class AgentState(TypedDict):
     chat_history: List[dict]
     context: List[str]
     graph_context: List[str]
+    touched_entities: List[str]
     reflection: str
     response: str
 
@@ -40,14 +41,16 @@ INTERNAL REFLECTION:"""
     context = retrieve_context(state["input"])
     
     # Phase 3: Association (Semantic Memory)
-    graph_context = retrieve_graph_context(state["input"])
+    graph_context, touched_entities = retrieve_graph_context(state["input"])
     
     return {
         "context": context, 
         "graph_context": graph_context,
+        "touched_entities": touched_entities,
         "trace_data": {
             "sensory_count": len(context),
             "graph_count": len(graph_context),
+            "touched": touched_entities,
             "query": state["input"]
         }
     }

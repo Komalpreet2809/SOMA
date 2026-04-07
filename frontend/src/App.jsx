@@ -13,6 +13,7 @@ function App() {
     statusMessage: "Brain idle.",
     isLoading: false,
     reflection: "",
+    highlightedNodes: [],
     traces: []
   })
   const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
@@ -86,7 +87,7 @@ function App() {
             isLoading={brainState.isLoading}
           />
         ) : (
-          <KnowledgeGraph />
+          <KnowledgeGraph highlightedNodes={brainState.highlightedNodes} />
         )}
       </main>
 
