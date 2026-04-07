@@ -14,6 +14,7 @@ function App() {
     isLoading: false,
     reflection: "",
     highlightedNodes: [],
+    sparks: [],
     traces: []
   })
   const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
@@ -35,8 +36,25 @@ function App() {
       }
     };
 
-    fetchVitals(); // Initial fetch
-    const interval = setInterval(fetchVitals, 20000); // Poll every 20s
+    const fetchSparks = async () => {
+      try {
+        const res = await fetch('/api/v1/brain/sparks');
+        const data = await res.json();
+        setBrainState(prev => ({
+          ...prev,
+          sparks: data
+        }));
+      } catch (err) {
+        console.error("Failed to fetch neural sparks:", err);
+      }
+    };
+
+    fetchVitals();
+    fetchSparks();
+    const interval = setInterval(() => {
+      fetchVitals();
+      fetchSparks();
+    }, 20000);
     return () => clearInterval(interval);
   }, []);
 

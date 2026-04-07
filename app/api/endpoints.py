@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Optional
 from app.services.orchestrator import orchestrator
 from app.services.memory import ingest_text
-from app.db.session import get_recent_messages, add_message
+from app.db.session import get_recent_messages, add_message, get_recent_sparks
 from app.services.hippocampus import consolidate_memory
 from app.services.neocortex import extract_and_store_knowledge
 from app.services.sleep_cycle import run_sleep_cycle
@@ -20,6 +20,11 @@ router = APIRouter()
 async def fetch_brain_vitals(user_id: str = "default_user"):
     """Return metrics for Sensory, Semantic, and Working Memory layers."""
     return get_brain_vitals(user_id)
+
+@router.get("/brain/sparks")
+async def fetch_neural_sparks(limit: int = 5):
+    """Retrieve the latest spontaneous background insights."""
+    return get_recent_sparks(limit=limit)
 
 
 # ── Knowledge Graph Endpoints ────────────────────────────────────
