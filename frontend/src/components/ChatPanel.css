@@ -1,12 +1,11 @@
-/* ═══ Chat Panel — Holographic Overlay Mode ═══ */
+/* ═══ Chat Panel — Left Pane Mode ═══ */
 .chat-panel {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  overflow: hidden;
   background: transparent;
-  padding: 24px 40px;
-  max-width: 750px;
-  margin: 0 auto;
+  padding: 20px 24px;
 }
 
 /* ── Chat Header ── */

@@ -19,9 +19,8 @@ function App() {
     cognitiveState: "IDLE",
     traces: []
   })
-  const [currentOverlay, setCurrentOverlay] = useState('chat') // 'chat', 'dreams', or 'none'
+  const [rightPanel, setRightPanel] = useState('graph') // 'graph' or 'dreams'
   const [currentPersona, setCurrentPersona] = useState('User_Alpha')
-  const [hudCollapsed, setHudCollapsed] = useState(false)
 
   // Fetch Brain Vitals
   useEffect(() => {
@@ -79,29 +78,28 @@ function App() {
 
   return (
     <div className={`app-container state-${brainState.cognitiveState.toLowerCase()}`}>
-
-      {/* ═══ LAYER 0: The 3D Neural Mesh — Always Present ═══ */}
-      <div className="neural-mesh-bg">
-        <KnowledgeGraph 
-          highlightedNodes={brainState.highlightedNodes} 
-          currentPersona={currentPersona}
-          isBackground={true}
-        />
-      </div>
-
-      {/* ═══ LAYER 1: Floating HUD Shell ═══ */}
+      
+      {/* ── Header ── */}
       <header className="app-header">
         <div className="logo-section">
           <div className="brain-pulse-icon" />
           <h1>SOMA</h1>
-          <span className="label-mono header-subtitle">Cognitive Neural Interface</span>
         </div>
         
+        <div className="header-center">
+          <button 
+            className={`tab-btn ${rightPanel === 'graph' ? 'active' : ''}`}
+            onClick={() => setRightPanel('graph')}
+          >Neural Mesh</button>
+          <button 
+            className={`tab-btn ${rightPanel === 'dreams' ? 'active' : ''}`}
+            onClick={() => setRightPanel('dreams')}
+          >Dreams</button>
+        </div>
+
         <div className="status-indicator">
           <span className={`dot ${brainState.isLoading ? 'thinking' : 'idle'}`}></span>
           <span className="label-mono">{brainState.cognitiveState}</span>
-          
-          {/* Persona Switcher — compact in header */}
           <select 
             className="persona-select label-mono"
             value={currentPersona}
@@ -114,53 +112,11 @@ function App() {
         </div>
       </header>
 
-      {/* ═══ LAYER 2: Left Floating Toolbar ═══ */}
-      <div className="floating-toolbar">
-        <button 
-          className={`toolbar-btn ${currentOverlay === 'chat' ? 'active' : ''}`}
-          onClick={() => setCurrentOverlay(currentOverlay === 'chat' ? 'none' : 'chat')}
-          title="Neural Interface"
-        >
-          <span className="toolbar-icon">⚡</span>
-          <span className="toolbar-label">Interface</span>
-        </button>
-        <button 
-          className={`toolbar-btn ${currentOverlay === 'dreams' ? 'active' : ''}`}
-          onClick={() => setCurrentOverlay(currentOverlay === 'dreams' ? 'none' : 'dreams')}
-          title="Dream Sequence"
-        >
-          <span className="toolbar-icon">◎</span>
-          <span className="toolbar-label">Dreams</span>
-        </button>
-        <button 
-          className={`toolbar-btn ${hudCollapsed ? '' : 'active'}`}
-          onClick={() => setHudCollapsed(!hudCollapsed)}
-          title="Toggle Diagnostics"
-        >
-          <span className="toolbar-icon">◈</span>
-          <span className="toolbar-label">Vitals</span>
-        </button>
+      {/* ── Main Split Layout ── */}
+      <div className="split-layout">
 
-        {/* Brain vitals mini readout */}
-        <div className="toolbar-vitals">
-          <div className="mini-vital">
-            <span className="mini-label">SEN</span>
-            <span className="mini-value">{brainState.sensoryDocuments}</span>
-          </div>
-          <div className="mini-vital">
-            <span className="mini-label">SYN</span>
-            <span className="mini-value purple">{brainState.graphRelations}</span>
-          </div>
-          <div className="mini-vital">
-            <span className="mini-label">WRK</span>
-            <span className="mini-value">{brainState.workingMemory}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ LAYER 3: Central Overlay (Chat or Dreams) ═══ */}
-      <div className={`center-overlay ${currentOverlay !== 'none' ? 'visible' : ''}`}>
-        {currentOverlay === 'chat' && (
+        {/* LEFT: Chat + Mini Vitals */}
+        <div className="left-pane">
           <ChatPanel 
             messages={messages} 
             setMessages={setMessages} 
@@ -169,20 +125,53 @@ function App() {
             isLoading={brainState.isLoading}
             currentPersona={currentPersona}
           />
-        )}
-        {currentOverlay === 'dreams' && (
-          <DreamSequence sparks={brainState.sparks} />
-        )}
+
+          {/* Compact vitals bar under chat */}
+          <div className="vitals-bar">
+            <div className="vb-item">
+              <span className="vb-label">Sensory</span>
+              <span className="vb-value">{brainState.sensoryDocuments}</span>
+            </div>
+            <div className="vb-item">
+              <span className="vb-label">Synaptic</span>
+              <span className="vb-value purple">{brainState.graphRelations}</span>
+            </div>
+            <div className="vb-item">
+              <span className="vb-label">Working</span>
+              <span className="vb-value">{brainState.workingMemory}</span>
+            </div>
+            <button 
+              className="sleep-btn-compact"
+              onClick={async () => {
+                setBrainState(prev => ({ ...prev, isLoading: true, statusMessage: 'Sleeping...' }));
+                try {
+                  const res = await fetch('/api/v1/sleep', { method: 'POST' });
+                  const data = await res.json();
+                  setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: `Sleep done. ${data.graph_relations_extracted} relations.` }));
+                } catch (e) {
+                  setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Sleep failed.' }));
+                }
+              }}
+              disabled={brainState.isLoading}
+            >
+              💤 Sleep
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT: Neural Mesh or Dreams */}
+        <div className="right-pane">
+          {rightPanel === 'graph' ? (
+            <KnowledgeGraph 
+              highlightedNodes={brainState.highlightedNodes} 
+              currentPersona={currentPersona}
+            />
+          ) : (
+            <DreamSequence sparks={brainState.sparks} />
+          )}
+        </div>
+
       </div>
-
-      {/* ═══ LAYER 4: Right Diagnostic HUD (collapsible) ═══ */}
-      <aside className={`diagnostic-hud ${hudCollapsed ? 'collapsed' : ''}`}>
-        <CognitiveDashboard 
-          brainState={brainState} 
-          setBrainState={setBrainState} 
-        />
-      </aside>
-
     </div>
   )
 }

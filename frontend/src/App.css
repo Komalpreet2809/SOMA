@@ -1,102 +1,120 @@
-/* ═══════════════════════════════════════════════════════════════
-   SOMA — Immersive Brain HUD Layout
-   The 3D Neural Mesh is ALWAYS the full-screen background.
-   Everything else is a transparent floating HUD layer.
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   SOMA — Clean Side-by-Side Layout
+   Chat LEFT | Neural Mesh RIGHT
+   ═══════════════════════════════════════════════ */
 
 .app-container {
-  position: relative;
-  width: 100vw;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
-  background-color: transparent;
 }
 
-/* ═══ LAYER 0: Persistent 3D Neural Mesh Background ═══ */
-.neural-mesh-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-}
-
-/* ═══ LAYER 1: Header — Floating Top Bar ═══ */
+/* ── Header ── */
 .app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 52px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  background: linear-gradient(180deg, rgba(5, 2, 11, 0.85) 0%, rgba(5, 2, 11, 0.4) 70%, transparent 100%);
+  height: 50px;
+  min-height: 50px;
+  background: rgba(7, 3, 15, 0.85);
   backdrop-filter: blur(12px);
-  z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 10;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brain-pulse-icon {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4), 0 0 30px rgba(255, 0, 229, 0.2);
+  background: linear-gradient(135deg, var(--accent-synapse), var(--accent-impulse));
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
   animation: brain-pulse 3s ease-in-out infinite;
 }
 
 @keyframes brain-pulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.4), 0 0 30px rgba(255, 0, 229, 0.2); transform: scale(1); }
-  50% { box-shadow: 0 0 20px rgba(255, 0, 229, 0.6), 0 0 40px rgba(0, 240, 255, 0.3); transform: scale(1.15); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
+  50% { transform: scale(1.2); box-shadow: 0 0 18px rgba(240, 171, 252, 0.6); }
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
+  background: linear-gradient(90deg, var(--accent-synapse), var(--accent-impulse));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 0.4em;
 }
 
-.header-subtitle {
-  font-size: 0.55rem !important;
-  color: var(--text-dim) !important;
-  opacity: 0.6;
+/* ── Header Center Tabs ── */
+.header-center {
+  display: flex;
+  gap: 4px;
+  background: rgba(10, 5, 20, 0.6);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ── Status / Persona (Header Right) ── */
+.tab-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: none;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(192, 132, 252, 0.06);
+  transform: none;
+  box-shadow: none;
+}
+
+.tab-btn.active {
+  background: rgba(192, 132, 252, 0.15);
+  color: var(--accent-primary);
+  border-color: rgba(192, 132, 252, 0.25);
+}
+
+/* ── Status / Persona ── */
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   font-size: 0.7rem;
   font-family: var(--font-mono);
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
 }
 
 .persona-select {
   background: rgba(10, 5, 20, 0.8) !important;
   color: var(--accent-primary) !important;
-  border: 1px solid rgba(0, 240, 255, 0.2) !important;
+  border: 1px solid rgba(192, 132, 252, 0.2) !important;
   padding: 4px 8px !important;
   border-radius: 4px;
   outline: none;
   cursor: pointer;
-  font-size: 0.65rem !important;
+  font-size: 0.6rem !important;
 }
 
 .persona-select option {
@@ -119,168 +137,126 @@
 .dot.thinking {
   background: var(--accent-secondary);
   box-shadow: 0 0 10px var(--accent-glow-pink);
-  animation: pulse-pink 1s ease-in-out infinite alternate;
+  animation: pulse-dot 1s ease-in-out infinite alternate;
 }
 
-@keyframes pulse-pink {
+@keyframes pulse-dot {
   0% { opacity: 1; transform: scale(1); }
   100% { opacity: 0.4; transform: scale(0.6); }
 }
 
-/* ═══ LAYER 2: Floating Toolbar (Left Edge) ═══ */
-.floating-toolbar {
-  position: fixed;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 100;
+/* ═══ Split Layout ═══ */
+.split-layout {
+  flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 8px;
-  background: rgba(5, 2, 11, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
-.toolbar-btn {
+/* ── Left Pane: Chat ── */
+.left-pane {
+  width: 45%;
+  min-width: 380px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(7, 3, 15, 0.3);
+}
+
+/* ── Right Pane: Graph / Dreams ── */
+.right-pane {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
   background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--text-dim);
-  box-shadow: none;
-  text-shadow: none;
 }
 
-.toolbar-btn:hover {
-  background: rgba(0, 240, 255, 0.06);
-  color: var(--text-secondary);
-  border-color: rgba(255, 255, 255, 0.05);
-  transform: none;
-  box-shadow: none;
+/* ── Compact Vitals Bar ── */
+.vitals-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 20px;
+  background: rgba(7, 3, 15, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
 }
 
-.toolbar-btn.active {
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--accent-primary);
-  border-color: rgba(0, 240, 255, 0.25);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+.vb-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.toolbar-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.toolbar-label {
+.vb-label {
   font-family: var(--font-mono);
   font-size: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-/* Mini vitals in toolbar */
-.toolbar-vitals {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-vital {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 6px;
-}
-
-.mini-label {
-  font-family: var(--font-mono);
-  font-size: 0.45rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-.mini-value {
+.vb-value {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--accent-primary);
   text-shadow: 0 0 6px var(--accent-glow);
 }
 
-.mini-value.purple {
-  color: var(--accent-secondary);
+.vb-value.purple {
+  color: var(--accent-impulse);
   text-shadow: 0 0 6px var(--accent-glow-pink);
 }
 
-/* ═══ LAYER 3: Center Overlay (Chat / Dreams) ═══ */
-.center-overlay {
-  position: fixed;
-  top: 52px;
-  left: 100px;
-  right: 0;
-  bottom: 0;
-  z-index: 50;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+.sleep-btn-compact {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.center-overlay.visible {
-  opacity: 1;
-  pointer-events: all;
+.sleep-btn-compact:hover {
+  background: rgba(192, 132, 252, 0.2);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: none;
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
-/* ═══ LAYER 4: Right Diagnostic HUD ═══ */
-.diagnostic-hud {
-  position: fixed;
-  top: 52px;
-  right: 0;
-  bottom: 0;
-  width: 300px;
-  z-index: 60;
-  background: linear-gradient(180deg, rgba(5, 2, 11, 0.75) 0%, rgba(5, 2, 11, 0.5) 100%);
-  backdrop-filter: blur(16px);
-  border-left: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 20px;
-  overflow-y: auto;
-  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+.sleep-btn-compact:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.diagnostic-hud.collapsed {
-  transform: translateX(100%);
-}
-
-/* ═══ Responsive ═══ */
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .floating-toolbar { display: none; }
-  .diagnostic-hud { display: none; }
-  .center-overlay {
-    left: 0;
+  .split-layout {
+    flex-direction: column;
   }
+  .left-pane {
+    width: 100%;
+    min-width: unset;
+    height: 50%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .right-pane {
+    height: 50%;
+  }
+  .header-center { display: none; }
 }
 
 .ephemeral-pill {
-  background: rgba(255, 51, 102, 0.1);
+  background: rgba(251, 113, 133, 0.1);
   color: var(--accent-error);
-  border: 1px solid rgba(255, 51, 102, 0.3);
+  border: 1px solid rgba(251, 113, 133, 0.3);
   padding: 3px 8px;
   border-radius: 4px;
   font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
