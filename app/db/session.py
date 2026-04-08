@@ -19,9 +19,15 @@ def init_session_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 content TEXT,
                 entities TEXT,
+                user_id TEXT DEFAULT 'default_user',
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        # Migration: add user_id to existing databses gracefully
+        try:
+            db.execute("ALTER TABLE neural_sparks ADD COLUMN user_id TEXT DEFAULT 'default_user'")
+        except sqlite3.OperationalError:
+            pass
         db.commit()
 
 def add_message(session_id: str, role: str, content: str):
@@ -81,23 +87,23 @@ def prune_old_messages(session_id: str, keep_recent: int = 10):
         
     return get_message_count(session_id)
 
-def add_spark(content: str, entities: list):
+def add_spark(content: str, entities: list, user_id: str = "default_user"):
     """Save a spontaneous neural spark."""
     import json
     with sqlite3.connect(DB_PATH) as db:
         db.execute(
-            'INSERT INTO neural_sparks (content, entities) VALUES (?, ?)',
-            (content, json.dumps(entities))
+            'INSERT INTO neural_sparks (content, entities, user_id) VALUES (?, ?, ?)',
+            (content, json.dumps(entities), user_id)
         )
         db.commit()
 
-def get_recent_sparks(limit: int = 5):
+def get_recent_sparks(user_id: str = "default_user", limit: int = 5):
     """Retrieve the latest neural sparks."""
     import json
     with sqlite3.connect(DB_PATH) as db:
         cursor = db.execute(
-            'SELECT content, entities, timestamp FROM neural_sparks ORDER BY timestamp DESC LIMIT ?',
-            (limit,)
+            'SELECT content, entities, timestamp FROM neural_sparks WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?',
+            (user_id, limit)
         )
         rows = cursor.fetchall()
     
