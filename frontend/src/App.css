@@ -1,197 +1,286 @@
+/* ═══════════════════════════════════════════════════════════════
+   SOMA — Immersive Brain HUD Layout
+   The 3D Neural Mesh is ALWAYS the full-screen background.
+   Everything else is a transparent floating HUD layer.
+   ═══════════════════════════════════════════════════════════════ */
+
 .app-container {
-  display: grid;
-  grid-template-columns: 260px 1fr 340px;
-  grid-template-rows: 64px 1fr;
-  grid-template-areas:
-    "header header header"
-    "sidebar main dash";
-  height: 100vh;
+  position: relative;
   width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background-color: transparent;
 }
 
-/* ── Header ── */
+/* ═══ LAYER 0: Persistent 3D Neural Mesh Background ═══ */
+.neural-mesh-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* ═══ LAYER 1: Header — Floating Top Bar ═══ */
 .app-header {
-  grid-area: header;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 28px;
-  background: rgba(7, 3, 15, 0.6);
-  backdrop-filter: blur(20px);
-  z-index: 10;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(5, 2, 11, 0.85) 0%, rgba(5, 2, 11, 0.4) 70%, transparent 100%);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brain-pulse-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4), 0 0 30px rgba(255, 0, 229, 0.2);
+  animation: brain-pulse 3s ease-in-out infinite;
+}
+
+@keyframes brain-pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.4), 0 0 30px rgba(255, 0, 229, 0.2); transform: scale(1); }
+  50% { box-shadow: 0 0 20px rgba(255, 0, 229, 0.6), 0 0 40px rgba(0, 240, 255, 0.3); transform: scale(1.15); }
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: 0.3em;
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  letter-spacing: 0.4em;
 }
 
-/* ── Sidebar ── */
-.sidebar {
-  grid-area: sidebar;
-  background: rgba(7, 3, 15, 0.4);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255,255,255,0.03);
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
+.header-subtitle {
+  font-size: 0.55rem !important;
+  color: var(--text-dim) !important;
+  opacity: 0.6;
 }
 
-/* ── Main / Chat area ── */
-.main-content {
-  grid-area: main;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-}
-
-/* ── Right diagnostic panel ── */
-.diagnostic-panel {
-  grid-area: dash;
-  background: rgba(7, 3, 15, 0.4);
-  backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(255,255,255,0.03);
-  padding: 24px;
-  overflow-y: auto;
-}
-
-/* ── Nav ── */
-.nav-section {
-  margin-bottom: 32px;
-}
-
-.nav-header {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  cursor: pointer;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  margin-bottom: 8px;
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-secondary);
-  border-color: rgba(255,255,255,0.05);
-}
-
-.nav-item.active {
-  background: rgba(0, 240, 255, 0.05);
-  color: var(--accent-primary);
-  border-color: var(--accent-glow);
-  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
-}
-
-/* ── Status indicator (header right) ── */
+/* ── Status / Persona (Header Right) ── */
 .status-indicator {
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-family: var(--font-mono);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
 
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--accent-purple);
-  flex-shrink: 0;
-  position: relative;
+.persona-select {
+  background: rgba(10, 5, 20, 0.8) !important;
+  color: var(--accent-primary) !important;
+  border: 1px solid rgba(0, 240, 255, 0.2) !important;
+  padding: 4px 8px !important;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.65rem !important;
 }
 
-.dot::before {
-  content: '';
-  position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
+.persona-select option {
+  background: #0a0510;
+  color: var(--accent-primary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
 }
 
 .dot.idle {
   background: var(--accent-primary);
-  box-shadow: 0 0 10px var(--accent-glow), 0 0 20px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 .dot.thinking {
   background: var(--accent-secondary);
-  box-shadow: 0 0 12px var(--accent-glow-pink);
+  box-shadow: 0 0 10px var(--accent-glow-pink);
   animation: pulse-pink 1s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-pink {
-  0% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px var(--accent-secondary); }
-  100% { opacity: 0.4; transform: scale(0.6); box-shadow: 0 0 2px var(--accent-secondary); }
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.4; transform: scale(0.6); }
 }
 
-/* ── Base Panel ── */
-.panel {
-  padding: 24px;
+/* ═══ LAYER 2: Floating Toolbar (Left Edge) ═══ */
+.floating-toolbar {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 6px;
+  padding: 12px 8px;
+  background: rgba(5, 2, 11, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-.panel-header {
-  margin: 0 0 20px 0;
-  font-size: 0.85rem;
-  font-weight: 600;
+.toolbar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-dim);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.toolbar-btn:hover {
+  background: rgba(0, 240, 255, 0.06);
   color: var(--text-secondary);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  padding-bottom: 16px;
-  letter-spacing: 0.25em;
+  border-color: rgba(255, 255, 255, 0.05);
+  transform: none;
+  box-shadow: none;
 }
 
+.toolbar-btn.active {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-primary);
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+.toolbar-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.toolbar-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Mini vitals in toolbar */
+.toolbar-vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-vital {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 6px;
+}
+
+.mini-label {
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.mini-value {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-shadow: 0 0 6px var(--accent-glow);
+}
+
+.mini-value.purple {
+  color: var(--accent-secondary);
+  text-shadow: 0 0 6px var(--accent-glow-pink);
+}
+
+/* ═══ LAYER 3: Center Overlay (Chat / Dreams) ═══ */
+.center-overlay {
+  position: fixed;
+  top: 52px;
+  left: 100px;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.center-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ═══ LAYER 4: Right Diagnostic HUD ═══ */
+.diagnostic-hud {
+  position: fixed;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  z-index: 60;
+  background: linear-gradient(180deg, rgba(5, 2, 11, 0.75) 0%, rgba(5, 2, 11, 0.5) 100%);
+  backdrop-filter: blur(16px);
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.diagnostic-hud.collapsed {
+  transform: translateX(100%);
+}
+
+/* ═══ Responsive ═══ */
 @media (max-width: 768px) {
-  .app-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: 64px 1fr;
-    grid-template-areas:
-      "header"
-      "main";
+  .floating-toolbar { display: none; }
+  .diagnostic-hud { display: none; }
+  .center-overlay {
+    left: 0;
   }
-  .sidebar, .diagnostic-panel { display: none; }
 }
 
 .ephemeral-pill {
   background: rgba(255, 51, 102, 0.1);
   color: var(--accent-error);
   border: 1px solid rgba(255, 51, 102, 0.3);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.65rem;
-  margin-left: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.55rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  box-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
 }

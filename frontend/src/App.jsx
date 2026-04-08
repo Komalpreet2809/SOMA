@@ -19,8 +19,9 @@ function App() {
     cognitiveState: "IDLE",
     traces: []
   })
-  const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
+  const [currentOverlay, setCurrentOverlay] = useState('chat') // 'chat', 'dreams', or 'none'
   const [currentPersona, setCurrentPersona] = useState('User_Alpha')
+  const [hudCollapsed, setHudCollapsed] = useState(false)
 
   // Fetch Brain Vitals
   useEffect(() => {
@@ -74,75 +75,92 @@ function App() {
       }
     };
     fetchHistory();
-    // Also trigger graph refresh if possible by passing persona down
   }, [currentPersona]);
 
   return (
     <div className={`app-container state-${brainState.cognitiveState.toLowerCase()}`}>
+
+      {/* ═══ LAYER 0: The 3D Neural Mesh — Always Present ═══ */}
+      <div className="neural-mesh-bg">
+        <KnowledgeGraph 
+          highlightedNodes={brainState.highlightedNodes} 
+          currentPersona={currentPersona}
+          isBackground={true}
+        />
+      </div>
+
+      {/* ═══ LAYER 1: Floating HUD Shell ═══ */}
       <header className="app-header">
         <div className="logo-section">
-          <h1 style={{ fontSize: '1.2rem' }}>SOMA AI CORE</h1>
+          <div className="brain-pulse-icon" />
+          <h1>SOMA</h1>
+          <span className="label-mono header-subtitle">Cognitive Neural Interface</span>
         </div>
         
         <div className="status-indicator">
           <span className={`dot ${brainState.isLoading ? 'thinking' : 'idle'}`}></span>
-          <span className="label-mono">System {brainState.cognitiveState}</span>
-          <span className="label-mono ephemeral-pill">Ephemeral Mode</span>
+          <span className="label-mono">{brainState.cognitiveState}</span>
+          
+          {/* Persona Switcher — compact in header */}
+          <select 
+            className="persona-select label-mono"
+            value={currentPersona}
+            onChange={(e) => setCurrentPersona(e.target.value)}
+          >
+            <option value="User_Alpha">Alpha</option>
+            <option value="User_Beta">Beta</option>
+            <option value="System_Admin">Admin</option>
+          </select>
         </div>
       </header>
-      
-      <aside className="sidebar">
-        <div className="nav-section">
-          <div className="nav-header">Workspace</div>
-          <div 
-            className={`nav-item ${currentView === 'chat' ? 'active' : ''}`}
-            onClick={() => setCurrentView('chat')}
-          >
-            Active Node
-          </div>
-          <div 
-            className={`nav-item ${currentView === 'graph' ? 'active' : ''}`}
-            onClick={() => setCurrentView('graph')}
-          >
-            Neural Mesh
-          </div>
-          <div 
-            className={`nav-item ${currentView === 'dreams' ? 'active' : ''}`}
-            onClick={() => setCurrentView('dreams')}
-          >
-            Subconscious Dreams
-          </div>
 
-        </div>
+      {/* ═══ LAYER 2: Left Floating Toolbar ═══ */}
+      <div className="floating-toolbar">
+        <button 
+          className={`toolbar-btn ${currentOverlay === 'chat' ? 'active' : ''}`}
+          onClick={() => setCurrentOverlay(currentOverlay === 'chat' ? 'none' : 'chat')}
+          title="Neural Interface"
+        >
+          <span className="toolbar-icon">⚡</span>
+          <span className="toolbar-label">Interface</span>
+        </button>
+        <button 
+          className={`toolbar-btn ${currentOverlay === 'dreams' ? 'active' : ''}`}
+          onClick={() => setCurrentOverlay(currentOverlay === 'dreams' ? 'none' : 'dreams')}
+          title="Dream Sequence"
+        >
+          <span className="toolbar-icon">◎</span>
+          <span className="toolbar-label">Dreams</span>
+        </button>
+        <button 
+          className={`toolbar-btn ${hudCollapsed ? '' : 'active'}`}
+          onClick={() => setHudCollapsed(!hudCollapsed)}
+          title="Toggle Diagnostics"
+        >
+          <span className="toolbar-icon">◈</span>
+          <span className="toolbar-label">Vitals</span>
+        </button>
 
-        <div className="nav-section" style={{ marginTop: '30px' }}>
-          <div className="nav-header">Persona / Context</div>
-          <div style={{ padding: '0 15px' }}>
-            <select 
-              className="label-mono"
-              value={currentPersona}
-              onChange={(e) => setCurrentPersona(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'rgba(8, 11, 9, 0.8)',
-                color: 'var(--accent-primary)',
-                border: '1px solid var(--border-subtle)',
-                padding: '8px 10px',
-                outline: 'none',
-                cursor: 'pointer',
-                fontSize: '0.7rem'
-              }}
-            >
-              <option value="User_Alpha">User Alpha</option>
-              <option value="User_Beta">User Beta</option>
-              <option value="System_Admin">System Admin</option>
-            </select>
+        {/* Brain vitals mini readout */}
+        <div className="toolbar-vitals">
+          <div className="mini-vital">
+            <span className="mini-label">SEN</span>
+            <span className="mini-value">{brainState.sensoryDocuments}</span>
+          </div>
+          <div className="mini-vital">
+            <span className="mini-label">SYN</span>
+            <span className="mini-value purple">{brainState.graphRelations}</span>
+          </div>
+          <div className="mini-vital">
+            <span className="mini-label">WRK</span>
+            <span className="mini-value">{brainState.workingMemory}</span>
           </div>
         </div>
-      </aside>
+      </div>
 
-      <main className="main-content">
-        {currentView === 'chat' && (
+      {/* ═══ LAYER 3: Central Overlay (Chat or Dreams) ═══ */}
+      <div className={`center-overlay ${currentOverlay !== 'none' ? 'visible' : ''}`}>
+        {currentOverlay === 'chat' && (
           <ChatPanel 
             messages={messages} 
             setMessages={setMessages} 
@@ -152,24 +170,18 @@ function App() {
             currentPersona={currentPersona}
           />
         )}
-        {currentView === 'graph' && (
-          <KnowledgeGraph 
-            highlightedNodes={brainState.highlightedNodes} 
-            currentPersona={currentPersona}
-          />
-        )}
-        {currentView === 'dreams' && (
+        {currentOverlay === 'dreams' && (
           <DreamSequence sparks={brainState.sparks} />
         )}
-      </main>
+      </div>
 
-      <aside className="diagnostic-panel">
+      {/* ═══ LAYER 4: Right Diagnostic HUD (collapsible) ═══ */}
+      <aside className={`diagnostic-hud ${hudCollapsed ? 'collapsed' : ''}`}>
         <CognitiveDashboard 
           brainState={brainState} 
           setBrainState={setBrainState} 
         />
       </aside>
-
 
     </div>
   )

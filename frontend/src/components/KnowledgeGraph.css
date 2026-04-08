@@ -365,3 +365,22 @@
   color: var(--text-secondary);
   letter-spacing: 0.1em;
 }
+
+/* ═══ Background Mode ═══ */
+.graph-bg-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.graph-bg-mode .graph-empty-state {
+  /* Soften empty state when it's the background */
+  opacity: 0.4;
+}
+
+.graph-bg-mode .graph-loading {
+  background: transparent;
+  backdrop-filter: none;
+}
