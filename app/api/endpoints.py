@@ -40,7 +40,7 @@ async def get_knowledge_graph(user_id: str = "default_user"):
         # Include legacy nodes (no user_id) alongside user-specific ones
         node_query = """
         MATCH (n:Entity)
-        WHERE n.user_id = $user_id OR NOT EXISTS(n.user_id)
+        WHERE n.user_id = $user_id OR n.user_id IS NULL
         OPTIONAL MATCH (n)-[r]-()
         RETURN n.name AS id, count(r) AS connections
         ORDER BY connections DESC
@@ -50,8 +50,8 @@ async def get_knowledge_graph(user_id: str = "default_user"):
         # Fetch all edges
         edge_query = """
         MATCH (s:Entity)-[r]->(t:Entity)
-        WHERE (s.user_id = $user_id OR NOT EXISTS(s.user_id))
-          AND (t.user_id = $user_id OR NOT EXISTS(t.user_id))
+        WHERE (s.user_id = $user_id OR s.user_id IS NULL)
+          AND (t.user_id = $user_id OR t.user_id IS NULL)
         RETURN s.name AS source, type(r) AS label, t.name AS target
         """
         edge_results = neo4j_db.query(edge_query, {"user_id": user_id}) or []
@@ -78,8 +78,9 @@ async def get_graph_stats(user_id: str = "default_user"):
 
     try:
         count_query = """
-        MATCH (n:Entity {user_id: $user_id})
-        OPTIONAL MATCH ()-[r]->() // Note: simplified for stats
+        MATCH (n:Entity)
+        WHERE n.user_id = $user_id OR n.user_id IS NULL
+        OPTIONAL MATCH (n)-[r]->()
         RETURN count(DISTINCT n) AS nodes, count(DISTINCT r) AS edges
         """
         counts = neo4j_db.query(count_query, {"user_id": user_id})
@@ -87,7 +88,8 @@ async def get_graph_stats(user_id: str = "default_user"):
         edge_count = counts[0]["edges"] if counts else 0
 
         top_query = """
-        MATCH (n:Entity {user_id: $user_id})-[r]-()
+        MATCH (n:Entity)-[r]-()
+        WHERE n.user_id = $user_id OR n.user_id IS NULL
         RETURN n.name AS entity, count(r) AS connections
         ORDER BY connections DESC
         LIMIT 5
