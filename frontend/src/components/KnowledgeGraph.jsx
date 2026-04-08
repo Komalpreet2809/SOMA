@@ -3,7 +3,7 @@ import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
 import './KnowledgeGraph.css';
 
-function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
+function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = false }) {
   const fgRef = useRef();
   const containerRef = useRef(null);
 
@@ -18,7 +18,9 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
   // Handle Resize
   useEffect(() => {
     const handleResize = () => {
-      if (containerRef.current) {
+      if (isBackground) {
+        setDimensions({ width: window.innerWidth, height: window.innerHeight });
+      } else if (containerRef.current) {
         setDimensions({
           width: containerRef.current.clientWidth,
           height: containerRef.current.clientHeight
@@ -28,7 +30,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isBackground]);
 
   // Fetch Graph Data
   const fetchGraph = useCallback(async () => {
@@ -95,8 +97,9 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
 
   // ── Render ──────────────────────────────────────────────────
   return (
-    <div className="graph-container" ref={containerRef}>
-      {/* Header Bar */}
+    <div className={`graph-container ${isBackground ? 'graph-bg-mode' : ''}`} ref={containerRef}>
+      {/* Header Bar — hidden in background mode */}
+      {!isBackground && (
       <div className="graph-header">
         <div className="graph-title">
           <div className="pulse-ring" />
@@ -124,6 +127,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
           </button>
         </div>
       </div>
+      )}
 
       {/* 3D Canvas Container */}
       {(graphStatus === 'online' || graphData.nodes.length > 0) && (
@@ -164,8 +168,8 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
         </div>
       )}
 
-      {/* Stats Overlay */}
-      {graphStatus === 'online' && (
+      {/* Stats Overlay — hidden in background */}
+      {!isBackground && graphStatus === 'online' && (
         <div className="graph-stats-overlay">
           <div className="stat-chip">
             Nodes<span className="stat-value">{stats.nodes}</span>
@@ -183,8 +187,8 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
         </div>
       )}
 
-      {/* Legend */}
-      {graphStatus === 'online' && (
+      {/* Legend — hidden in background */}
+      {!isBackground && graphStatus === 'online' && (
         <div className="graph-legend">
           <div className="legend-title">Legend</div>
           <div className="legend-item">
