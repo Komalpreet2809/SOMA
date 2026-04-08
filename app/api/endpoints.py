@@ -30,7 +30,7 @@ async def fetch_neural_sparks(limit: int = 5):
 # ── Knowledge Graph Endpoints ────────────────────────────────────
 
 @router.get("/graph")
-async def get_knowledge_graph():
+async def get_knowledge_graph(user_id: str = "default_user"):
     """Return all nodes and edges from the Knowledge Graph for visualization."""
     if not neo4j_db.driver:
         return {"nodes": [], "edges": [], "status": "offline"}
@@ -38,19 +38,19 @@ async def get_knowledge_graph():
     try:
         # Fetch all nodes with their connection counts
         node_query = """
-        MATCH (n:Entity)
+        MATCH (n:Entity {user_id: $user_id})
         OPTIONAL MATCH (n)-[r]-()
         RETURN n.name AS id, count(r) AS connections
         ORDER BY connections DESC
         """
-        node_results = neo4j_db.query(node_query) or []
+        node_results = neo4j_db.query(node_query, {"user_id": user_id}) or []
 
         # Fetch all edges
         edge_query = """
-        MATCH (s:Entity)-[r]->(t:Entity)
+        MATCH (s:Entity {user_id: $user_id})-[r]->(t:Entity {user_id: $user_id})
         RETURN s.name AS source, type(r) AS label, t.name AS target
         """
-        edge_results = neo4j_db.query(edge_query) or []
+        edge_results = neo4j_db.query(edge_query, {"user_id": user_id}) or []
 
         nodes = [
             {"id": r["id"], "label": r["id"], "connections": r["connections"]}
@@ -67,28 +67,28 @@ async def get_knowledge_graph():
 
 
 @router.get("/graph/stats")
-async def get_graph_stats():
+async def get_graph_stats(user_id: str = "default_user"):
     """Return aggregate stats about the Knowledge Graph."""
     if not neo4j_db.driver:
         return {"node_count": 0, "edge_count": 0, "top_entities": [], "status": "offline"}
 
     try:
         count_query = """
-        MATCH (n:Entity)
-        OPTIONAL MATCH ()-[r]->()
+        MATCH (n:Entity {user_id: $user_id})
+        OPTIONAL MATCH ()-[r]->() // Note: simplified for stats
         RETURN count(DISTINCT n) AS nodes, count(DISTINCT r) AS edges
         """
-        counts = neo4j_db.query(count_query)
+        counts = neo4j_db.query(count_query, {"user_id": user_id})
         node_count = counts[0]["nodes"] if counts else 0
         edge_count = counts[0]["edges"] if counts else 0
 
         top_query = """
-        MATCH (n:Entity)-[r]-()
+        MATCH (n:Entity {user_id: $user_id})-[r]-()
         RETURN n.name AS entity, count(r) AS connections
         ORDER BY connections DESC
         LIMIT 5
         """
-        top_results = neo4j_db.query(top_query) or []
+        top_results = neo4j_db.query(top_query, {"user_id": user_id}) or []
         top_entities = [{"entity": r["entity"], "connections": r["connections"]} for r in top_results]
 
         return {
@@ -111,6 +111,7 @@ class QueryResponse(BaseModel):
 class IngestRequest(BaseModel):
     text: str
     metadata: Optional[Dict] = None
+    user_id: str = "default_user"
 
 class IngestResponse(BaseModel):
     message: str
@@ -127,7 +128,7 @@ async def process_consolidation(request: ConsolidateRequest):
         if chunks > 0:
             history = get_recent_messages(request.user_id, exchanges=50)
             doc = "\n".join([f"{m['role']}: {m['content']}" for m in history])
-            triples = extract_and_store_knowledge(doc)
+            triples = extract_and_store_knowledge(doc, request.user_id)
             msg += f" Extracted {triples} graph relations."
             
         return IngestResponse(
@@ -149,8 +150,8 @@ async def process_sleep_cycle():
 @router.post("/ingest", response_model=IngestResponse)
 async def process_ingest(request: IngestRequest):
     try:
-        num_chunks = ingest_text(request.text, request.metadata)
-        triples = extract_and_store_knowledge(request.text)
+        num_chunks = ingest_text(request.text, request.metadata, request.user_id)
+        triples = extract_and_store_knowledge(request.text, request.user_id)
         return IngestResponse(
             message=f"Sensory data ingested. Extracted {triples} graph relations.",
             chunks=num_chunks
@@ -169,6 +170,7 @@ async def process_query_stream(request: QueryRequest):
             history = get_recent_messages(request.user_id, exchanges=5)
             state_input = {
                 "input": request.text,
+                "user_id": request.user_id,
                 "chat_history": history,
                 "context": [],
                 "graph_context": [],
@@ -230,6 +232,7 @@ async def process_query(request: QueryRequest):
         # Step 2: Sensory Memory Logic - invoke the retrieval-augmented graph
         state_input = {
             "input": request.text,
+            "user_id": request.user_id,
             "chat_history": history,
             "context": [],
             "graph_context": [],
@@ -250,3 +253,13 @@ async def process_query(request: QueryRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/history")
+async def fetch_chat_history(user_id: str = "default_user"):
+    """Fetch the recent SQLite conversation when switching personas."""
+    try:
+        history = get_recent_messages(user_id, exchanges=20)
+        return {"messages": history}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

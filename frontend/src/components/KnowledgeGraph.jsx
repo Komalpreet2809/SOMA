@@ -3,7 +3,7 @@ import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
 import './KnowledgeGraph.css';
 
-function KnowledgeGraph({ highlightedNodes = [] }) {
+function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
   const fgRef = useRef();
   const containerRef = useRef(null);
 
@@ -35,7 +35,7 @@ function KnowledgeGraph({ highlightedNodes = [] }) {
     setLoading(true);
     setGraphStatus('loading');
     try {
-      const res = await fetch('/api/v1/graph');
+      const res = await fetch(`/api/v1/graph?user_id=${currentPersona}`);
       const data = await res.json();
 
       if (data.status === 'offline') {
@@ -73,7 +73,7 @@ function KnowledgeGraph({ highlightedNodes = [] }) {
       setGraphData({ nodes: [], links: [] });
     }
     setLoading(false);
-  }, []);
+  }, [currentPersona]);
 
   useEffect(() => {
     fetchGraph();

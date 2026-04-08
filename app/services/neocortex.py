@@ -4,7 +4,7 @@ from langchain_core.messages import HumanMessage
 from app.core.config import settings
 from app.db.neo4j_driver import neo4j_db
 
-def extract_and_store_knowledge(text: str):
+def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
     """
     The Neocortex extraction.
     Takes plain text, finds logical triples, and stores them in Neo4j.
@@ -54,11 +54,11 @@ Example output:
             
             if subj and rel and obj:
                 cypher = f"""
-                MERGE (s:Entity {{name: $subject}})
-                MERGE (o:Entity {{name: $object}})
+                MERGE (s:Entity {{name: $subject, user_id: $user_id}})
+                MERGE (o:Entity {{name: $object, user_id: $user_id}})
                 MERGE (s)-[r:`{rel}`]->(o)
                 """
-                neo4j_db.query(cypher, {"subject": subj, "object": obj})
+                neo4j_db.query(cypher, {"subject": subj, "object": obj, "user_id": user_id})
                 stored_count += 1
                 
         return stored_count
@@ -66,7 +66,7 @@ Example output:
         print(f"Error in Neocortex extraction: {e}")
         return 0
 
-def retrieve_graph_context(query: str):
+def retrieve_graph_context(query: str, user_id: str = "default_user"):
     """
     Search the Knowledge Graph for entities mentioned in the query.
     Returns (context_strings, touched_entities)
@@ -76,13 +76,13 @@ def retrieve_graph_context(query: str):
         
     # Naive keyword matching: if any node name is in the query, pull its connections.
     cypher = """
-    MATCH (n:Entity)-[r]->(m:Entity)
+    MATCH (n:Entity {user_id: $user_id})-[r]->(m:Entity {user_id: $user_id})
     WHERE toLower($query) CONTAINS toLower(n.name) OR toLower($query) CONTAINS toLower(m.name)
     RETURN n.name AS s, type(r) AS rel, m.name AS o
     LIMIT 15
     """
     try:
-        results = neo4j_db.query(cypher, {"query": query})
+        results = neo4j_db.query(cypher, {"query": query, "user_id": user_id})
         if not results:
             return [], []
         
