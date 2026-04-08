@@ -25,14 +25,22 @@ async def generate_neural_spark():
     if not neo4j_db.driver:
         return
         
-    # 1. Fetch 2 random entities
-    cypher = "MATCH (n:Entity) RETURN n.name as name ORDER BY rand() LIMIT 2"
+    # 1. Fetch 2 random entities belonging to the SAME random user
+    cypher = """
+    MATCH (n:Entity)
+    WITH COLLECT(DISTINCT n.user_id) AS users
+    WITH users[toInteger(rand() * size(users))] AS selected_user
+    MATCH (e:Entity {user_id: selected_user})
+    RETURN e.name AS name, selected_user AS user_id
+    ORDER BY rand() LIMIT 2
+    """
     results = neo4j_db.query(cypher)
     
     if len(results) < 2:
         return
         
     entities = [res["name"] for res in results]
+    user_id = results[0]["user_id"]
     
     # 2. Ask LLM for an insight
     api_key = settings.GROQ_API_KEY if settings.GROQ_API_KEY else "dummy_key"
@@ -52,7 +60,7 @@ async def generate_neural_spark():
         content = response.content.strip()
         
         # 3. Save to DB
-        add_spark(content, entities)
-        print(f"Neural Spark Generated: {entities[0]} <-> {entities[1]}")
+        add_spark(content, entities, user_id=user_id)
+        print(f"Neural Spark Generated for {user_id}: {entities[0]} <-> {entities[1]}")
     except Exception as e:
         print(f"Failed to generate spark: {e}")
