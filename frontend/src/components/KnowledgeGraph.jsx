@@ -143,9 +143,9 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = 
             nodeLabel={showLabels ? "label" : ""}
             nodeColor={node => {
               if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
-                return 'rgba(255, 215, 0, 0.9)'; // Highlight Gold
+                return 'rgba(240, 171, 252, 0.95)'; // Active impulse pink
               }
-              return 'rgba(71, 191, 255, 0.8)'; // Default Cyan
+              return 'rgba(167, 139, 250, 0.85)'; // Dendrite violet
             }}
             nodeRelSize={4}
             nodeResolution={16}
@@ -154,10 +154,10 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = 
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={d => 0.005 + (0.002 * Math.random())} // Varying speed
             linkDirectionalParticleWidth={2}
-            linkDirectionalParticleColor={() => 'rgba(134, 59, 255, 0.9)'} // Purple energy
+            linkDirectionalParticleColor={() => 'rgba(240, 171, 252, 0.8)'} // Neural impulse pink
             
             // Edge line styling
-            linkColor={() => 'rgba(71, 191, 255, 0.2)'}
+            linkColor={() => 'rgba(167, 139, 250, 0.15)'}
             linkOpacity={0.4}
             linkWidth={0.8}
 
