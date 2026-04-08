@@ -37,8 +37,10 @@ async def get_knowledge_graph(user_id: str = "default_user"):
 
     try:
         # Fetch all nodes with their connection counts
+        # Include legacy nodes (no user_id) alongside user-specific ones
         node_query = """
-        MATCH (n:Entity {user_id: $user_id})
+        MATCH (n:Entity)
+        WHERE n.user_id = $user_id OR NOT EXISTS(n.user_id)
         OPTIONAL MATCH (n)-[r]-()
         RETURN n.name AS id, count(r) AS connections
         ORDER BY connections DESC
@@ -47,7 +49,9 @@ async def get_knowledge_graph(user_id: str = "default_user"):
 
         # Fetch all edges
         edge_query = """
-        MATCH (s:Entity {user_id: $user_id})-[r]->(t:Entity {user_id: $user_id})
+        MATCH (s:Entity)-[r]->(t:Entity)
+        WHERE (s.user_id = $user_id OR NOT EXISTS(s.user_id))
+          AND (t.user_id = $user_id OR NOT EXISTS(t.user_id))
         RETURN s.name AS source, type(r) AS label, t.name AS target
         """
         edge_results = neo4j_db.query(edge_query, {"user_id": user_id}) or []
