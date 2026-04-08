@@ -19,12 +19,13 @@ function App() {
     traces: []
   })
   const [currentView, setCurrentView] = useState('chat') // 'chat' or 'graph'
+  const [currentPersona, setCurrentPersona] = useState('User_Alpha')
 
   // Fetch Brain Vitals
   useEffect(() => {
     const fetchVitals = async () => {
       try {
-        const res = await fetch('/api/v1/brain/vitals');
+        const res = await fetch(`/api/v1/brain/vitals?user_id=${currentPersona}`);
         const data = await res.json();
         setBrainState(prev => ({
           ...prev,
@@ -58,7 +59,22 @@ function App() {
       fetchSparks();
     }, 20000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentPersona]);
+
+  // Fetch SQLite Chat History on Persona Change
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch(`/api/v1/history?user_id=${currentPersona}`);
+        const data = await res.json();
+        setMessages(data.messages || []);
+      } catch (err) {
+        console.error("Failed to fetch chat history:", err);
+      }
+    };
+    fetchHistory();
+    // Also trigger graph refresh if possible by passing persona down
+  }, [currentPersona]);
 
   return (
     <div className={`app-container state-${brainState.cognitiveState.toLowerCase()}`}>
@@ -92,7 +108,30 @@ function App() {
 
         </div>
 
-
+        <div className="nav-section" style={{ marginTop: '30px' }}>
+          <div className="nav-header">Persona / Context</div>
+          <div style={{ padding: '0 15px' }}>
+            <select 
+              className="label-mono"
+              value={currentPersona}
+              onChange={(e) => setCurrentPersona(e.target.value)}
+              style={{
+                width: '100%',
+                background: 'rgba(8, 11, 9, 0.8)',
+                color: 'var(--accent-primary)',
+                border: '1px solid var(--border-subtle)',
+                padding: '8px 10px',
+                outline: 'none',
+                cursor: 'pointer',
+                fontSize: '0.7rem'
+              }}
+            >
+              <option value="User_Alpha">User Alpha</option>
+              <option value="User_Beta">User Beta</option>
+              <option value="System_Admin">System Admin</option>
+            </select>
+          </div>
+        </div>
       </aside>
 
       <main className="main-content">
@@ -103,9 +142,13 @@ function App() {
             brainState={brainState}
             setBrainState={setBrainState} 
             isLoading={brainState.isLoading}
+            currentPersona={currentPersona}
           />
         ) : (
-          <KnowledgeGraph highlightedNodes={brainState.highlightedNodes} />
+          <KnowledgeGraph 
+            highlightedNodes={brainState.highlightedNodes} 
+            currentPersona={currentPersona}
+          />
         )}
       </main>
 

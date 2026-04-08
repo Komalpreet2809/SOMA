@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import './ChatPanel.css';
 
-function ChatPanel({ messages, setMessages, setBrainState, isLoading }) {
+function ChatPanel({ messages, setMessages, setBrainState, isLoading, currentPersona }) {
   const [inputTimer, setInputTimer] = useState('');
   const [inputText, setInputText] = useState('');
   const endOfMessagesRef = useRef(null);
@@ -37,7 +37,7 @@ function ChatPanel({ messages, setMessages, setBrainState, isLoading }) {
       const response = await fetch('/api/v1/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: currentInput, user_id: 'ui_user' })
+        body: JSON.stringify({ text: currentInput, user_id: currentPersona })
       });
       
       const reader = response.body.getReader();
@@ -93,7 +93,7 @@ function ChatPanel({ messages, setMessages, setBrainState, isLoading }) {
     <div className="chat-panel">
       <div className="chat-header-scifi">
          <h2 style={{ fontSize: '0.8rem' }}>Neural Feedback Interface</h2>
-         <span className="label-mono">Live Session: active_node_01</span>
+         <span className="label-mono">Live Session: {currentPersona}</span>
       </div>
       
       <div className="messages-container">

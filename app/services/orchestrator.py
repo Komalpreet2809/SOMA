@@ -8,6 +8,7 @@ from app.services.neocortex import retrieve_graph_context
 
 class AgentState(TypedDict):
     input: str
+    user_id: str
     chat_history: List[dict]
     context: List[str]
     graph_context: List[str]
@@ -39,10 +40,11 @@ INTERNAL REFLECTION:"""
 def retrieve(state: AgentState):
     """Memory retrieval phase: Sensory and Semantic recall."""
     # Phase 2: Recall (Sensory Memory)
-    context = retrieve_context(state["input"])
+    user_id = state.get("user_id", "default_user")
+    context = retrieve_context(state["input"], user_id)
     
     # Phase 3: Association (Semantic Memory)
-    graph_context, touched_entities = retrieve_graph_context(state["input"])
+    graph_context, touched_entities = retrieve_graph_context(state["input"], user_id)
     
     return {
         "context": context, 
