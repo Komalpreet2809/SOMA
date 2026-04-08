@@ -22,9 +22,9 @@ async def fetch_brain_vitals(user_id: str = "default_user"):
     return get_brain_vitals(user_id)
 
 @router.get("/brain/sparks")
-async def fetch_neural_sparks(limit: int = 5):
+async def fetch_neural_sparks(user_id: str = "default_user", limit: int = 5):
     """Retrieve the latest spontaneous background insights."""
-    return get_recent_sparks(limit=limit)
+    return get_recent_sparks(user_id=user_id, limit=limit)
 
 
 # ── Knowledge Graph Endpoints ────────────────────────────────────
