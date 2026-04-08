@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ChatPanel from './components/ChatPanel'
 import CognitiveDashboard from './components/CognitiveDashboard'
 import KnowledgeGraph from './components/KnowledgeGraph'
+import DreamSequence from './components/DreamSequence'
 import './App.css'
 
 function App() {
@@ -41,7 +42,7 @@ function App() {
 
     const fetchSparks = async () => {
       try {
-        const res = await fetch('/api/v1/brain/sparks');
+        const res = await fetch(`/api/v1/brain/sparks?user_id=${currentPersona}`);
         const data = await res.json();
         setBrainState(prev => ({
           ...prev,
@@ -105,6 +106,12 @@ function App() {
           >
             Neural Mesh
           </div>
+          <div 
+            className={`nav-item ${currentView === 'dreams' ? 'active' : ''}`}
+            onClick={() => setCurrentView('dreams')}
+          >
+            Subconscious Dreams
+          </div>
 
         </div>
 
@@ -135,7 +142,7 @@ function App() {
       </aside>
 
       <main className="main-content">
-        {currentView === 'chat' ? (
+        {currentView === 'chat' && (
           <ChatPanel 
             messages={messages} 
             setMessages={setMessages} 
@@ -144,11 +151,15 @@ function App() {
             isLoading={brainState.isLoading}
             currentPersona={currentPersona}
           />
-        ) : (
+        )}
+        {currentView === 'graph' && (
           <KnowledgeGraph 
             highlightedNodes={brainState.highlightedNodes} 
             currentPersona={currentPersona}
           />
+        )}
+        {currentView === 'dreams' && (
+          <DreamSequence sparks={brainState.sparks} />
         )}
       </main>
 
