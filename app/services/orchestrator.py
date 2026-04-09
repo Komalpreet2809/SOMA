@@ -15,6 +15,7 @@ class AgentState(TypedDict):
     touched_entities: List[str]
     reflection: str
     response: str
+    trace_data: dict
 
 def reflect(state: AgentState):
     """Initial cognitive phase: Internal reflection on the user intent."""
@@ -78,18 +79,23 @@ def call_model(state: AgentState):
     context_str = "\n\n".join(state["context"])
     graph_str = "\n".join(state["graph_context"]) if state["graph_context"] else "No related knowledge graph entities found."
     
-    prompt = f"""You are Soma, a brain-inspired AI.
-Use the following memories to answer the user's question.
-If the memory doesn't help, use your general knowledge.
+    prompt = f"""You are Soma, a brain-inspired AI with specialized memory layers.
+Your mission is to provide accurate, grounded answers based ONLY on the provided memories.
 
-WORKING MEMORY (Recent Conversation):
+### COGNITIVE CONTEXT:
+#### WORKING MEMORY (Recent Conversation):
 {history_str}
 
-SEMANTIC MEMORY (Knowledge Graph):
+#### SEMANTIC MEMORY (Knowledge Graph Relationships):
 {graph_str}
 
-SENSORY MEMORY (Retrieved Facts):
+#### SENSORY MEMORY (Retrieved Facts):
 {context_str}
+
+### INSTRUCTIONS:
+1. STRICT GROUNDING: Use the provided SEMANTIC and SENSORY memories to answer.
+2. NO HALLUCINATION: If the memories do not contain the answer, say: 'My neural pathways do not currently contain information regarding this. I may need more sensory data.'
+3. CORE IDENTITY: Keep your persona brief, high-tech, and helpful.
 
 USER QUESTION:
 {state["input"]}"""

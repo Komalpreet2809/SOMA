@@ -3,6 +3,7 @@ import ChatPanel from './components/ChatPanel'
 import CognitiveDashboard from './components/CognitiveDashboard'
 import KnowledgeGraph from './components/KnowledgeGraph'
 import DreamSequence from './components/DreamSequence'
+import Onboarding from './components/Onboarding'
 import './App.css'
 
 function App() {
@@ -21,6 +22,16 @@ function App() {
   })
   const [rightPanel, setRightPanel] = useState('graph') // 'graph' or 'dreams'
   const [currentPersona, setCurrentPersona] = useState('User_Alpha')
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Check for first visit
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('soma_visited');
+    if (!hasVisited) {
+      setShowOnboarding(true);
+      localStorage.setItem('soma_visited', 'true');
+    }
+  }, []);
 
   // Fetch Brain Vitals
   useEffect(() => {
@@ -79,6 +90,8 @@ function App() {
   return (
     <div className={`app-container state-${brainState.cognitiveState.toLowerCase()}`}>
       
+      {showOnboarding && <Onboarding onClose={() => setShowOnboarding(false)} />}
+
       {/* ── Header ── */}
       <header className="app-header">
         <div className="logo-section">
@@ -98,6 +111,13 @@ function App() {
         </div>
 
         <div className="status-indicator">
+          <button 
+            className="help-btn" 
+            onClick={() => setShowOnboarding(true)}
+            title="System Overview"
+          >
+            ?
+          </button>
           <span className={`dot ${brainState.isLoading ? 'thinking' : 'idle'}`}></span>
           <span className="label-mono">{brainState.cognitiveState}</span>
           <select 
@@ -143,13 +163,23 @@ function App() {
             <button 
               className="sleep-btn-compact"
               onClick={async () => {
-                setBrainState(prev => ({ ...prev, isLoading: true, statusMessage: 'Sleeping...' }));
+                setBrainState(prev => ({ 
+                  ...prev, 
+                  isLoading: true, 
+                  statusMessage: 'Sleeping...', 
+                  cognitiveState: 'SLEEPING' 
+                }));
                 try {
                   const res = await fetch('/api/v1/sleep', { method: 'POST' });
                   const data = await res.json();
-                  setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: `Sleep done. ${data.graph_relations_extracted} relations.` }));
+                  setBrainState(prev => ({ 
+                    ...prev, 
+                    isLoading: false, 
+                    statusMessage: `Sleep done. ${data.graph_relations_extracted} relations.`,
+                    cognitiveState: 'IDLE'
+                  }));
                 } catch (e) {
-                  setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Sleep failed.' }));
+                  setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Sleep failed.', cognitiveState: 'IDLE' }));
                 }
               }}
               disabled={brainState.isLoading}

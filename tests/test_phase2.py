@@ -2,7 +2,7 @@ import requests
 import json
 import time
 
-BASE_URL = "http://localhost:8000/api/v1"
+BASE_URL = "http://127.0.0.1:8000/api/v1"
 
 def test_step2():
     # 1. Ingest a specific fact
