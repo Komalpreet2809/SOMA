@@ -1,9 +1,45 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
-import * as THREE from 'three';
 import './KnowledgeGraph.css';
 
-function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = false }) {
+// Brain anatomy scaffold shown when Neo4j is empty / offline
+const DEMO_GRAPH = {
+  nodes: [
+    { id: 'prefrontal',   label: 'Prefrontal Cortex',  connections: 5, isDemo: true, val: 8  },
+    { id: 'hippocampus',  label: 'Hippocampus',         connections: 8, isDemo: true, val: 12 },
+    { id: 'amygdala',     label: 'Amygdala',            connections: 4, isDemo: true, val: 6  },
+    { id: 'neocortex',    label: 'Neocortex',           connections: 7, isDemo: true, val: 10 },
+    { id: 'thalamus',     label: 'Thalamus',            connections: 9, isDemo: true, val: 14 },
+    { id: 'cerebellum',   label: 'Cerebellum',          connections: 4, isDemo: true, val: 7  },
+    { id: 'broca',        label: "Broca's Area",        connections: 3, isDemo: true, val: 5  },
+    { id: 'wernicke',     label: "Wernicke's Area",     connections: 3, isDemo: true, val: 5  },
+    { id: 'sensory_c',    label: 'Sensory Cortex',      connections: 5, isDemo: true, val: 7  },
+    { id: 'motor_c',      label: 'Motor Cortex',        connections: 4, isDemo: true, val: 6  },
+    { id: 'basal',        label: 'Basal Ganglia',       connections: 4, isDemo: true, val: 6  },
+    { id: 'insula',       label: 'Insula',              connections: 3, isDemo: true, val: 5  },
+  ],
+  links: [
+    { source: 'thalamus',    target: 'neocortex',   label: 'relays_signals'        },
+    { source: 'thalamus',    target: 'prefrontal',  label: 'executive_relay'       },
+    { source: 'thalamus',    target: 'sensory_c',   label: 'sensory_routing'       },
+    { source: 'hippocampus', target: 'neocortex',   label: 'memory_consolidation'  },
+    { source: 'hippocampus', target: 'amygdala',    label: 'emotional_memory'      },
+    { source: 'hippocampus', target: 'prefrontal',  label: 'working_memory'        },
+    { source: 'prefrontal',  target: 'amygdala',    label: 'emotional_regulation'  },
+    { source: 'prefrontal',  target: 'motor_c',     label: 'motor_planning'        },
+    { source: 'neocortex',   target: 'broca',       label: 'language_production'   },
+    { source: 'neocortex',   target: 'wernicke',    label: 'language_comprehension'},
+    { source: 'broca',       target: 'wernicke',    label: 'language_integration'  },
+    { source: 'motor_c',     target: 'cerebellum',  label: 'motor_coordination'    },
+    { source: 'cerebellum',  target: 'thalamus',    label: 'feedback_loop'         },
+    { source: 'basal',       target: 'thalamus',    label: 'reward_circuit'        },
+    { source: 'basal',       target: 'prefrontal',  label: 'decision_making'       },
+    { source: 'insula',      target: 'amygdala',    label: 'interoception'         },
+    { source: 'sensory_c',   target: 'neocortex',   label: 'sensory_processing'    },
+  ],
+};
+
+function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
   const fgRef = useRef();
   const containerRef = useRef(null);
 
@@ -12,27 +48,23 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = 
   const [stats, setStats] = useState({ nodes: 0, edges: 0 });
   const [graphStatus, setGraphStatus] = useState('loading');
   const [showLabels, setShowLabels] = useState(true);
+  const [isDemo, setIsDemo] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [tooltipData, setTooltipData] = useState(null);
 
-  // Handle Resize
   useEffect(() => {
     const handleResize = () => {
-      if (isBackground) {
-        setDimensions({ width: window.innerWidth, height: window.innerHeight });
-      } else if (containerRef.current) {
+      if (containerRef.current) {
         setDimensions({
           width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight
+          height: containerRef.current.clientHeight,
         });
       }
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isBackground]);
+  }, []);
 
-  // Fetch Graph Data
   const fetchGraph = useCallback(async () => {
     setLoading(true);
     setGraphStatus('loading');
@@ -40,191 +72,173 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, isBackground = 
       const res = await fetch(`/api/v1/graph?user_id=${currentPersona}`);
       const data = await res.json();
 
-      if (data.status === 'offline') {
-        setGraphStatus('offline');
-        setGraphData({ nodes: [], links: [] });
-        setStats({ nodes: 0, edges: 0 });
-      } else if (data.nodes.length === 0) {
-        setGraphStatus('empty');
-        setGraphData({ nodes: [], links: [] });
-        setStats({ nodes: 0, edges: 0 });
+      if (data.status === 'offline' || data.nodes.length === 0) {
+        // Show brain anatomy demo so the graph is never empty
+        setIsDemo(true);
+        setGraphStatus('demo');
+        setGraphData(DEMO_GRAPH);
+        setStats({ nodes: DEMO_GRAPH.nodes.length, edges: DEMO_GRAPH.links.length });
       } else {
+        setIsDemo(false);
         setGraphStatus('online');
-        
-        // Format for 3D Graph
-        const formattedData = {
+        const formatted = {
           nodes: data.nodes.map(n => ({
             id: n.id,
             label: n.label,
             connections: n.connections || 0,
-            val: Math.max(1, (n.connections || 0) * 1.5) // Node visual size
+            val: Math.max(2, (n.connections || 0) * 1.5),
           })),
           links: data.edges.map(e => ({
             source: e.source,
             target: e.target,
-            label: e.label
-          }))
+            label: e.label,
+          })),
         };
-        
-        setGraphData(formattedData);
+        setGraphData(formatted);
         setStats({ nodes: data.nodes.length, edges: data.edges.length });
       }
-    } catch (err) {
-      console.error('Failed to fetch graph:', err);
-      setGraphStatus('error');
-      setGraphData({ nodes: [], links: [] });
+    } catch {
+      setIsDemo(true);
+      setGraphStatus('demo');
+      setGraphData(DEMO_GRAPH);
+      setStats({ nodes: DEMO_GRAPH.nodes.length, edges: DEMO_GRAPH.links.length });
     }
     setLoading(false);
   }, [currentPersona]);
 
-  useEffect(() => {
-    fetchGraph();
-  }, [fetchGraph]);
+  useEffect(() => { fetchGraph(); }, [fetchGraph]);
 
   const handleNodeClick = useCallback(node => {
-    if (fgRef.current) {
-      // Aim at node from outside it
-      const distance = 80;
-      const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+    if (!fgRef.current) return;
+    const distance = 80;
+    const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+    fgRef.current.cameraPosition(
+      { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+      node,
+      1200
+    );
+  }, []);
 
-      fgRef.current.cameraPosition(
-        { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
-        node, // lookAt ({ x, y, z })
-        1500  // ms transition duration
-      );
+  const getNodeColor = node => {
+    if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
+      return 'rgba(240, 171, 252, 1)';
     }
-  }, [fgRef]);
+    if (node.isDemo) {
+      // Gradient from violet → cyan for demo anatomy nodes
+      const hash = node.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      const hue = (hash * 37) % 60; // 0–60 → violet to indigo range
+      return `hsla(${260 + hue}, 80%, 72%, 0.9)`;
+    }
+    return 'rgba(192, 132, 252, 0.9)';
+  };
 
-  // ── Render ──────────────────────────────────────────────────
+  const getLinkColor = () => isDemo
+    ? 'rgba(130, 100, 220, 0.25)'
+    : 'rgba(167, 139, 250, 0.2)';
+
   return (
-    <div className={`graph-container ${isBackground ? 'graph-bg-mode' : ''}`} ref={containerRef}>
-      {/* Header Bar — hidden in background mode */}
-      {!isBackground && (
+    <div className="graph-container" ref={containerRef}>
+
+      {/* Header */}
       <div className="graph-header">
         <div className="graph-title">
           <div className="pulse-ring" />
-          <h2>Neural Mesh Topology (3D)</h2>
-          <span className="label-mono" style={{ fontSize: '0.55rem' }}>
-            {graphStatus === 'online' ? 'LIVE' : graphStatus.toUpperCase()}
+          <h2>Neural Mesh Topology</h2>
+          <span className="label-mono graph-status-chip">
+            {isDemo ? 'DEMO' : graphStatus === 'online' ? 'LIVE' : graphStatus.toUpperCase()}
           </span>
+          {isDemo && (
+            <span className="demo-badge">Brain Anatomy Template</span>
+          )}
         </div>
         <div className="graph-controls">
           <button
             className={`graph-btn ${showLabels ? 'active' : ''}`}
-            onClick={() => setShowLabels(prev => !prev)}
+            onClick={() => setShowLabels(p => !p)}
           >
             {showLabels ? 'Hide Labels' : 'Show Labels'}
           </button>
           <button className="graph-btn" onClick={() => {
-            if (fgRef.current) {
-              fgRef.current.cameraPosition({ x: 0, y: 0, z: 250 }, { x: 0, y: 0, z: 0 }, 1000);
-            }
+            fgRef.current?.cameraPosition({ x: 0, y: 0, z: 280 }, { x: 0, y: 0, z: 0 }, 900);
           }}>
-            Reset View
+            Reset
           </button>
-          <button className="graph-btn" onClick={fetchGraph}>
-            ↻ Refresh
-          </button>
+          <button className="graph-btn" onClick={fetchGraph}>↻</button>
         </div>
       </div>
-      )}
 
-      {/* 3D Canvas Container */}
-      {(graphStatus === 'online' || graphData.nodes.length > 0) && (
-        <div className="graph-canvas-3d" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+      {/* 3D Canvas */}
+      {graphData.nodes.length > 0 && (
+        <div style={{ position: 'absolute', inset: 0 }}>
           <ForceGraph3D
             ref={fgRef}
             width={dimensions.width}
             height={dimensions.height}
             graphData={graphData}
-            backgroundColor="rgba(0,0,0,0)" // Transparent to show CSS background
-            
-            // Nodes
-            nodeLabel={showLabels ? "label" : ""}
-            nodeColor={node => {
-              if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
-                return 'rgba(240, 171, 252, 0.95)'; // Active impulse pink
-              }
-              return 'rgba(167, 139, 250, 0.85)'; // Dendrite violet
-            }}
-            nodeRelSize={4}
-            nodeResolution={16}
-            
-            // Edges (Synapses) -> Particles
-            linkDirectionalParticles={2}
-            linkDirectionalParticleSpeed={d => 0.005 + (0.002 * Math.random())} // Varying speed
-            linkDirectionalParticleWidth={2}
-            linkDirectionalParticleColor={() => 'rgba(240, 171, 252, 0.8)'} // Neural impulse pink
-            
-            // Edge line styling
-            linkColor={() => 'rgba(167, 139, 250, 0.15)'}
-            linkOpacity={0.4}
-            linkWidth={0.8}
+            backgroundColor="rgba(0,0,0,0)"
 
-            // Interaction
+            nodeLabel={showLabels ? 'label' : ''}
+            nodeColor={getNodeColor}
+            nodeRelSize={5}
+            nodeResolution={16}
+            nodeOpacity={0.9}
+
+            linkDirectionalParticles={2}
+            linkDirectionalParticleSpeed={0.006}
+            linkDirectionalParticleWidth={isDemo ? 1.5 : 2}
+            linkDirectionalParticleColor={() => isDemo
+              ? 'rgba(167, 139, 250, 0.7)'
+              : 'rgba(240, 171, 252, 0.85)'}
+
+            linkColor={getLinkColor}
+            linkOpacity={isDemo ? 0.45 : 0.5}
+            linkWidth={isDemo ? 0.6 : 0.9}
+
             onNodeClick={handleNodeClick}
             enableNodeDrag={true}
           />
         </div>
       )}
 
-      {/* Stats Overlay — hidden in background */}
-      {!isBackground && graphStatus === 'online' && (
-        <div className="graph-stats-overlay">
-          <div className="stat-chip">
-            Nodes<span className="stat-value">{stats.nodes}</span>
-          </div>
-          <div className="stat-chip">
-            Edges<span className="stat-value purple">{stats.edges}</span>
-          </div>
-          <div className="stat-chip">
-            Density<span className="stat-value">
-              {stats.nodes > 1
-                ? ((2 * stats.edges) / (stats.nodes * (stats.nodes - 1)) * 100).toFixed(1) + '%'
-                : '—'}
-            </span>
-          </div>
+      {/* Stats overlay */}
+      <div className="graph-stats-overlay">
+        <div className="stat-chip">
+          Nodes<span className="stat-value">{stats.nodes}</span>
         </div>
-      )}
-
-      {/* Legend — hidden in background */}
-      {!isBackground && graphStatus === 'online' && (
-        <div className="graph-legend">
-          <div className="legend-title">Legend</div>
-          <div className="legend-item">
-            <div className="legend-dot primary" style={{ background: 'rgba(71, 191, 255, 0.8)' }} />
-            <span className="legend-label">Entity Node</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot secondary" style={{ background: 'rgba(134, 59, 255, 0.8)' }} />
-            <span className="legend-label">Synaptic Flow (Particle)</span>
-          </div>
+        <div className="stat-chip">
+          Edges<span className="stat-value purple">{stats.edges}</span>
         </div>
-      )}
+        <div className="stat-chip">
+          Density
+          <span className="stat-value">
+            {stats.nodes > 1
+              ? ((2 * stats.edges) / (stats.nodes * (stats.nodes - 1)) * 100).toFixed(1) + '%'
+              : '—'}
+          </span>
+        </div>
+      </div>
 
-      {/* Loading State */}
+      {/* Legend */}
+      <div className="graph-legend">
+        <div className="legend-title">Legend</div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: 'rgba(192, 132, 252, 0.9)' }} />
+          <span className="legend-label">{isDemo ? 'Brain Region' : 'Entity Node'}</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: 'rgba(240, 171, 252, 0.9)' }} />
+          <span className="legend-label">Active Node</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot" style={{ background: 'rgba(167, 139, 250, 0.7)', borderRadius: '2px', width: '16px', height: '4px' }} />
+          <span className="legend-label">Synaptic Flow</span>
+        </div>
+      </div>
+
+      {/* Loading */}
       {loading && (
         <div className="graph-loading">
           <span className="loading-text">Scanning Neural Mesh...</span>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && (graphStatus === 'empty' || graphStatus === 'offline' || graphStatus === 'error') && (
-        <div className="graph-empty-state">
-          <div className="empty-brain-icon">🧠</div>
-          <div className="empty-title">
-            {graphStatus === 'offline' ? 'Knowledge Graph Offline' :
-             graphStatus === 'error' ? 'Connection Error' :
-             'No Neural Pathways Detected'}
-          </div>
-          <div className="empty-subtitle">
-            {graphStatus === 'offline'
-              ? 'Neo4j database is not connected. Configure your credentials in .env to enable the semantic memory layer.'
-              : graphStatus === 'error'
-              ? 'Failed to reach the backend. Ensure the API server is running.'
-              : 'Start chatting or ingest data to build the knowledge graph. Entities and relationships will appear here in real-time.'}
-          </div>
         </div>
       )}
     </div>

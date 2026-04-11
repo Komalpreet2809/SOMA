@@ -1,31 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  /* ── Brain-Organic Palette ── */
-  --bg-base:        #0a0810;
-  --bg-panel:       rgba(12, 8, 20, 0.7);
-  
-  /* Warm neural tones instead of cold neon */
-  --accent-synapse:   #c084fc;  /* Soft violet — like neurotransmitter signals */
-  --accent-dendrite:  #a78bfa;  /* Lighter violet */
-  --accent-axon:      #7c3aed;  /* Deep violet — axon core */
-  --accent-impulse:   #f0abfc;  /* Warm pink — neural impulse flash */
-  --accent-cortex:    #818cf8;  /* Indigo — cortex connections */
-  --accent-error:     #fb7185;
+  /* ── Brain-Organic Palette (brightened) ── */
+  --bg-base:   #07030e;
+  --bg-panel:  rgba(14, 8, 26, 0.82);
+
+  --accent-synapse:  #c084fc;   /* Soft violet */
+  --accent-dendrite: #a78bfa;   /* Lighter violet */
+  --accent-axon:     #7c3aed;   /* Deep violet */
+  --accent-impulse:  #f0abfc;   /* Warm pink */
+  --accent-cortex:   #818cf8;   /* Indigo */
+  --accent-error:    #fb7185;
 
   --accent-primary:   var(--accent-synapse);
   --accent-secondary: var(--accent-impulse);
-  --accent-glow:      rgba(192, 132, 252, 0.25);
-  --accent-glow-pink: rgba(240, 171, 252, 0.25);
+  --accent-glow:      rgba(192, 132, 252, 0.3);
+  --accent-glow-pink: rgba(240, 171, 252, 0.3);
 
-  --text-primary:   #ede9fe;
-  --text-secondary: #c4b5fd;
-  --text-dim:       #7c6faa;
+  /* Brighter text */
+  --text-primary:   #f0ebff;
+  --text-secondary: #cfc0f8;
+  --text-dim:       #9d8fcc;
 
-  --border-subtle:  rgba(167, 139, 250, 0.12);
-  --border-active:  rgba(192, 132, 252, 0.35);
+  --border-subtle:  rgba(167, 139, 250, 0.14);
+  --border-active:  rgba(192, 132, 252, 0.4);
 
-  --panel-shadow:   0 8px 32px rgba(0, 0, 0, 0.5);
+  --panel-shadow:   0 8px 32px rgba(0, 0, 0, 0.55);
 
   --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
@@ -43,16 +43,13 @@ body {
   color: var(--text-primary);
   height: 100vh;
   overflow: hidden;
-  /* Deep organic neural tissue gradient */
-  background-image: 
-    radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.08), transparent 50%),
-    radial-gradient(ellipse at 80% 30%, rgba(192, 132, 252, 0.05), transparent 40%),
-    radial-gradient(ellipse at 50% 90%, rgba(240, 171, 252, 0.04), transparent 40%);
+  background-image:
+    radial-gradient(ellipse at 15% 50%, rgba(124, 58, 237, 0.1), transparent 50%),
+    radial-gradient(ellipse at 85% 25%, rgba(192, 132, 252, 0.07), transparent 40%),
+    radial-gradient(ellipse at 50% 95%, rgba(240, 171, 252, 0.05), transparent 40%);
 }
 
-#root {
-  height: 100%;
-}
+#root { height: 100%; }
 
 /* ── Glassmorphism ── */
 .glass-panel {
@@ -70,7 +67,7 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.2), transparent);
 }
 
 h1, h2, h3 {
@@ -82,7 +79,7 @@ h1, h2, h3 {
 
 .label-mono {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--text-secondary);
   letter-spacing: 0.1em;
@@ -91,8 +88,8 @@ h1, h2, h3 {
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.3); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(192, 132, 252, 0.5); }
+::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.35); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(192, 132, 252, 0.55); }
 
 /* ── Base Button ── */
 button {
@@ -104,12 +101,12 @@ button {
   font-family: var(--font-main);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 button:hover {
-  background: rgba(192, 132, 252, 0.2);
-  box-shadow: 0 0 15px var(--accent-glow);
+  background: rgba(192, 132, 252, 0.22);
+  box-shadow: 0 0 16px var(--accent-glow);
   border-color: var(--accent-primary);
   transform: translateY(-1px);
 }
@@ -117,7 +114,7 @@ button:hover {
 button:active { transform: translateY(1px); }
 
 button:disabled {
-  background: rgba(10, 5, 20, 0.8);
+  background: rgba(10, 5, 20, 0.7);
   color: var(--text-dim);
   border-color: var(--border-subtle);
   cursor: not-allowed;
@@ -127,7 +124,7 @@ button:disabled {
 
 /* ── Brain Vitals HUD ── */
 .vitals-hud {
-  background: rgba(12, 8, 20, 0.5);
+  background: rgba(14, 8, 26, 0.6);
   border-radius: 12px;
   padding: 16px;
   border-left: 3px solid var(--accent-impulse);
@@ -136,14 +133,13 @@ button:disabled {
   overflow: hidden;
 }
 
-/* Subtle scan-line effect like looking through tissue */
 .vitals-hud::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(192, 132, 252, 0.01) 0px,
+    rgba(192, 132, 252, 0.015) 0px,
     transparent 1px,
     transparent 3px
   );
@@ -169,15 +165,15 @@ button:disabled {
 
 .vital-value {
   font-family: var(--font-mono);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--accent-primary);
-  text-shadow: 0 0 8px var(--accent-glow);
+  text-shadow: 0 0 10px var(--accent-glow);
 }
 
 .vital-value.purple {
   color: var(--accent-impulse);
-  text-shadow: 0 0 8px var(--accent-glow-pink);
+  text-shadow: 0 0 10px var(--accent-glow-pink);
 }
 
 .vital-value.warning {
@@ -188,12 +184,12 @@ button:disabled {
 .warning-text { color: var(--accent-error); opacity: 0.9; }
 
 .internal-monologue {
-  background: rgba(124, 58, 237, 0.08);
+  background: rgba(124, 58, 237, 0.1);
   border-left: 2px solid var(--accent-dendrite);
   padding: 14px;
   margin: 15px 0 20px 0;
-  font-size: 0.75rem;
-  line-height: 1.6;
+  font-size: 0.77rem;
+  line-height: 1.65;
   color: var(--text-primary);
   font-style: italic;
   border-radius: 6px;
@@ -201,8 +197,8 @@ button:disabled {
 }
 
 @keyframes monologue-fade {
-  from { opacity: 0; filter: blur(5px); transform: translateX(-10px); }
-  to { opacity: 1; filter: blur(0); transform: translateX(0); }
+  from { opacity: 0; filter: blur(4px); transform: translateX(-8px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateX(0); }
 }
 
 .sparks-container {
@@ -215,8 +211,8 @@ button:disabled {
 }
 
 .spark-item {
-  background: rgba(192, 132, 252, 0.04);
-  border: 1px solid rgba(192, 132, 252, 0.12);
+  background: rgba(192, 132, 252, 0.06);
+  border: 1px solid rgba(192, 132, 252, 0.15);
   border-radius: 6px;
   padding: 10px;
   font-size: 0.65rem;
@@ -225,29 +221,29 @@ button:disabled {
 }
 
 .spark-time {
-  opacity: 0.5;
+  opacity: 0.55;
   margin-right: 8px;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.52rem;
 }
 
-.spark-content { margin: 6px 0; color: var(--text-primary); line-height: 1.4; }
+.spark-content { margin: 6px 0; color: var(--text-primary); line-height: 1.45; }
 
 .spark-tag {
   display: inline-block;
-  background: rgba(240, 171, 252, 0.1);
+  background: rgba(240, 171, 252, 0.12);
   color: var(--accent-impulse);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   margin-right: 6px;
   text-transform: uppercase;
   font-family: var(--font-mono);
 }
 
 @keyframes spark-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 /* ── Neural Pulse Animations ── */
@@ -255,12 +251,12 @@ button:disabled {
 
 @keyframes box-glow {
   0%   { border-color: var(--border-subtle); box-shadow: 0 0 5px rgba(192, 132, 252, 0.05); }
-  100% { border-color: var(--accent-primary); box-shadow: 0 0 20px var(--accent-glow); }
+  100% { border-color: var(--accent-primary); box-shadow: 0 0 22px var(--accent-glow); }
 }
 
 @keyframes text-pulse {
   from { opacity: 0.5; text-shadow: none; }
-  to   { opacity: 1; text-shadow: 0 0 10px var(--accent-error); }
+  to   { opacity: 1;   text-shadow: 0 0 10px var(--accent-error); }
 }
 
 .neural-scan-line {
@@ -268,22 +264,11 @@ button:disabled {
   top: 0; left: 0; width: 100%; height: 1.5px;
   background: linear-gradient(90deg, transparent, var(--accent-synapse), transparent);
   animation: scan-move 2.5s linear infinite;
-  z-index: 10; opacity: 0.5;
+  z-index: 10;
+  opacity: 0.6;
 }
 
 @keyframes scan-move {
   from { top: -5%; }
   to   { top: 105%; }
-}
-
-/* ── Cognitive State Themes ── */
-.state-overloaded {
-  --accent-primary: var(--accent-error);
-  --accent-glow: rgba(251, 113, 133, 0.3);
-}
-
-.state-focused {
-  --accent-primary: #34d399;
-  --accent-secondary: #a78bfa;
-  --accent-glow: rgba(52, 211, 153, 0.2);
 }

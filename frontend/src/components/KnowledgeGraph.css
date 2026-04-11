@@ -52,10 +52,31 @@
 }
 
 .graph-title h2 {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   margin: 0;
-  letter-spacing: 0.3em;
-  color: var(--text-dim);
+  letter-spacing: 0.25em;
+  color: var(--text-secondary);
+}
+
+.graph-status-chip {
+  font-size: 0.5rem !important;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  color: var(--accent-synapse);
+}
+
+.demo-badge {
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 2px 7px;
+  border-radius: 3px;
 }
 
 /* Animated pulse ring — cyan/pink */
@@ -153,9 +174,10 @@
   text-shadow: 0 0 8px rgba(0,240,255,0.4);
 }
 
-.stat-chip .stat-value.secondary {
-  color: var(--accent-secondary);
-  text-shadow: 0 0 8px rgba(255,0,229,0.4);
+.stat-chip .stat-value.secondary,
+.stat-chip .stat-value.purple {
+  color: var(--accent-impulse);
+  text-shadow: 0 0 8px rgba(240, 171, 252, 0.4);
 }
 
 /* ── Tooltip ── */
