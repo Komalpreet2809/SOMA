@@ -58,7 +58,7 @@ function resetTilt(e) {
   e.currentTarget.style.setProperty('--ty', '0deg');
 }
 
-function BrainProcess({ brainState }) {
+function BrainProcess({ brainState, messageCount = 0 }) {
   const isActive   = brainState.isLoading;
   const activeId   = getActiveStage(brainState.traces, isActive);
   const traces     = (brainState.traces || []).slice(-6);
@@ -121,7 +121,11 @@ function BrainProcess({ brainState }) {
               <div className="bp-mem-top">
                 <span className="bp-mem-name">{layer.label}</span>
                 <span className="bp-mem-count" style={{ color: layer.color }}>
-                  {layer.key ? (brainState[layer.key] ?? 0) : '—'}
+                  {layer.key
+                    ? (brainState[layer.key] ?? 0)
+                    : layer.id === 'episodic'
+                      ? messageCount
+                      : '—'}
                 </span>
               </div>
               <div className="bp-mem-tech t-label">{layer.tech}</div>
