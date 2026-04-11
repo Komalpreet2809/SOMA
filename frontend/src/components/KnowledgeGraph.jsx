@@ -59,11 +59,18 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
           width: containerRef.current.clientWidth,
           height: containerRef.current.clientHeight,
         });
+        // Recenter after resize so nodes don't drift off-screen
+        setTimeout(() => fgRef.current?.zoomToFit(400, 80), 300);
       }
     };
     handleResize();
+    const ro = new ResizeObserver(handleResize);
+    if (containerRef.current) ro.observe(containerRef.current);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const fetchGraph = useCallback(async () => {
@@ -105,6 +112,8 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
       setStats({ nodes: DEMO_GRAPH.nodes.length, edges: DEMO_GRAPH.links.length });
     }
     setLoading(false);
+    // Recenter camera once force simulation has settled
+    setTimeout(() => fgRef.current?.zoomToFit(400, 80), 1200);
   }, [currentPersona]);
 
   useEffect(() => { fetchGraph(); }, [fetchGraph]);
@@ -176,7 +185,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
             {showLabels ? 'Hide Labels' : 'Show Labels'}
           </button>
           <button className="graph-btn" onClick={() => {
-            fgRef.current?.cameraPosition({ x: 0, y: 0, z: 280 }, { x: 0, y: 0, z: 0 }, 900);
+            fgRef.current?.zoomToFit(600, 80);
           }}>
             Reset
           </button>
