@@ -13,10 +13,9 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
     e.preventDefault();
     if (!inputText.trim() || isLoading) return;
 
-    const userMessage = { role: 'user', content: inputText };
-    setMessages(prev => [...prev, userMessage]);
     const query = inputText;
     setInputText('');
+    setMessages(prev => [...prev, { role: 'user', content: query }]);
 
     setBrainState(prev => ({
       ...prev,
@@ -28,107 +27,101 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
     }));
 
     try {
-      const response = await fetch('/api/v1/query/stream', {
+      const res = await fetch('/api/v1/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: query, user_id: currentPersona }),
       });
 
-      const reader = response.body.getReader();
+      const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = '';
+      let buf = '';
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split('\n\n');
-        buffer = parts.pop();
+        buf += decoder.decode(value, { stream: true });
+        const parts = buf.split('\n\n');
+        buf = parts.pop();
 
         for (const part of parts) {
           if (!part.trim()) continue;
-          const match = part.match(/event: (.*)\ndata: (.*)/);
-          if (!match) continue;
-          const [, eventType, rawData] = match;
-          const data = JSON.parse(rawData);
+          const m = part.match(/event: (.*)\ndata: (.*)/);
+          if (!m) continue;
+          const [, evType, raw] = m;
+          const data = JSON.parse(raw);
 
-          if (eventType === 'trace') {
+          if (evType === 'trace') {
             setBrainState(prev => ({
               ...prev,
               statusMessage: data.message,
               traces: [...prev.traces, data],
               highlightedNodes: data.touched || prev.highlightedNodes,
             }));
-          } else if (eventType === 'reflection') {
+          } else if (evType === 'reflection') {
             setBrainState(prev => ({ ...prev, reflection: data.message }));
-          } else if (eventType === 'final_result') {
+          } else if (evType === 'final_result') {
             setMessages(prev => [...prev, { role: 'soma', content: data.response }]);
-          } else if (eventType === 'error') {
+          } else if (evType === 'error') {
             throw new Error(data.detail);
           }
         }
       }
 
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Cognitive cycle complete.' }));
-    } catch (error) {
-      console.error('Stream error:', error);
-      setMessages(prev => [...prev, { role: 'soma', content: `Neural Error: ${error.message}` }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'soma', content: `Neural Error: ${err.message}` }]);
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Process interrupted.' }));
     }
   };
 
   return (
     <div className="chat-panel">
-      <div className="chat-header-scifi">
-        <h2>Neural Feedback Interface</h2>
-        <span className="label-mono" style={{ fontSize: '0.52rem', color: 'var(--text-dim)' }}>
-          {currentPersona}
-        </span>
+
+      <div className="chat-header">
+        <span className="chat-header-title">Neural Feedback</span>
+        <span className="chat-header-session">{currentPersona}</span>
       </div>
 
       <div className="messages-container">
         {messages.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">🧠</div>
-            <div className="empty-state-text">
-              Awaiting neural input.<br />
-              Ask anything — watch the brain think.
-            </div>
+          <div className="chat-empty">
+            <div className="chat-empty-brain">🧠</div>
+            <p className="chat-empty-text">
+              Send a message — watch Soma reflect, retrieve memory, and synthesize a response in real-time.
+            </p>
           </div>
         ) : (
-          messages.map((msg, idx) => (
-            <div key={idx} className={`message-wrapper ${msg.role}`}>
-              <div className="label-mono" style={{ fontSize: '0.5rem', marginBottom: '5px' }}>
+          messages.map((msg, i) => (
+            <div key={i} className={`msg ${msg.role}`}>
+              <div className="msg-role">
                 {msg.role === 'user' ? currentPersona : 'SOMA'}
               </div>
-              <div className="message-bubble">{msg.content}</div>
+              <div className="msg-bubble">{msg.content}</div>
             </div>
           ))
         )}
         <div ref={endRef} />
       </div>
 
-      <div className="chat-input-area">
-        <form className="chat-input-form" onSubmit={handleSend}>
-          <span className="chat-input-prefix">⚡</span>
+      <div className="chat-input-wrap">
+        <form className="chat-form" onSubmit={handleSend}>
           <input
-            type="text"
             className="chat-input"
+            type="text"
             value={inputText}
             onChange={e => setInputText(e.target.value)}
-            placeholder="Ask something..."
+            placeholder="Ask anything…"
             disabled={isLoading}
             autoFocus
           />
-          <button type="submit" disabled={isLoading || !inputText.trim()}>
-            {isLoading ? '...' : 'Send'}
+          <button className="chat-submit" type="submit" disabled={isLoading || !inputText.trim()}>
+            {isLoading ? '…' : 'Send'}
           </button>
         </form>
-        <div className="chat-status-line">
-          {brainState.statusMessage}
-        </div>
+        <div className="chat-status">{brainState.statusMessage}</div>
       </div>
+
     </div>
   );
 }
