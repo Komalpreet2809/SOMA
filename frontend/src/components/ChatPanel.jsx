@@ -8,11 +8,15 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
   const [showIngest,  setShowIngest]  = useState(false);
   const [ingestText,  setIngestText]  = useState('');
   const [ingestStatus, setIngestStatus] = useState('');
-  const endRef = useRef(null);
+  const endRef     = useRef(null);
+  const abortRef   = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Cancel any in-flight stream when the component unmounts
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const sendMessage = async (text) => {
     if (!text.trim() || isLoading) return;
@@ -27,12 +31,20 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
       traces: [],
     }));
 
+    // Cancel any previous in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const res = await fetch('/api/v1/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, user_id: currentPersona }),
+        signal: controller.signal,
       });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const reader  = res.body.getReader();
       const decoder = new TextDecoder();
@@ -47,10 +59,11 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
 
         for (const part of parts) {
           if (!part.trim()) continue;
-          const m = part.match(/event: (.*)\ndata: (.*)/);
+          const m = part.match(/event: (.*)\ndata: ([\s\S]*)/);
           if (!m) continue;
           const [, evType, raw] = m;
-          const data = JSON.parse(raw);
+          let data;
+          try { data = JSON.parse(raw.trim()); } catch { continue; }
 
           if (evType === 'trace') {
             setBrainState(prev => ({
@@ -63,7 +76,7 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
             setBrainState(prev => ({ ...prev, reflection: data.message }));
           } else if (evType === 'final_result') {
             setMessages(prev => [...prev, { role: 'soma', content: data.response }]);
-            onChatComplete?.();   // ← trigger graph refresh
+            onChatComplete?.();
           } else if (evType === 'error') {
             throw new Error(data.detail);
           }
@@ -72,6 +85,8 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
 
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Cognitive cycle complete.' }));
     } catch (err) {
+      // AbortError means we cancelled intentionally — don't surface it
+      if (err.name === 'AbortError') return;
       setMessages(prev => [...prev, { role: 'soma', content: `Neural Error: ${err.message}` }]);
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Process interrupted.' }));
     }
