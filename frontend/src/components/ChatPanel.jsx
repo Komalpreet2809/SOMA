@@ -86,7 +86,6 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
       <div className="messages-container">
         {messages.length === 0 ? (
           <div className="chat-empty">
-            <div className="chat-empty-brain">🧠</div>
             <p className="chat-empty-text">
               Send a message — watch Soma reflect, retrieve memory, and synthesize a response in real-time.
             </p>

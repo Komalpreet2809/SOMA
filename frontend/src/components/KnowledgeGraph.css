@@ -1,246 +1,251 @@
-/* ── Knowledge Graph Visualizer ─────────────────────────────── */
+/* ── Knowledge Graph ─────────────────────────────── */
 
 .graph-container {
   position: relative;
   width: 100%;
   height: 100%;
-  background: transparent;
+  background: var(--bg-0);
   overflow: hidden;
 }
 
-/* Ambient Neural radial glow */
 .graph-container::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(212, 168, 83, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 72% 62%, rgba(78, 205, 196, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 30% 40%, rgba(212, 168, 83, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(78, 205, 196, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   animation: glow-pulse 10s ease-in-out infinite alternate;
 }
 
+[data-theme="light"] .graph-container::before {
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(107, 63, 160, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(45, 125, 154, 0.05) 0%, transparent 50%);
+}
+
 @keyframes glow-pulse {
-  0% { opacity: 0.8; }
+  0%   { opacity: 0.8; }
   100% { opacity: 1.2; }
 }
 
-/* ── Header Bar ── */
+/* ── Header ── */
 .graph-header {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  background: linear-gradient(180deg, rgba(5,2,11,0.9) 0%, transparent 100%);
+  padding: 16px 22px;
+  background: linear-gradient(180deg, var(--bg-0) 0%, transparent 100%);
   z-index: 10;
   pointer-events: none;
 }
 
-.graph-header > * {
-  pointer-events: all;
-}
+.graph-header > * { pointer-events: all; }
 
 .graph-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .graph-title h2 {
-  font-size: 0.75rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.8rem;
+  font-weight: 400;
   margin: 0;
-  letter-spacing: 0.25em;
-  color: var(--text-secondary);
+  color: var(--text-1);
+  letter-spacing: 0.01em;
+}
+
+.pulse-ring {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pulse);
+  box-shadow: 0 0 8px var(--pulse);
+  animation: dot-breathe 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dot-breathe {
+  0%, 100% { transform: scale(1);   opacity: 0.7; }
+  50%       { transform: scale(1.3); opacity: 1; }
 }
 
 .graph-status-chip {
-  font-size: 0.5rem !important;
+  font-family: var(--font-mono);
+  font-size: 0.46rem !important;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   padding: 2px 7px;
   border-radius: 3px;
-  background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.2);
-  color: var(--accent-synapse);
+  background: var(--border-0);
+  border: 1px solid var(--border-1);
+  color: var(--pulse);
 }
 
 .demo-badge {
   font-family: var(--font-mono);
-  font-size: 0.48rem;
+  font-size: 0.44rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--fire);
+  background: var(--border-0);
+  border: 1px solid var(--border-2);
   padding: 2px 7px;
   border-radius: 3px;
-}
-
-/* Animated pulse ring — cyan/pink */
-.graph-title .pulse-ring {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow:
-    0 0 10px var(--accent-glow),
-    0 0 20px rgba(0, 240, 255, 0.3);
-  animation: graph-pulse 2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
-}
-
-@keyframes graph-pulse {
-  0%, 100% {
-    box-shadow: 0 0 10px var(--accent-glow), 0 0 20px rgba(0, 240, 255, 0.3);
-    background: var(--accent-primary);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(255, 0, 229, 0.5), 0 0 35px rgba(255, 0, 229, 0.3);
-    background: var(--accent-secondary);
-  }
+  opacity: 0.8;
 }
 
 .graph-controls {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
 /* ── Graph Buttons ── */
 .graph-btn {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.56rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  padding: 8px 16px;
+  letter-spacing: 0.12em;
+  padding: 6px 14px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.05);
-  background: rgba(10, 5, 20, 0.6);
-  color: var(--text-dim);
+  border: 1px solid var(--border-0);
+  background: var(--bg-1);
+  color: var(--text-2);
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
 .graph-btn:hover {
-  background: rgba(0, 240, 255, 0.1);
-  border-color: var(--border-active);
-  color: var(--accent-primary);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  background: var(--bg-2);
+  border-color: var(--border-1);
+  color: var(--text-0);
   transform: none;
+  box-shadow: none;
 }
 
-.graph-btn:active {
-  transform: scale(0.95);
-}
+.graph-btn:active { opacity: 0.7; }
 
 .graph-btn.active {
-  background: rgba(106, 13, 173, 0.4);
-  border-color: var(--accent-primary);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(0,240,255,0.2);
+  background: var(--bg-2);
+  border-color: var(--pulse);
+  color: var(--pulse);
 }
 
-/* ── Stats Overlay (bottom-left) ── */
+/* ── Stats Overlay ── */
 .graph-stats-overlay {
   position: absolute;
-  bottom: 24px;
-  left: 24px;
+  bottom: 22px;
+  left: 22px;
   z-index: 10;
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .stat-chip {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.56rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-dim);
-  padding: 6px 14px;
-  background: rgba(5, 2, 11, 0.8);
-  border: 1px solid rgba(255,255,255,0.05);
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+  padding: 5px 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-0);
   border-radius: 6px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 .stat-chip .stat-value {
-  color: var(--accent-primary);
+  color: var(--pulse);
   font-weight: 700;
-  margin-left: 8px;
-  text-shadow: 0 0 8px rgba(0,240,255,0.4);
+  margin-left: 6px;
 }
 
 .stat-chip .stat-value.secondary,
 .stat-chip .stat-value.purple {
-  color: var(--accent-impulse);
-  text-shadow: 0 0 8px rgba(240, 171, 252, 0.4);
+  color: var(--fire);
 }
 
-/* ── Tooltip ── */
-.graph-tooltip {
+/* ── Legend ── */
+.graph-legend {
   position: absolute;
-  pointer-events: none;
-  z-index: 20;
-  background: rgba(7, 3, 15, 0.95);
-  border: 1px solid var(--border-active);
-  border-radius: 8px;
+  bottom: 22px;
+  right: 22px;
+  z-index: 10;
+  background: var(--bg-1);
+  border: 1px solid var(--border-0);
+  border-radius: 10px;
   padding: 12px 16px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 240, 255, 0.15);
-  min-width: 160px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(10px);
 }
 
-.graph-tooltip.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.tooltip-name {
+.legend-title {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent-primary);
+  font-size: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
+  color: var(--text-2);
   margin-bottom: 8px;
-  text-shadow: 0 0 5px rgba(0,240,255,0.3);
+  border-bottom: 1px solid var(--border-0);
+  padding-bottom: 6px;
 }
 
-.tooltip-detail {
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  letter-spacing: 0.1em;
-}
-
-.tooltip-relations {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.tooltip-relation-item {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
+  font-size: 0.56rem;
+  color: var(--text-1);
   letter-spacing: 0.08em;
 }
 
-.tooltip-relation-item .rel-arrow {
-  color: var(--accent-secondary);
-  margin: 0 6px;
-  text-shadow: 0 0 4px rgba(255,0,229,0.4);
+/* ── Loading ── */
+.graph-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  background: var(--bg-0);
+  opacity: 0.9;
 }
 
-/* ── Empty State ── */
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--pulse);
+  animation: load-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes load-pulse {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* ── Empty state (unused now that demo data exists, but kept) ── */
 .graph-empty-state {
   position: absolute;
   inset: 0;
@@ -252,157 +257,25 @@
 }
 
 .empty-brain-icon {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 2px solid rgba(0, 240, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.2rem;
-  margin-bottom: 24px;
-  animation: empty-pulse 4s ease-in-out infinite;
-  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
-}
-
-@keyframes empty-pulse {
-  0%, 100% { border-color: rgba(0, 240, 255, 0.15); box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05); }
-  50%       { border-color: rgba(255, 0, 229, 0.3); box-shadow: 0 0 30px rgba(255, 0, 229, 0.15), inset 0 0 30px rgba(255, 0, 229, 0.1); }
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  opacity: 0.3;
 }
 
 .empty-title {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-}
-
-.empty-subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.15em;
-  max-width: 340px;
-  text-align: center;
-  line-height: 1.8;
-}
-
-/* ── Loading scan line ── */
-.graph-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 15;
-  background: rgba(5, 2, 11, 0.6);
-  backdrop-filter: blur(4px);
-}
-
-.graph-loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-pink), transparent);
-  animation: scan-line 2s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-}
-
-@keyframes scan-line {
-  0%   { top: 0;    opacity: 0; }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
-}
-
-.loading-text {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: var(--accent-primary);
-  animation: pulse-glow 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-glow {
-  from { text-shadow: 0 0 5px rgba(0,240,255,0.2); }
-  to { text-shadow: 0 0 20px rgba(0,240,255,0.8); }
-}
-
-/* ── Legend (bottom-right) ── */
-.graph-legend {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  z-index: 10;
-  background: rgba(5, 2, 11, 0.85);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px;
-  padding: 12px 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-}
-
-.legend-title {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  padding-bottom: 6px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  letter-spacing: 0.25em;
+  color: var(--text-2);
   margin-bottom: 8px;
 }
 
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.legend-dot.primary {
-  background: var(--accent-primary);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
-}
-
-.legend-dot.secondary {
-  background: var(--accent-secondary);
-  box-shadow: 0 0 8px rgba(255, 0, 229, 0.6);
-}
-
-.legend-label {
-  font-family: var(--font-mono);
+.empty-subtitle {
   font-size: 0.65rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.1em;
-}
-
-/* ═══ Background Mode ═══ */
-.graph-bg-mode {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
-
-.graph-bg-mode .graph-empty-state {
-  /* Soften empty state when it's the background */
-  opacity: 0.4;
-}
-
-.graph-bg-mode .graph-loading {
-  background: transparent;
-  backdrop-filter: none;
+  color: var(--text-2);
+  max-width: 320px;
+  text-align: center;
+  line-height: 1.8;
+  opacity: 0.7;
 }

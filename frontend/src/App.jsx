@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import ChatPanel from './components/ChatPanel'
 import BrainProcess from './components/BrainProcess'
 import KnowledgeGraph from './components/KnowledgeGraph'
 import DreamSequence from './components/DreamSequence'
 import Onboarding from './components/Onboarding'
-import EEGWave from './components/EEGWave'
 import './App.css'
 
 function App() {
@@ -27,6 +26,47 @@ function App() {
   const [theme, setTheme] = useState(() =>
     localStorage.getItem('soma_theme') || 'dark'
   )
+
+  // ── Resizable columns ──
+  const [colWidths, setColWidths] = useState([30, 32, 38]) // percentages
+  const dragRef = useRef(null) // { divider: 0|1, startX, startWidths }
+  const layoutRef = useRef(null)
+
+  const startDrag = useCallback((dividerIndex, e) => {
+    e.preventDefault()
+    dragRef.current = {
+      divider: dividerIndex,
+      startX: e.clientX,
+      startWidths: [...colWidths],
+    }
+
+    const onMove = (ev) => {
+      if (!dragRef.current || !layoutRef.current) return
+      const totalW = layoutRef.current.getBoundingClientRect().width
+      const dx = ((ev.clientX - dragRef.current.startX) / totalW) * 100
+      const { divider, startWidths } = dragRef.current
+      const next = [...startWidths]
+      next[divider]     = Math.max(18, startWidths[divider] + dx)
+      next[divider + 1] = Math.max(18, startWidths[divider + 1] - dx)
+      // clamp so total stays 100
+      const total = next.reduce((a, b) => a + b, 0)
+      const scale = 100 / total
+      setColWidths(next.map(w => w * scale))
+    }
+
+    const onUp = () => {
+      dragRef.current = null
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [colWidths])
 
   // Apply theme to root
   useEffect(() => {
@@ -120,13 +160,8 @@ function App() {
           </div>
         </div>
 
-        {/* Center: EEG + state */}
-        <div className="header-center">
-          <EEGWave cognitiveState={brainState.cognitiveState} isActive={brainState.isLoading} />
-          <span className={`state-label t-label ${brainState.isLoading ? 'firing' : ''}`}>
-            {brainState.cognitiveState}
-          </span>
-        </div>
+        {/* Center spacer */}
+        <div className="header-center" />
 
         {/* Right: Controls */}
         <div className="header-controls">
@@ -179,10 +214,10 @@ function App() {
         </div>
       </header>
 
-      {/* ── Three-Column Layout ── */}
-      <div className="tri-layout">
+      {/* ── Three-Column Resizable Layout ── */}
+      <div className="tri-layout" ref={layoutRef}>
 
-        <div className="col-chat">
+        <div className="col-chat" style={{ width: `${colWidths[0]}%` }}>
           <ChatPanel
             messages={messages}
             setMessages={setMessages}
@@ -193,14 +228,18 @@ function App() {
           />
         </div>
 
-        <div className="col-brain">
+        <div className="resize-handle" onMouseDown={(e) => startDrag(0, e)} />
+
+        <div className="col-brain" style={{ width: `${colWidths[1]}%` }}>
           <BrainProcess
             brainState={brainState}
             currentPersona={currentPersona}
           />
         </div>
 
-        <div className="col-graph">
+        <div className="resize-handle" onMouseDown={(e) => startDrag(1, e)} />
+
+        <div className="col-graph" style={{ width: `${colWidths[2]}%` }}>
           {rightPanel === 'graph'
             ? <KnowledgeGraph highlightedNodes={brainState.highlightedNodes} currentPersona={currentPersona} />
             : <DreamSequence sparks={brainState.sparks} />

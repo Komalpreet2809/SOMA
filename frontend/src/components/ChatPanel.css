@@ -114,11 +114,6 @@
   text-align: center;
 }
 
-.chat-empty-brain {
-  font-size: 2rem;
-  opacity: 0.25;
-  animation: soma-pulse 5s infinite ease-in-out;
-}
 
 .chat-empty-text {
   font-size: 0.7rem;
