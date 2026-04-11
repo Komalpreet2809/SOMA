@@ -4,11 +4,14 @@ import BrainProcess from './components/BrainProcess'
 import KnowledgeGraph from './components/KnowledgeGraph'
 import DreamSequence from './components/DreamSequence'
 import Onboarding from './components/Onboarding'
+import AuthScreen from './components/AuthScreen'
+import { apiFetch } from './api'
 import './App.css'
 
 function App() {
-  const [messages, setMessages]     = useState([])
-  const [brainState, setBrainState] = useState({
+  const [currentUser,     setCurrentUser]     = useState(() => localStorage.getItem('soma_username') || null)
+  const [messages,        setMessages]        = useState([])
+  const [brainState,      setBrainState]      = useState({
     sensoryDocuments: 0,
     graphRelations:   0,
     workingMemory:    0,
@@ -20,17 +23,16 @@ function App() {
     cognitiveState:   'IDLE',
     traces:           []
   })
-  const [rightPanel,      setRightPanel]      = useState('graph')
-  const [currentPersona,  setCurrentPersona]  = useState('User_Alpha')
-  const [showOnboarding,  setShowOnboarding]  = useState(false)
-  const [theme,           setTheme]           = useState(() => localStorage.getItem('soma_theme') || 'dark')
-  const [graphRefreshTick, setGraphRefreshTick] = useState(0)   // increments → graph re-fetches
-  const [sleepModal,      setSleepModal]      = useState(null)  // null | { pruned, relations }
+  const [rightPanel,       setRightPanel]       = useState('graph')
+  const [showOnboarding,   setShowOnboarding]   = useState(false)
+  const [theme,            setTheme]            = useState(() => localStorage.getItem('soma_theme') || 'dark')
+  const [graphRefreshTick, setGraphRefreshTick] = useState(0)
+  const [sleepModal,       setSleepModal]       = useState(null)
 
   // ── Resizable columns ──
   const [colWidths, setColWidths] = useState([30, 32, 38])
-  const dragRef   = useRef(null)
-  const layoutRef = useRef(null)
+  const dragRef    = useRef(null)
+  const layoutRef  = useRef(null)
 
   const startDrag = useCallback((dividerIndex, e) => {
     e.preventDefault()
@@ -68,19 +70,22 @@ function App() {
     localStorage.setItem('soma_theme', theme)
   }, [theme])
 
-  // ── First visit ──
+  // ── First visit onboarding ──
   useEffect(() => {
-    if (!localStorage.getItem('soma_visited')) {
+    if (currentUser && !localStorage.getItem('soma_visited')) {
       setShowOnboarding(true)
       localStorage.setItem('soma_visited', 'true')
     }
-  }, [])
+  }, [currentUser])
 
-  // ── Poll vitals & sparks ──
+  // ── Poll vitals & sparks (only when logged in) ──
   useEffect(() => {
+    if (!currentUser) return
+
     const fetchVitals = async () => {
       try {
-        const res  = await fetch(`/api/v1/brain/vitals?user_id=${currentPersona}`)
+        const res  = await apiFetch(`/api/v1/brain/vitals`)
+        if (!res.ok) return
         const data = await res.json()
         setBrainState(prev => ({
           ...prev,
@@ -91,35 +96,40 @@ function App() {
         }))
       } catch { /* backend offline */ }
     }
+
     const fetchSparks = async () => {
       try {
-        const res  = await fetch(`/api/v1/brain/sparks?user_id=${currentPersona}`)
+        const res  = await apiFetch(`/api/v1/brain/sparks`)
+        if (!res.ok) return
         const data = await res.json()
         setBrainState(prev => ({ ...prev, sparks: data }))
       } catch { /* silent */ }
     }
+
     fetchVitals(); fetchSparks()
     const id = setInterval(() => { fetchVitals(); fetchSparks() }, 20000)
     return () => clearInterval(id)
-  }, [currentPersona])
+  }, [currentUser])
 
-  // ── Chat history on persona change ──
+  // ── Chat history on login ──
   useEffect(() => {
+    if (!currentUser) return
     const load = async () => {
       try {
-        const res  = await fetch(`/api/v1/history?user_id=${currentPersona}`)
+        const res  = await apiFetch(`/api/v1/history`)
+        if (!res.ok) return
         const data = await res.json()
         setMessages(data.messages || [])
       } catch { /* silent */ }
     }
     load()
-  }, [currentPersona])
+  }, [currentUser])
 
   // ── Sleep ──
   const handleSleep = async () => {
     setBrainState(prev => ({ ...prev, isLoading: true, cognitiveState: 'SLEEPING' }))
     try {
-      const res  = await fetch('/api/v1/sleep', { method: 'POST' })
+      const res  = await apiFetch('/api/v1/sleep', { method: 'POST' })
       const data = await res.json()
       setBrainState(prev => ({ ...prev, isLoading: false, cognitiveState: 'IDLE', statusMessage: 'Memory consolidated.' }))
       setSleepModal({ pruned: data.messages_pruned ?? 0, relations: data.graph_relations_extracted ?? 0 })
@@ -128,10 +138,33 @@ function App() {
     }
   }
 
-  // ── Called by ChatPanel after each AI response ──
+  // ── Graph refresh after chat ──
   const handleChatComplete = useCallback(() => {
     setGraphRefreshTick(t => t + 1)
   }, [])
+
+  // ── Auth ──
+  const handleAuth = (username) => {
+    setCurrentUser(username)
+    setMessages([])
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('soma_token')
+    localStorage.removeItem('soma_username')
+    setCurrentUser(null)
+    setMessages([])
+    setBrainState(prev => ({ ...prev, sensoryDocuments: 0, graphRelations: 0, workingMemory: 0, sparks: [] }))
+  }
+
+  // ── Show auth screen if not logged in ──
+  if (!currentUser) {
+    return (
+      <div data-theme={theme}>
+        <AuthScreen onAuth={handleAuth} />
+      </div>
+    )
+  }
 
   return (
     <div className={`app-root state-${brainState.cognitiveState.toLowerCase()}`}>
@@ -188,11 +221,11 @@ function App() {
             Sleep
           </button>
 
-          <select className="persona-select t-label" value={currentPersona} onChange={e => setCurrentPersona(e.target.value)}>
-            <option value="User_Alpha">Alpha</option>
-            <option value="User_Beta">Beta</option>
-            <option value="System_Admin">Admin</option>
-          </select>
+          {/* Logged-in user + logout */}
+          <div className="user-chip">
+            <span className="user-chip-name t-label">{currentUser}</span>
+            <button className="user-logout-btn t-label" onClick={handleLogout} title="Sign out">↩</button>
+          </div>
 
           <button className="theme-toggle" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} title="Toggle theme">
             {theme === 'dark' ? (
@@ -224,7 +257,7 @@ function App() {
             brainState={brainState}
             setBrainState={setBrainState}
             isLoading={brainState.isLoading}
-            currentPersona={currentPersona}
+            currentUser={currentUser}
             onChatComplete={handleChatComplete}
           />
         </div>
@@ -244,7 +277,7 @@ function App() {
           {rightPanel === 'graph'
             ? <KnowledgeGraph
                 highlightedNodes={brainState.highlightedNodes}
-                currentPersona={currentPersona}
+                currentUser={currentUser}
                 refreshTick={graphRefreshTick}
               />
             : <DreamSequence sparks={brainState.sparks} />

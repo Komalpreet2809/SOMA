@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     # SQLite Path
     SQLITE_DB_PATH: str = os.getenv("SQLITE_DB_PATH", os.path.join(os.getcwd(), "data", "soma_sessions.db"))
 
+    # Auth
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-this-in-production-please")
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_DAYS: int = 30
+
     model_config = SettingsConfigDict(case_sensitive=True)
 
 @lru_cache()
