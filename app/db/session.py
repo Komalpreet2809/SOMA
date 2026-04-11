@@ -6,6 +6,14 @@ DB_PATH = settings.SQLITE_DB_PATH
 def init_session_db():
     with sqlite3.connect(DB_PATH) as db:
         db.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                hashed_password TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        db.execute('''
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 session_id TEXT,
@@ -23,12 +31,36 @@ def init_session_db():
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
-        # Migration: add user_id to existing databses gracefully
+        # Migration: add user_id to existing databases gracefully
         try:
             db.execute("ALTER TABLE neural_sparks ADD COLUMN user_id TEXT DEFAULT 'default_user'")
         except sqlite3.OperationalError:
             pass
         db.commit()
+
+# ── User account helpers ──────────────────────────────────────────
+
+def create_user(username: str, hashed_password: str) -> bool:
+    """Insert a new user. Returns False if username already taken."""
+    try:
+        with sqlite3.connect(DB_PATH) as db:
+            db.execute(
+                'INSERT INTO users (username, hashed_password) VALUES (?, ?)',
+                (username, hashed_password)
+            )
+            db.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+
+def get_user(username: str):
+    """Return (username, hashed_password) row or None."""
+    with sqlite3.connect(DB_PATH) as db:
+        cursor = db.execute(
+            'SELECT username, hashed_password FROM users WHERE username = ?',
+            (username,)
+        )
+        return cursor.fetchone()
 
 def add_message(session_id: str, role: str, content: str):
     """Save a single message to the Working Memory."""

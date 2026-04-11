@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.endpoints import router as api_router
+from app.api.auth_router import router as auth_router
 from app.db.session import init_session_db
 from app.services.dreaming import idle_brain_cycle
 import asyncio
@@ -27,7 +28,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the API router
+# Include routers
+app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # Serve React frontend if built
