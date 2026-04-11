@@ -121,20 +121,22 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
 
   const getNodeColor = node => {
     if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
-      return 'rgba(240, 171, 252, 1)';
+      return 'rgba(224, 122, 56, 1)';   // fire — active node
     }
     if (node.isDemo) {
-      // Gradient from violet → cyan for demo anatomy nodes
       const hash = node.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-      const hue = (hash * 37) % 60; // 0–60 → violet to indigo range
-      return `hsla(${260 + hue}, 80%, 72%, 0.9)`;
+      const hue = (hash * 41) % 80;
+      // Demo nodes span amber → teal (warm, not purple)
+      return hue < 40
+        ? `hsla(${38 + hue * 0.4}, 75%, 60%, 0.9)`   // amber range
+        : `hsla(${175 + hue * 0.3}, 60%, 55%, 0.9)`;  // teal range
     }
-    return 'rgba(192, 132, 252, 0.9)';
+    return 'rgba(212, 168, 83, 0.85)';  // amber
   };
 
   const getLinkColor = () => isDemo
-    ? 'rgba(130, 100, 220, 0.25)'
-    : 'rgba(167, 139, 250, 0.2)';
+    ? 'rgba(212, 168, 83, 0.18)'
+    : 'rgba(212, 168, 83, 0.22)';
 
   return (
     <div className="graph-container" ref={containerRef}>
@@ -187,8 +189,8 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
             linkDirectionalParticleSpeed={0.006}
             linkDirectionalParticleWidth={isDemo ? 1.5 : 2}
             linkDirectionalParticleColor={() => isDemo
-              ? 'rgba(167, 139, 250, 0.7)'
-              : 'rgba(240, 171, 252, 0.85)'}
+              ? 'rgba(212, 168, 83, 0.8)'
+              : 'rgba(224, 122, 56, 0.9)'}
 
             linkColor={getLinkColor}
             linkOpacity={isDemo ? 0.45 : 0.5}
