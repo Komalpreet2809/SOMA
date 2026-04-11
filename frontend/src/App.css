@@ -282,7 +282,7 @@
 /* ── Drag handle ── */
 .resize-handle {
   flex-shrink: 0;
-  width: 5px;
+  width: 8px;
   background: var(--border-0);
   cursor: col-resize;
   transition: background 0.2s ease;
@@ -300,6 +300,106 @@
 .resize-handle:active {
   background: var(--pulse);
 }
+
+/* ══════════════════════════════════════
+   Sleep Modal
+   ══════════════════════════════════════ */
+.sleep-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  animation: ob-fade 0.3s ease;
+}
+
+[data-theme="light"] .sleep-modal-overlay {
+  background: rgba(180,165,140,0.45);
+}
+
+.sleep-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: 18px;
+  padding: 36px 40px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 28px 64px rgba(0,0,0,0.45);
+  animation: ob-rise 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+
+.sm-icon { font-size: 2.4rem; animation: float 3s ease-in-out infinite; }
+
+.sm-title {
+  font-size: 1.35rem;
+  color: var(--pulse);
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.sm-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-0);
+  border-radius: 12px;
+  padding: 16px 28px;
+  width: 100%;
+  justify-content: center;
+}
+
+.sm-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+.sm-num {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fire);
+  line-height: 1;
+  filter: drop-shadow(0 0 8px var(--fire));
+}
+
+.sm-lbl {
+  font-size: 0.5rem;
+  letter-spacing: 0.16em;
+  color: var(--text-2);
+}
+
+.sm-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border-1);
+}
+
+.sm-desc {
+  font-size: 0.8rem;
+  color: var(--text-1);
+  line-height: 1.65;
+  max-width: 300px;
+}
+
+.sm-close {
+  padding: 10px 32px;
+  border-radius: 10px;
+  background: var(--pulse);
+  color: var(--bg-0);
+  border-color: var(--pulse);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.sm-close:hover { opacity: 0.85; transform: none; box-shadow: var(--glow-pulse); }
 
 /* ── Cognitive state background shifts ── */
 .state-sleeping { --bg-0: #04040a; }

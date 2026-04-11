@@ -39,7 +39,7 @@ const DEMO_GRAPH = {
   ],
 };
 
-function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
+function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) {
   const fgRef = useRef();
   const containerRef = useRef(null);
 
@@ -50,6 +50,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
   const [showLabels, setShowLabels] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [pulsingNodes, setPulsingNodes] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -108,6 +109,19 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
 
   useEffect(() => { fetchGraph(); }, [fetchGraph]);
 
+  // Re-fetch when a chat completes (refreshTick incremented by App)
+  useEffect(() => {
+    if (refreshTick > 0) fetchGraph();
+  }, [refreshTick, fetchGraph]);
+
+  // Pulse nodes that were retrieved, then clear after 2.5 s
+  useEffect(() => {
+    if (!highlightedNodes.length) return;
+    setPulsingNodes(highlightedNodes);
+    const t = setTimeout(() => setPulsingNodes([]), 2500);
+    return () => clearTimeout(t);
+  }, [highlightedNodes]);
+
   const handleNodeClick = useCallback(node => {
     if (!fgRef.current) return;
     const distance = 80;
@@ -120,16 +134,20 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
   }, []);
 
   const getNodeColor = node => {
+    // Currently pulsing (retrieved during last query) — bright fire
+    if (pulsingNodes.includes(node.id) || pulsingNodes.includes(node.label)) {
+      return 'rgba(255, 140, 60, 1)';
+    }
+    // Highlighted (still active) — fire
     if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
-      return 'rgba(224, 122, 56, 1)';   // fire — active node
+      return 'rgba(224, 122, 56, 1)';
     }
     if (node.isDemo) {
       const hash = node.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
       const hue = (hash * 41) % 80;
-      // Demo nodes span amber → teal (warm, not purple)
       return hue < 40
-        ? `hsla(${38 + hue * 0.4}, 75%, 60%, 0.9)`   // amber range
-        : `hsla(${175 + hue * 0.3}, 60%, 55%, 0.9)`;  // teal range
+        ? `hsla(${38 + hue * 0.4}, 75%, 60%, 0.9)`
+        : `hsla(${175 + hue * 0.3}, 60%, 55%, 0.9)`;
     }
     return 'rgba(212, 168, 83, 0.85)';  // amber
   };
@@ -149,9 +167,6 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
           <span className="label-mono graph-status-chip">
             {isDemo ? 'DEMO' : graphStatus === 'online' ? 'LIVE' : graphStatus.toUpperCase()}
           </span>
-          {isDemo && (
-            <span className="demo-badge">Brain Anatomy Template</span>
-          )}
         </div>
         <div className="graph-controls">
           <button
@@ -181,6 +196,11 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
 
             nodeLabel={showLabels ? 'label' : ''}
             nodeColor={getNodeColor}
+            nodeVal={node =>
+              (pulsingNodes.includes(node.id) || pulsingNodes.includes(node.label))
+                ? (node.val || 5) * 2.2
+                : (node.val || 5)
+            }
             nodeRelSize={5}
             nodeResolution={16}
             nodeOpacity={0.9}
@@ -224,15 +244,15 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona }) {
       <div className="graph-legend">
         <div className="legend-title">Legend</div>
         <div className="legend-item">
-          <div className="legend-dot" style={{ background: 'rgba(192, 132, 252, 0.9)' }} />
+          <div className="legend-dot" style={{ background: 'rgba(212, 168, 83, 0.9)' }} />
           <span className="legend-label">{isDemo ? 'Brain Region' : 'Entity Node'}</span>
         </div>
         <div className="legend-item">
-          <div className="legend-dot" style={{ background: 'rgba(240, 171, 252, 0.9)' }} />
-          <span className="legend-label">Active Node</span>
+          <div className="legend-dot" style={{ background: 'rgba(255, 140, 60, 1)' }} />
+          <span className="legend-label">Active / Retrieved</span>
         </div>
         <div className="legend-item">
-          <div className="legend-dot" style={{ background: 'rgba(167, 139, 250, 0.7)', borderRadius: '2px', width: '16px', height: '4px' }} />
+          <div className="legend-dot" style={{ background: 'rgba(212, 168, 83, 0.6)', borderRadius: '2px', width: '16px', height: '4px' }} />
           <span className="legend-label">Synaptic Flow</span>
         </div>
       </div>

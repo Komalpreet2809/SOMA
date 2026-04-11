@@ -1,22 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import './ChatPanel.css';
 
-function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading, currentPersona }) {
-  const [inputText, setInputText] = useState('');
+const DEMO_QUERY = "What is the hippocampus and how does the brain form long-term memories?";
+
+function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading, currentPersona, onChatComplete }) {
+  const [inputText,   setInputText]   = useState('');
+  const [showIngest,  setShowIngest]  = useState(false);
+  const [ingestText,  setIngestText]  = useState('');
+  const [ingestStatus, setIngestStatus] = useState('');
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!inputText.trim() || isLoading) return;
+  const sendMessage = async (text) => {
+    if (!text.trim() || isLoading) return;
 
-    const query = inputText;
-    setInputText('');
-    setMessages(prev => [...prev, { role: 'user', content: query }]);
-
+    setMessages(prev => [...prev, { role: 'user', content: text }]);
     setBrainState(prev => ({
       ...prev,
       isLoading: true,
@@ -30,10 +31,10 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
       const res = await fetch('/api/v1/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: query, user_id: currentPersona }),
+        body: JSON.stringify({ text, user_id: currentPersona }),
       });
 
-      const reader = res.body.getReader();
+      const reader  = res.body.getReader();
       const decoder = new TextDecoder();
       let buf = '';
 
@@ -54,14 +55,15 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
           if (evType === 'trace') {
             setBrainState(prev => ({
               ...prev,
-              statusMessage: data.message,
-              traces: [...prev.traces, data],
+              statusMessage:    data.message,
+              traces:           [...prev.traces, data],
               highlightedNodes: data.touched || prev.highlightedNodes,
             }));
           } else if (evType === 'reflection') {
             setBrainState(prev => ({ ...prev, reflection: data.message }));
           } else if (evType === 'final_result') {
             setMessages(prev => [...prev, { role: 'soma', content: data.response }]);
+            onChatComplete?.();   // ← trigger graph refresh
           } else if (evType === 'error') {
             throw new Error(data.detail);
           }
@@ -72,6 +74,33 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
     } catch (err) {
       setMessages(prev => [...prev, { role: 'soma', content: `Neural Error: ${err.message}` }]);
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Process interrupted.' }));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendMessage(inputText);
+    setInputText('');
+  };
+
+  const handleDemo = () => sendMessage(DEMO_QUERY);
+
+  const handleIngest = async () => {
+    if (!ingestText.trim()) return;
+    setIngestStatus('Ingesting…');
+    try {
+      const res  = await fetch('/api/v1/ingest', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ text: ingestText, user_id: currentPersona }),
+      });
+      const data = await res.json();
+      setIngestStatus(`✓ ${data.chunks ?? 1} chunk${(data.chunks ?? 1) !== 1 ? 's' : ''} stored`);
+      setIngestText('');
+      setTimeout(() => setIngestStatus(''), 3000);
+    } catch {
+      setIngestStatus('✗ Ingest failed');
+      setTimeout(() => setIngestStatus(''), 3000);
     }
   };
 
@@ -89,13 +118,14 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
             <p className="chat-empty-text">
               Send a message — watch Soma reflect, retrieve memory, and synthesize a response in real-time.
             </p>
+            <button className="demo-btn" onClick={handleDemo} disabled={isLoading}>
+              Try a demo question
+            </button>
           </div>
         ) : (
           messages.map((msg, i) => (
             <div key={i} className={`msg ${msg.role}`}>
-              <div className="msg-role">
-                {msg.role === 'user' ? currentPersona : 'SOMA'}
-              </div>
+              <div className="msg-role">{msg.role === 'user' ? currentPersona : 'SOMA'}</div>
               <div className="msg-bubble">{msg.content}</div>
             </div>
           ))
@@ -103,8 +133,9 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
         <div ref={endRef} />
       </div>
 
+      {/* ── Input ── */}
       <div className="chat-input-wrap">
-        <form className="chat-form" onSubmit={handleSend}>
+        <form className="chat-form" onSubmit={handleSubmit}>
           <input
             className="chat-input"
             type="text"
@@ -118,7 +149,41 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
             {isLoading ? '…' : 'Send'}
           </button>
         </form>
-        <div className="chat-status">{brainState.statusMessage}</div>
+
+        <div className="chat-footer-row">
+          <div className="chat-status">{brainState.statusMessage}</div>
+          <button
+            className={`ingest-toggle-btn ${showIngest ? 'open' : ''}`}
+            onClick={() => setShowIngest(p => !p)}
+            title="Feed knowledge to Soma"
+          >
+            {showIngest ? '↓ Close' : '+ Feed Knowledge'}
+          </button>
+        </div>
+
+        {/* ── Ingest drawer ── */}
+        {showIngest && (
+          <div className="ingest-drawer">
+            <p className="ingest-hint t-label">Paste any text — articles, notes, facts — and Soma will ingest it into sensory memory.</p>
+            <textarea
+              className="ingest-textarea"
+              value={ingestText}
+              onChange={e => setIngestText(e.target.value)}
+              placeholder="Paste knowledge here…"
+              rows={4}
+            />
+            <div className="ingest-footer">
+              {ingestStatus && <span className="ingest-status">{ingestStatus}</span>}
+              <button
+                className="ingest-submit"
+                onClick={handleIngest}
+                disabled={!ingestText.trim()}
+              >
+                Ingest
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>
