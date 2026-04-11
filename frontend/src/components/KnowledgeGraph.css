@@ -14,8 +14,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(106, 13, 173, 0.15) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(0, 240, 255, 0.08) 0%, transparent 60%);
+    radial-gradient(ellipse at 30% 40%, rgba(212, 168, 83, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(78, 205, 196, 0.06) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   animation: glow-pulse 10s ease-in-out infinite alternate;
