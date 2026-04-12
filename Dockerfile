@@ -47,5 +47,5 @@ ENV SQLITE_DB_PATH=/home/user/app/data/soma_sessions.db
 
 EXPOSE 8080
 
-# Run Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# PORT env var is overridden by each platform (HF sets 7860, Fly.io sets 8080)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
