@@ -25,7 +25,7 @@ function App() {
   })
   const [rightPanel,       setRightPanel]       = useState('graph')
   const [showOnboarding,   setShowOnboarding]   = useState(false)
-  const [theme,            setTheme]            = useState(() => localStorage.getItem('soma_theme') || 'light')
+  const [theme,            setTheme]            = useState('light')
   const [graphRefreshTick, setGraphRefreshTick] = useState(0)
   const [sleepModal,       setSleepModal]       = useState(null)
 
