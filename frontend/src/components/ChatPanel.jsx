@@ -85,8 +85,14 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
 
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Cognitive cycle complete.' }));
     } catch (err) {
-      // AbortError means we cancelled intentionally — don't surface it
-      if (err.name === 'AbortError') return;
+      // AbortError or BodyStreamBuffer abort = intentional cancel, don't surface it
+      if (
+        err.name === 'AbortError' ||
+        err.message?.toLowerCase().includes('abort')
+      ) {
+        setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Brain idle.' }));
+        return;
+      }
       setMessages(prev => [...prev, { role: 'soma', content: `Neural Error: ${err.message}` }]);
       setBrainState(prev => ({ ...prev, isLoading: false, statusMessage: 'Process interrupted.' }));
     }
