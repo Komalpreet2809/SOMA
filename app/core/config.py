@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # SQLite Path
     SQLITE_DB_PATH: str = os.getenv("SQLITE_DB_PATH", os.path.join(os.getcwd(), "data", "soma_sessions.db"))
 
+    # Database — if set, uses Supabase Postgres; otherwise falls back to SQLite
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+
     # Auth
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-this-in-production-please")
     JWT_ALGORITHM: str = "HS256"

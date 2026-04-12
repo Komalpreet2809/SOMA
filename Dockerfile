@@ -36,7 +36,7 @@ RUN mkdir -p /home/user/app/data && chown -R user:user /home/user/app/data
 
 USER user
 
-ENV PORT=8080
+ENV PORT=7860
 ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
 ENV TORCH_HOME=/home/user/app/data/.cache/torch
