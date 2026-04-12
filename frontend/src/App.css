@@ -210,6 +210,49 @@
   color: var(--text-0);
 }
 
+/* User chip */
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: 20px;
+  padding: 4px 10px 4px 12px;
+}
+
+.user-chip-name {
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  color: var(--text-1);
+  text-transform: uppercase;
+}
+
+.user-logout-btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  background: transparent;
+  border: 1px solid var(--border-0);
+  color: var(--text-2);
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.user-logout-btn:hover {
+  background: var(--fire);
+  color: #fff;
+  border-color: var(--fire);
+  transform: none;
+  box-shadow: none;
+}
+
 /* Theme toggle */
 .theme-toggle {
   width: 32px;
@@ -317,7 +360,7 @@
 }
 
 [data-theme="light"] .sleep-modal-overlay {
-  background: rgba(180,165,140,0.45);
+  background: rgba(100, 80, 65, 0.35);
 }
 
 .sleep-modal {
@@ -404,7 +447,7 @@
 /* ── Cognitive state background shifts ── */
 .state-sleeping { --bg-0: #04040a; }
 
-[data-theme="light"] .state-sleeping { --bg-0: #eee8f5; }
+[data-theme="light"] .state-sleeping { --bg-0: #e8e0d4; }
 
 /* ── Responsive ── */
 @media (max-width: 1100px) {
