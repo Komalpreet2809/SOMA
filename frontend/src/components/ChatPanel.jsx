@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { apiFetch } from '../api';
 import './ChatPanel.css';
 
 const DEMO_QUERY = "What is the hippocampus and how does the brain form long-term memories?";
 
-function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading, currentPersona, onChatComplete }) {
+function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading, currentUser, onChatComplete }) {
   const [inputText,   setInputText]   = useState('');
   const [showIngest,  setShowIngest]  = useState(false);
   const [ingestText,  setIngestText]  = useState('');
@@ -37,10 +38,9 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
     abortRef.current = controller;
 
     try {
-      const res = await fetch('/api/v1/query/stream', {
+      const res = await apiFetch('/api/v1/query/stream', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, user_id: currentPersona }),
+        body: JSON.stringify({ text }),
         signal: controller.signal,
       });
 
@@ -104,10 +104,9 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
     if (!ingestText.trim()) return;
     setIngestStatus('Ingesting…');
     try {
-      const res  = await fetch('/api/v1/ingest', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ text: ingestText, user_id: currentPersona }),
+      const res  = await apiFetch('/api/v1/ingest', {
+        method: 'POST',
+        body:   JSON.stringify({ text: ingestText }),
       });
       const data = await res.json();
       setIngestStatus(`✓ ${data.chunks ?? 1} chunk${(data.chunks ?? 1) !== 1 ? 's' : ''} stored`);
@@ -124,7 +123,7 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
 
       <div className="chat-header">
         <span className="chat-header-title">Neural Feedback</span>
-        <span className="chat-header-session">{currentPersona}</span>
+        <span className="chat-header-session">{currentUser}</span>
       </div>
 
       <div className="messages-container">
@@ -140,7 +139,7 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
         ) : (
           messages.map((msg, i) => (
             <div key={i} className={`msg ${msg.role}`}>
-              <div className="msg-role">{msg.role === 'user' ? currentPersona : 'SOMA'}</div>
+              <div className="msg-role">{msg.role === 'user' ? currentUser : 'SOMA'}</div>
               <div className="msg-bubble">{msg.content}</div>
             </div>
           ))
