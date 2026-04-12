@@ -22,8 +22,8 @@
 
 [data-theme="light"] .graph-container::before {
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(229, 83, 59, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse at 72% 62%, rgba(90, 144, 168, 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 30% 40%, rgba(229, 83, 59, 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 62%, rgba(90, 143, 163, 0.03) 0%, transparent 50%);
 }
 
 @keyframes glow-pulse {
