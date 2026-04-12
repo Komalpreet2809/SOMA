@@ -70,6 +70,17 @@ function App() {
     localStorage.setItem('soma_theme', theme)
   }, [theme])
 
+  // ── Auto-logout on token expiry ──
+  useEffect(() => {
+    const handler = () => {
+      setCurrentUser(null)
+      setMessages([])
+      setBrainState(prev => ({ ...prev, sensoryDocuments: 0, graphRelations: 0, workingMemory: 0, sparks: [] }))
+    }
+    window.addEventListener('soma-auth-expired', handler)
+    return () => window.removeEventListener('soma-auth-expired', handler)
+  }, [])
+
   // ── First visit onboarding ──
   useEffect(() => {
     if (currentUser && !localStorage.getItem('soma_visited')) {
