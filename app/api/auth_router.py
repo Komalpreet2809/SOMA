@@ -20,7 +20,7 @@ class AuthRequest(BaseModel):
             raise ValueError("Username must be 3–30 characters")
         if not re.match(r"^[a-zA-Z0-9_]+$", v):
             raise ValueError("Username can only contain letters, numbers, and underscores")
-        return v
+        return v.lower()
 
     @field_validator("password")
     @classmethod
