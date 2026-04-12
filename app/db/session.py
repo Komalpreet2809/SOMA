@@ -57,7 +57,7 @@ def get_user(username: str):
     """Return (username, hashed_password) row or None."""
     with sqlite3.connect(DB_PATH) as db:
         cursor = db.execute(
-            'SELECT username, hashed_password FROM users WHERE username = ?',
+            'SELECT username, hashed_password FROM users WHERE username = ? COLLATE NOCASE',
             (username,)
         )
         return cursor.fetchone()
