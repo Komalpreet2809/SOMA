@@ -1,6 +1,49 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
+import * as THREE from 'three';
+import { apiFetch } from '../api';
 import './KnowledgeGraph.css';
+
+// Build a canvas-texture sprite for a node label
+function makeTextSprite(text) {
+  const fontSize = 22;
+  const padding  = 10;
+  const font     = `bold ${fontSize}px "SF Mono","Fira Mono","Consolas",monospace`;
+
+  const canvas = document.createElement('canvas');
+  const ctx    = canvas.getContext('2d');
+  ctx.font = font;
+  const textW  = ctx.measureText(text).width;
+  canvas.width  = Math.ceil(textW + padding * 2);
+  canvas.height = Math.ceil(fontSize + padding);
+
+  // pill background
+  ctx.fillStyle = 'rgba(8, 6, 4, 0.72)';
+  const r = 5;
+  const w = canvas.width, h = canvas.height;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(w - r, 0);
+  ctx.quadraticCurveTo(w, 0, w, r);
+  ctx.lineTo(w, h - r);
+  ctx.quadraticCurveTo(w, h, w - r, h);
+  ctx.lineTo(r, h);
+  ctx.quadraticCurveTo(0, h, 0, h - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // label text
+  ctx.font = font;
+  ctx.fillStyle = '#e8d4a0';
+  ctx.fillText(text, padding, fontSize);
+
+  const tex  = new THREE.CanvasTexture(canvas);
+  const mat  = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+  const spr  = new THREE.Sprite(mat);
+  spr.scale.set(canvas.width / 14, canvas.height / 14, 1);
+  return spr;
+}
 
 // Brain anatomy scaffold shown when Neo4j is empty / offline
 const DEMO_GRAPH = {
@@ -39,7 +82,7 @@ const DEMO_GRAPH = {
   ],
 };
 
-function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) {
+function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
   const fgRef = useRef();
   const containerRef = useRef(null);
 
@@ -77,7 +120,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
     setLoading(true);
     setGraphStatus('loading');
     try {
-      const res = await fetch(`/api/v1/graph?user_id=${currentPersona}`);
+      const res = await apiFetch('/api/v1/graph');
       const data = await res.json();
 
       if (data.status === 'offline' || data.nodes.length === 0) {
@@ -114,7 +157,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
     setLoading(false);
     // Recenter camera once force simulation has settled
     setTimeout(() => fgRef.current?.zoomToFit(400, 80), 1200);
-  }, [currentPersona]);
+  }, [currentUser]);
 
   useEffect(() => { fetchGraph(); }, [fetchGraph]);
 
@@ -130,6 +173,14 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
     const t = setTimeout(() => setPulsingNodes([]), 2500);
     return () => clearTimeout(t);
   }, [highlightedNodes]);
+
+  // nodeRelSize=5 → sphere radius ≈ 5 * ∛val
+  const nodeThreeObject = useCallback((node) => {
+    const nodeRadius = 5 * Math.cbrt(node.val || 5);
+    const sprite = makeTextSprite(node.label || node.id);
+    sprite.position.set(0, nodeRadius + sprite.scale.y / 2 + 1.5, 0);
+    return sprite;
+  }, []);
 
   const handleNodeClick = useCallback(node => {
     if (!fgRef.current) return;
@@ -203,7 +254,9 @@ function KnowledgeGraph({ highlightedNodes = [], currentPersona, refreshTick }) 
             graphData={graphData}
             backgroundColor="rgba(0,0,0,0)"
 
-            nodeLabel={showLabels ? 'label' : ''}
+            nodeLabel=""
+            nodeThreeObject={showLabels ? nodeThreeObject : undefined}
+            nodeThreeObjectExtend={true}
             nodeColor={getNodeColor}
             nodeVal={node =>
               (pulsingNodes.includes(node.id) || pulsingNodes.includes(node.label))

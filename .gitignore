@@ -15,3 +15,4 @@ venv.bak/
 chroma_db/
 data/
 *.db
+.claude/
