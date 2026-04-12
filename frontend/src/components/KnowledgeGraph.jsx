@@ -6,6 +6,7 @@ import './KnowledgeGraph.css';
 
 // Build a canvas-texture sprite for a node label
 function makeTextSprite(text) {
+  const isLight  = document.documentElement.getAttribute('data-theme') === 'light';
   const fontSize = 22;
   const padding  = 10;
   const font     = `bold ${fontSize}px "SF Mono","Fira Mono","Consolas",monospace`;
@@ -18,7 +19,7 @@ function makeTextSprite(text) {
   canvas.height = Math.ceil(fontSize + padding);
 
   // pill background
-  ctx.fillStyle = 'rgba(8, 6, 4, 0.72)';
+  ctx.fillStyle = isLight ? 'rgba(26, 21, 16, 0.68)' : 'rgba(8, 6, 4, 0.72)';
   const r = 5;
   const w = canvas.width, h = canvas.height;
   ctx.beginPath();
@@ -35,7 +36,7 @@ function makeTextSprite(text) {
 
   // label text
   ctx.font = font;
-  ctx.fillStyle = '#e8d4a0';
+  ctx.fillStyle = isLight ? '#F5F1EB' : '#e8d4a0';
   ctx.fillText(text, padding, fontSize);
 
   const tex  = new THREE.CanvasTexture(canvas);
@@ -193,28 +194,36 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
     );
   }, []);
 
+  const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+
   const getNodeColor = node => {
-    // Currently pulsing (retrieved during last query) — bright fire
     if (pulsingNodes.includes(node.id) || pulsingNodes.includes(node.label)) {
-      return 'rgba(255, 140, 60, 1)';
+      return isLightTheme ? 'rgba(229, 83, 59, 1)' : 'rgba(255, 140, 60, 1)';
     }
-    // Highlighted (still active) — fire
     if (highlightedNodes.includes(node.id) || highlightedNodes.includes(node.label)) {
-      return 'rgba(224, 122, 56, 1)';
+      return isLightTheme ? 'rgba(217, 59, 34, 1)' : 'rgba(224, 122, 56, 1)';
     }
     if (node.isDemo) {
       const hash = node.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+      if (isLightTheme) {
+        // coral / steel-blue palette for light theme
+        const hue = (hash * 41) % 80;
+        return hue < 40
+          ? `hsla(${12 + hue * 0.3}, 72%, 52%, 0.88)`
+          : `hsla(${200 + hue * 0.4}, 52%, 50%, 0.88)`;
+      }
       const hue = (hash * 41) % 80;
       return hue < 40
         ? `hsla(${38 + hue * 0.4}, 75%, 60%, 0.9)`
         : `hsla(${175 + hue * 0.3}, 60%, 55%, 0.9)`;
     }
-    return 'rgba(212, 168, 83, 0.85)';  // amber
+    return isLightTheme ? 'rgba(229, 83, 59, 0.82)' : 'rgba(212, 168, 83, 0.85)';
   };
 
-  const getLinkColor = () => isDemo
-    ? 'rgba(212, 168, 83, 0.18)'
-    : 'rgba(212, 168, 83, 0.22)';
+  const getLinkColor = () => {
+    if (isLightTheme) return isDemo ? 'rgba(229, 83, 59, 0.22)' : 'rgba(229, 83, 59, 0.28)';
+    return isDemo ? 'rgba(212, 168, 83, 0.18)' : 'rgba(212, 168, 83, 0.22)';
+  };
 
   return (
     <div className="graph-container" ref={containerRef}>
@@ -270,9 +279,11 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
             linkDirectionalParticles={2}
             linkDirectionalParticleSpeed={0.006}
             linkDirectionalParticleWidth={isDemo ? 1.5 : 2}
-            linkDirectionalParticleColor={() => isDemo
-              ? 'rgba(212, 168, 83, 0.8)'
-              : 'rgba(224, 122, 56, 0.9)'}
+            linkDirectionalParticleColor={() => isLightTheme
+              ? 'rgba(229, 83, 59, 0.9)'
+              : isDemo
+                ? 'rgba(212, 168, 83, 0.8)'
+                : 'rgba(224, 122, 56, 0.9)'}
 
             linkColor={getLinkColor}
             linkOpacity={isDemo ? 0.45 : 0.5}
@@ -306,11 +317,11 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
       <div className="graph-legend">
         <div className="legend-title">Legend</div>
         <div className="legend-item">
-          <div className="legend-dot" style={{ background: 'rgba(212, 168, 83, 0.9)' }} />
+          <div className="legend-dot" style={{ background: isLightTheme ? 'rgba(229,83,59,0.85)' : 'rgba(212,168,83,0.9)' }} />
           <span className="legend-label">{isDemo ? 'Brain Region' : 'Entity Node'}</span>
         </div>
         <div className="legend-item">
-          <div className="legend-dot" style={{ background: 'rgba(255, 140, 60, 1)' }} />
+          <div className="legend-dot" style={{ background: isLightTheme ? 'rgba(217,59,34,1)' : 'rgba(255,140,60,1)' }} />
           <span className="legend-label">Active / Retrieved</span>
         </div>
         <div className="legend-item">

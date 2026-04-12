@@ -37,28 +37,28 @@
 }
 
 [data-theme="light"] {
-  --bg-0:    #f5f0e8;   /* Histology glass slide */
-  --bg-1:    #ede7db;
-  --bg-2:    #e6dfd4;
-  --bg-3:    #ffffff;
+  --bg-0:    #EDE8DF;   /* warm cream canvas */
+  --bg-1:    #F5F1EB;   /* soft panel */
+  --bg-2:    #FFFFFF;   /* white card surface */
+  --bg-3:    #FAF8F4;   /* elevated element */
 
-  --fire:    #c4424e;   /* Nissl stain — red */
-  --pulse:   #6b3fa0;   /* Brain tissue — deep violet */
-  --calm:    #2d7d9a;   /* CSF — steel blue */
-  --synapse: #6b3fa0;
-  --error:   #c4424e;
+  --fire:    #E5533B;   /* coral / terracotta — primary accent */
+  --pulse:   #E5533B;   /* same coral for rings, active states */
+  --calm:    #5A90A8;   /* steel blue — secondary */
+  --synapse: #9B72C0;   /* muted violet — used sparingly */
+  --error:   #D93B22;   /* deep coral — destructive */
 
-  --text-0:  #1c1209;
-  --text-1:  #4a3d30;
-  --text-2:  #8a7565;
+  --text-0:  #1A1510;   /* near-black charcoal */
+  --text-1:  #4A3D35;   /* warm dark brown */
+  --text-2:  #9B8D85;   /* warm medium gray */
 
-  --border-0: rgba(107, 63, 160, 0.07);
-  --border-1: rgba(107, 63, 160, 0.18);
-  --border-2: rgba(196, 66, 78, 0.32);
+  --border-0: rgba(160, 145, 128, 0.18);
+  --border-1: rgba(140, 125, 108, 0.28);
+  --border-2: rgba(229, 83, 59, 0.26);
 
-  --glow-pulse: 0 0 16px rgba(107, 63, 160, 0.14);
-  --glow-fire:  0 0 14px rgba(196, 66, 78, 0.18);
-  --glow-calm:  0 0 12px rgba(45, 125, 154, 0.14);
+  --glow-pulse: 0 4px 20px rgba(229, 83, 59, 0.14);
+  --glow-fire:  0 4px 18px rgba(229, 83, 59, 0.20);
+  --glow-calm:  0 4px 14px rgba(90, 144, 168, 0.14);
 }
 
 /* ── Reset ── */
