@@ -278,6 +278,18 @@ def add_spark(content: str, entities: list, user_id: str = "default_user"):
             )
 
 
+def clear_user_messages(user_id: str):
+    """Delete all messages and sparks for a user (fresh session)."""
+    with get_conn() as conn:
+        cur = conn.cursor()
+        if _db_backend == "postgres":
+            cur.execute('DELETE FROM messages WHERE session_id = %s', (user_id,))
+            cur.execute('DELETE FROM neural_sparks WHERE user_id = %s', (user_id,))
+        else:
+            cur.execute('DELETE FROM messages WHERE session_id = ?', (user_id,))
+            cur.execute('DELETE FROM neural_sparks WHERE user_id = ?', (user_id,))
+
+
 def get_recent_sparks(user_id: str = "default_user", limit: int = 5):
     with get_conn() as conn:
         cur = _cursor(conn)

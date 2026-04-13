@@ -3,7 +3,9 @@ from pydantic import BaseModel, field_validator
 import re
 
 from app.auth.auth import hash_password, verify_password, create_token, get_current_user
-from app.db.session import create_user, get_user
+from app.db.session import create_user, get_user, clear_user_messages
+from app.db.chroma import clear_user_vectors
+from app.db.neo4j_driver import clear_user_graph
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -36,6 +38,13 @@ class TokenResponse(BaseModel):
     username: str
 
 
+def _reset_user_memory(username: str):
+    """Wipe all prior data so every session starts with a clean slate."""
+    clear_user_messages(username)
+    clear_user_vectors(username)
+    clear_user_graph(username)
+
+
 @router.post("/register", response_model=TokenResponse)
 async def register(req: AuthRequest):
     hashed = hash_password(req.password)
@@ -57,6 +66,7 @@ async def login(req: AuthRequest):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password"
         )
+    _reset_user_memory(req.username)
     token = create_token(req.username)
     return TokenResponse(access_token=token, username=req.username)
 
