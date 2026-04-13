@@ -2,7 +2,6 @@ import { useState } from 'react';
 import './AuthScreen.css';
 
 function AuthScreen({ onAuth }) {
-  const [mode,     setMode]     = useState('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
@@ -13,9 +12,8 @@ function AuthScreen({ onAuth }) {
     setError('');
     setLoading(true);
 
-    const endpoint = mode === 'login' ? 'login' : 'register';
     try {
-      const res  = await fetch(`/api/v1/auth/${endpoint}`, {
+      const res = await fetch('/api/v1/auth/enter', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ username: username.trim(), password }),
@@ -103,13 +101,9 @@ function AuthScreen({ onAuth }) {
 
       {/* ── Auth Card ── */}
       <section className="landing-auth">
-        <h2 className="auth-heading">
-          {mode === 'login' ? 'Welcome back' : 'Create your brain'}
-        </h2>
+        <h2 className="auth-heading">Enter your neural space</h2>
         <p className="auth-sub">
-          {mode === 'login'
-            ? 'Sign in to start a new cognitive session.'
-            : 'Your own private neural space — built from scratch, every time.'}
+          Pick a username and password. New name? We'll create your brain automatically.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -135,7 +129,7 @@ function AuthScreen({ onAuth }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Min. 6 characters"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              autoComplete="current-password"
               required
             />
           </div>
@@ -143,19 +137,9 @@ function AuthScreen({ onAuth }) {
           {error && <p className="auth-error">{error}</p>}
 
           <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+            {loading ? 'Initializing...' : 'Enter'}
           </button>
         </form>
-
-        <p className="auth-toggle">
-          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-          <button
-            className="auth-toggle-btn"
-            onClick={() => { setMode(m => m === 'login' ? 'register' : 'login'); setError(''); }}
-          >
-            {mode === 'login' ? 'Sign Up' : 'Sign In'}
-          </button>
-        </p>
       </section>
 
       {/* ── Footer ── */}
