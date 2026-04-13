@@ -5,8 +5,8 @@ primary_region = "sin"
 
 [env]
   PORT = "8080"
-  CHROMA_DB_PATH = "/home/user/app/data/chroma_db"
-  SQLITE_DB_PATH = "/home/user/app/data/soma_sessions.db"
+  CHROMA_DB_PATH = "/data/chroma_db"
+  SQLITE_DB_PATH = "/data/soma_sessions.db"
 
 [http_service]
   internal_port = 8080
@@ -17,4 +17,4 @@ primary_region = "sin"
 
 [[mounts]]
   source = "soma_data"
-  destination = "/home/user/app/data"
+  destination = "/data"
