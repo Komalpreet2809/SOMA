@@ -50,7 +50,7 @@ async def get_knowledge_graph(current_user: str = Depends(get_current_user)):
     try:
         node_query = """
         MATCH (n:Entity)
-        WHERE n.user_id = $user_id OR n.user_id IS NULL
+        WHERE n.user_id = $user_id
         OPTIONAL MATCH (n)-[r]-()
         RETURN n.name AS id, count(r) AS connections
         ORDER BY connections DESC
@@ -59,8 +59,8 @@ async def get_knowledge_graph(current_user: str = Depends(get_current_user)):
 
         edge_query = """
         MATCH (s:Entity)-[r]->(t:Entity)
-        WHERE (s.user_id = $user_id OR s.user_id IS NULL)
-          AND (t.user_id = $user_id OR t.user_id IS NULL)
+        WHERE (s.user_id = $user_id )
+          AND (t.user_id = $user_id )
         RETURN s.name AS source, type(r) AS label, t.name AS target
         """
         edge_results = neo4j_db.query(edge_query, {"user_id": current_user}) or []
@@ -81,7 +81,7 @@ async def get_graph_stats(current_user: str = Depends(get_current_user)):
     try:
         count_query = """
         MATCH (n:Entity)
-        WHERE n.user_id = $user_id OR n.user_id IS NULL
+        WHERE n.user_id = $user_id
         OPTIONAL MATCH (n)-[r]->()
         RETURN count(DISTINCT n) AS nodes, count(DISTINCT r) AS edges
         """
@@ -91,7 +91,7 @@ async def get_graph_stats(current_user: str = Depends(get_current_user)):
 
         top_query = """
         MATCH (n:Entity)-[r]-()
-        WHERE n.user_id = $user_id OR n.user_id IS NULL
+        WHERE n.user_id = $user_id
         RETURN n.name AS entity, count(r) AS connections
         ORDER BY connections DESC
         LIMIT 5

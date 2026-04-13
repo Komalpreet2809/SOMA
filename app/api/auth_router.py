@@ -54,6 +54,7 @@ async def register(req: AuthRequest):
             status_code=status.HTTP_409_CONFLICT,
             detail="Username already taken"
         )
+    _reset_user_memory(req.username)
     token = create_token(req.username)
     return TokenResponse(access_token=token, username=req.username)
 

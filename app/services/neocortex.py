@@ -77,8 +77,8 @@ def retrieve_graph_context(query: str, user_id: str = "default_user"):
     # Naive keyword matching: if any node name is in the query, pull its connections.
     cypher = """
     MATCH (n:Entity)-[r]->(m:Entity)
-    WHERE (n.user_id = $user_id OR n.user_id IS NULL)
-      AND (m.user_id = $user_id OR m.user_id IS NULL)
+    WHERE (n.user_id = $user_id)
+      AND (m.user_id = $user_id)
       AND (toLower($query) CONTAINS toLower(n.name) OR toLower($query) CONTAINS toLower(m.name))
     RETURN n.name AS s, type(r) AS rel, m.name AS o
     LIMIT 15
