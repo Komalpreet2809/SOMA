@@ -8,6 +8,7 @@ from app.core.config import settings
 # Otherwise fall back to local SQLite (development).
 
 USE_POSTGRES = bool(settings.DATABASE_URL)
+DB_PATH = settings.SQLITE_DB_PATH  # Always defined for fallback
 
 if USE_POSTGRES:
     import psycopg2
@@ -15,7 +16,6 @@ if USE_POSTGRES:
     from psycopg2 import IntegrityError as DBIntegrityError
 else:
     from sqlite3 import IntegrityError as DBIntegrityError
-    DB_PATH = settings.SQLITE_DB_PATH
 
 
 def _test_postgres_connection():
