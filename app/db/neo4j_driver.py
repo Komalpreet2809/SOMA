@@ -30,3 +30,16 @@ class Neo4jConnection:
             return [record.data() for record in result]
 
 neo4j_db = Neo4jConnection()
+
+
+def clear_user_graph(user_id: str):
+    """Delete all Neo4j entities and relationships belonging to a user."""
+    if not neo4j_db.driver:
+        return
+    try:
+        neo4j_db.query(
+            "MATCH (n:Entity {user_id: $user_id}) DETACH DELETE n",
+            {"user_id": user_id}
+        )
+    except Exception as e:
+        print(f"Neo4j clear error: {e}")
