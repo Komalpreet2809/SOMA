@@ -9,7 +9,7 @@ import { apiFetch } from './api'
 import './App.css'
 
 function App() {
-  const [currentUser,     setCurrentUser]     = useState(() => localStorage.getItem('soma_username') || null)
+  const [currentUser,     setCurrentUser]     = useState(null)
   const [messages,        setMessages]        = useState([])
   const [brainState,      setBrainState]      = useState({
     sensoryDocuments: 0,
