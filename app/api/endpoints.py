@@ -17,6 +17,17 @@ from app.auth.auth import get_current_user
 router = APIRouter()
 
 
+# ── Background memory builder ────────────────────────────────────
+
+async def _build_memory(exchange_text: str, user_id: str):
+    """Ingest a chat exchange into sensory + semantic memory in the background."""
+    try:
+        await asyncio.to_thread(ingest_text, exchange_text, {"type": "chat_exchange"}, user_id)
+        await asyncio.to_thread(extract_and_store_knowledge, exchange_text, user_id)
+    except Exception as e:
+        print(f"Background memory build error: {e}")
+
+
 # ── Brain Vitals ─────────────────────────────────────────────────
 
 @router.get("/brain/vitals")
@@ -201,6 +212,11 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                         final_response = node_output.get("response", "")
                         add_message(current_user, "user", request.text)
                         add_message(current_user, "assistant", final_response)
+
+                        # Auto-build neural mesh: ingest exchange into
+                        # sensory memory (ChromaDB) and semantic memory (Neo4j)
+                        exchange_text = f"User: {request.text}\nSoma: {final_response}"
+                        asyncio.create_task(_build_memory(exchange_text, current_user))
 
                         yield f"event: final_result\ndata: {json.dumps({'response': final_response})}\n\n"
 
