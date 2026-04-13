@@ -24,8 +24,12 @@ def get_brain_vitals(user_id: str = "default_user"):
     # 2. Semantic Memory (Neo4j)
     if neo4j_db.driver:
         try:
-            count_query = "MATCH (n:Entity) OPTIONAL MATCH ()-[r]->() RETURN count(DISTINCT n) AS nodes, count(DISTINCT r) AS edges"
-            counts = neo4j_db.query(count_query)
+            count_query = """
+            MATCH (n:Entity) WHERE n.user_id = $user_id
+            OPTIONAL MATCH (n)-[r]->()
+            RETURN count(DISTINCT n) AS nodes, count(DISTINCT r) AS edges
+            """
+            counts = neo4j_db.query(count_query, {"user_id": user_id})
             if counts:
                 vitals["semantic"] = {
                     "nodes": counts[0]["nodes"],
