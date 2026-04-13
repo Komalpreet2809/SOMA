@@ -31,7 +31,9 @@ COPY --chown=user . .
 # Copy the built React app from the frontend-builder stage
 COPY --from=frontend-builder --chown=user /app/frontend/dist /home/user/app/frontend/dist
 
-# Create a data directory for persistent storage
+# Create data directories for persistent storage
+# /data is the HF Spaces persistent volume mount point
+RUN mkdir -p /data && chown -R user:user /data
 RUN mkdir -p /home/user/app/data && chown -R user:user /home/user/app/data
 
 USER user
@@ -39,11 +41,11 @@ USER user
 ENV PORT=7860
 ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
-ENV TORCH_HOME=/home/user/app/data/.cache/torch
-ENV HF_HOME=/home/user/app/data/.cache/huggingface
-ENV XDG_CACHE_HOME=/home/user/app/data/.cache
-ENV CHROMA_DB_PATH=/home/user/app/data/chroma_db
-ENV SQLITE_DB_PATH=/home/user/app/data/soma_sessions.db
+ENV TORCH_HOME=/data/.cache/torch
+ENV HF_HOME=/data/.cache/huggingface
+ENV XDG_CACHE_HOME=/data/.cache
+ENV CHROMA_DB_PATH=/data/chroma_db
+ENV SQLITE_DB_PATH=/data/soma_sessions.db
 
 EXPOSE 8080
 
