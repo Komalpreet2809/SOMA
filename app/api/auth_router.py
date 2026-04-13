@@ -45,28 +45,26 @@ def _reset_user_memory(username: str):
     clear_user_graph(username)
 
 
-@router.post("/register", response_model=TokenResponse)
-async def register(req: AuthRequest):
-    hashed = hash_password(req.password)
-    created = create_user(req.username, hashed)
-    if not created:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already taken"
-        )
-    _reset_user_memory(req.username)
-    token = create_token(req.username)
-    return TokenResponse(access_token=token, username=req.username)
-
-
-@router.post("/login", response_model=TokenResponse)
-async def login(req: AuthRequest):
+@router.post("/enter", response_model=TokenResponse)
+async def enter(req: AuthRequest):
+    """Single entry point: auto-creates account if new, logs in if existing."""
     row = get_user(req.username)
-    if not row or not verify_password(req.password, row[1]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password"
-        )
+    if row:
+        # Existing user — verify password
+        if not verify_password(req.password, row[1]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect password"
+            )
+    else:
+        # New user — auto-register
+        hashed = hash_password(req.password)
+        created = create_user(req.username, hashed)
+        if not created:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Could not create account"
+            )
     _reset_user_memory(req.username)
     token = create_token(req.username)
     return TokenResponse(access_token=token, username=req.username)
