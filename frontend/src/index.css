@@ -8,8 +8,8 @@
 :root {
   --bg-0:    #F5F2EC;
   --bg-1:    #FAFAF8;
-  --bg-2:    rgba(255, 255, 255, 0.65);
-  --bg-3:    rgba(255, 255, 255, 0.85);
+  --bg-2:    rgba(255, 255, 255, 0.22);
+  --bg-3:    rgba(255, 255, 255, 0.35);
 
   --fire:    #E8614D;
   --pulse:   #E8614D;
@@ -26,9 +26,9 @@
   --border-1: rgba(0, 0, 0, 0.06);
   --border-2: rgba(232, 97, 77, 0.25);
 
-  --glass-bg:   rgba(255, 255, 255, 0.6);
-  --glass-blur:  24px;
-  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-bg:   rgba(255, 255, 255, 0.18);
+  --glass-blur:  30px;
+  --glass-border: rgba(255, 255, 255, 0.35);
 
   --glow-pulse: 0 8px 32px rgba(232, 97, 77, 0.12);
   --glow-fire:  0 12px 40px rgba(232, 97, 77, 0.15);
@@ -51,8 +51,8 @@
 [data-theme="dark"] {
   --bg-0:    #0F0F18;
   --bg-1:    #16161F;
-  --bg-2:    rgba(25, 25, 40, 0.8);
-  --bg-3:    rgba(35, 35, 55, 0.88);
+  --bg-2:    rgba(25, 25, 40, 0.25);
+  --bg-3:    rgba(35, 35, 55, 0.35);
 
   --fire:    #FF6B56;
   --pulse:   #FF6B56;
@@ -69,9 +69,9 @@
   --border-1: rgba(255, 255, 255, 0.08);
   --border-2: rgba(255, 107, 86, 0.3);
 
-  --glass-bg:   rgba(20, 20, 35, 0.65);
-  --glass-blur:  24px;
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg:   rgba(20, 20, 35, 0.2);
+  --glass-blur:  30px;
+  --glass-border: rgba(255, 255, 255, 0.12);
 
   --glow-pulse: 0 8px 32px rgba(255, 107, 86, 0.15);
   --glow-fire:  0 12px 40px rgba(255, 107, 86, 0.18);
@@ -98,9 +98,49 @@ body {
   overflow: hidden;
   transition: background 0.4s ease, color 0.4s ease;
   -webkit-font-smoothing: antialiased;
+  position: relative;
 }
 
-#root { height: 100%; }
+/* ── Animated Mesh Gradient Background ──
+   This is the KEY to glassmorphism — colorful blobs
+   that glass panels blur over. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 600px 600px at 15% 20%, rgba(232, 97, 77, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 75% 15%, rgba(155, 114, 192, 0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 550px 550px at 60% 70%, rgba(90, 158, 173, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 25% 80%, rgba(232, 180, 120, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 300px at 90% 50%, rgba(212, 168, 83, 0.15) 0%, transparent 70%);
+  animation: mesh-drift 20s ease-in-out infinite alternate;
+}
+
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 600px 600px at 15% 20%, rgba(255, 107, 86, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 75% 15%, rgba(168, 126, 207, 0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 550px 550px at 60% 70%, rgba(78, 205, 196, 0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 25% 80%, rgba(255, 140, 60, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 300px at 90% 50%, rgba(212, 168, 83, 0.1) 0%, transparent 70%);
+}
+
+@keyframes mesh-drift {
+  0% {
+    background-position: 0% 0%, 100% 0%, 60% 70%, 20% 80%, 90% 50%;
+  }
+  50% {
+    background-position: 20% 30%, 80% 25%, 40% 60%, 35% 70%, 75% 40%;
+  }
+  100% {
+    background-position: 10% 15%, 90% 10%, 50% 75%, 30% 85%, 85% 55%;
+  }
+}
+
+#root { height: 100%; position: relative; z-index: 1; }
 
 /* ── Typography helpers ── */
 .t-display {
@@ -178,31 +218,19 @@ button:disabled {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
   box-shadow:
-    0 0 1px rgba(255, 255, 255, 0.3) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
     var(--shadow-md);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.45);
   box-shadow:
-    0 0 1px rgba(255, 255, 255, 0.4) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
     var(--shadow-lg);
-}
-
-/* ── Light frosted glass ── */
-[data-theme="light"] .glass-card {
-  background: rgba(255, 255, 255, 0.68);
-  border-color: rgba(255, 255, 255, 0.75);
-}
-
-/* ── Dark frosted glass ── */
-[data-theme="dark"] .glass-card {
-  background: rgba(25, 25, 40, 0.75);
-  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ── Shared animations ── */
