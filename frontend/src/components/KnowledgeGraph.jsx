@@ -125,11 +125,11 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
       const data = await res.json();
 
       if (data.status === 'offline' || data.nodes.length === 0) {
-        // Show brain anatomy demo so the graph is never empty
-        setIsDemo(true);
-        setGraphStatus('demo');
-        setGraphData(DEMO_GRAPH);
-        setStats({ nodes: DEMO_GRAPH.nodes.length, edges: DEMO_GRAPH.links.length });
+        // Blank slate - no demo, just empty until user learns
+        setIsDemo(false);
+        setGraphStatus('empty');
+        setGraphData({ nodes: [], links: [] });
+        setStats({ nodes: 0, edges: 0 });
       } else {
         setIsDemo(false);
         setGraphStatus('online');
@@ -150,10 +150,11 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
         setStats({ nodes: data.nodes.length, edges: data.edges.length });
       }
     } catch {
-      setIsDemo(true);
-      setGraphStatus('demo');
-      setGraphData(DEMO_GRAPH);
-      setStats({ nodes: DEMO_GRAPH.nodes.length, edges: DEMO_GRAPH.links.length });
+      // Blank slate on error
+      setIsDemo(false);
+      setGraphStatus('empty');
+      setGraphData({ nodes: [], links: [] });
+      setStats({ nodes: 0, edges: 0 });
     }
     setLoading(false);
     // Recenter camera once force simulation has settled
@@ -329,6 +330,18 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
           <span className="legend-label">Synaptic Flow</span>
         </div>
       </div>
+
+      {/* Empty state - blank slate waiting to learn */}
+      {!loading && graphData.nodes.length === 0 && (
+        <div className="graph-empty-state">
+          <div className="empty-state-content">
+            <div className="empty-state-icon">🧠</div>
+            <h3>Neural Mesh Idle</h3>
+            <p>Start talking to build your knowledge graph</p>
+            <p className="empty-state-subtext">Your brain learns as you interact</p>
+          </div>
+        </div>
+      )}
 
       {/* Loading */}
       {loading && (
