@@ -25,6 +25,10 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download the embedding model while we have internet access
+# This caches it so runtime doesn't need to download
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')" 2>/dev/null || echo "Model download skipped (expected in some environments)"
+
 # Copy the backend code
 COPY --chown=user . .
 
