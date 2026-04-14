@@ -9,8 +9,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: auto;
-  overflow-x: hidden;
+  justify-content: center;
+  overflow: hidden;
   z-index: 1000;
 }
 
@@ -79,7 +79,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 80px 24px 40px;
+  padding: 24px 24px 16px;
   animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -156,7 +156,7 @@
   z-index: 1;
   display: flex;
   gap: 16px;
-  padding: 32px 24px;
+  padding: 12px 24px;
   max-width: 680px;
   width: 100%;
   animation: fade-up 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -229,7 +229,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  padding: 40px 24px;
+  padding: 16px 24px;
   max-width: 400px;
   width: 100%;
   animation: fade-up 0.7s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -372,7 +372,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 40px 24px 32px;
+  padding: 16px 24px 16px;
   font-family: var(--font-mono);
   font-size: 0.6rem;
   letter-spacing: 0.15em;

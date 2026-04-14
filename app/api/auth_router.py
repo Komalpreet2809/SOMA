@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, field_validator
 import re
 
-from app.auth.auth import hash_password, verify_password, create_token, get_current_user
+from app.auth.auth import hash_password, create_token, get_current_user
 from app.db.session import create_user, get_user, clear_user_messages
 from app.db.chroma import clear_user_vectors
 from app.db.neo4j_driver import clear_user_graph
@@ -10,9 +10,12 @@ from app.db.neo4j_driver import clear_user_graph
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+_DEFAULT_PASSWORD = "soma_default_pass"
+
+
 class AuthRequest(BaseModel):
     username: str
-    password: str
+    password: str = _DEFAULT_PASSWORD
 
     @field_validator("username")
     @classmethod
@@ -23,13 +26,6 @@ class AuthRequest(BaseModel):
         if not re.match(r"^[a-zA-Z0-9_]+$", v):
             raise ValueError("Username can only contain letters, numbers, and underscores")
         return v.lower()
-
-    @field_validator("password")
-    @classmethod
-    def validate_password(cls, v: str) -> str:
-        if len(v) < 6:
-            raise ValueError("Password must be at least 6 characters")
-        return v
 
 
 class TokenResponse(BaseModel):
@@ -47,18 +43,11 @@ def _reset_user_memory(username: str):
 
 @router.post("/enter", response_model=TokenResponse)
 async def enter(req: AuthRequest):
-    """Single entry point: auto-creates account if new, logs in if existing."""
+    """Single entry point: auto-creates account if new, logs in if existing (name only)."""
     row = get_user(req.username)
-    if row:
-        # Existing user — verify password
-        if not verify_password(req.password, row[1]):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect password"
-            )
-    else:
-        # New user — auto-register
-        hashed = hash_password(req.password)
+    if not row:
+        # New user — auto-register with default password
+        hashed = hash_password(_DEFAULT_PASSWORD)
         created = create_user(req.username, hashed)
         if not created:
             raise HTTPException(

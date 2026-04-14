@@ -17,16 +17,6 @@ from app.auth.auth import get_current_user
 router = APIRouter()
 
 
-# ── Background memory builder ────────────────────────────────────
-
-async def _build_memory(exchange_text: str, user_id: str):
-    """Ingest a chat exchange into sensory + semantic memory in the background."""
-    try:
-        await asyncio.to_thread(ingest_text, exchange_text, {"type": "chat_exchange"}, user_id)
-        await asyncio.to_thread(extract_and_store_knowledge, exchange_text, user_id)
-    except Exception as e:
-        print(f"Background memory build error: {e}")
-
 
 # ── Brain Vitals ─────────────────────────────────────────────────
 
@@ -213,12 +203,19 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                         add_message(current_user, "user", request.text)
                         add_message(current_user, "assistant", final_response)
 
-                        # Auto-build neural mesh: ingest exchange into
-                        # sensory memory (ChromaDB) and semantic memory (Neo4j)
-                        exchange_text = f"User: {request.text}\nSoma: {final_response}"
-                        asyncio.create_task(_build_memory(exchange_text, current_user))
-
                         yield f"event: final_result\ndata: {json.dumps({'response': final_response})}\n\n"
+
+                        # Build neural mesh AFTER streaming the response so
+                        # the user sees the reply immediately, then the graph
+                        # refreshes once knowledge extraction finishes.
+                        exchange_text = f"User: {request.text}\nSoma: {final_response}"
+                        try:
+                            await asyncio.to_thread(ingest_text, exchange_text, {"type": "chat_exchange"}, current_user)
+                            triples = await asyncio.to_thread(extract_and_store_knowledge, exchange_text, current_user)
+                            yield f"event: graph_updated\ndata: {json.dumps({'triples': triples})}\n\n"
+                        except Exception as e:
+                            print(f"Memory build error: {e}")
+                            yield f"event: graph_updated\ndata: {json.dumps({'triples': 0})}\n\n"
 
         except Exception as e:
             yield f"event: error\ndata: {json.dumps({'detail': str(e)})}\n\n"
