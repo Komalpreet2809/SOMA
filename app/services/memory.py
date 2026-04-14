@@ -3,22 +3,38 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.db.chroma import get_collection
 from typing import List
 import uuid
+import os
 
 # Lazy-load the embedding model to avoid startup hangs
 _embeddings = None
+_embeddings_failed = False
 
 def get_embeddings():
-    """Lazy-load embeddings on first use to avoid startup delays."""
-    global _embeddings
-    if _embeddings is None:
-        try:
-            _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-            print("✓ Embeddings model loaded successfully")
-        except Exception as e:
-            print(f"⚠ Failed to load embeddings: {e}")
-            print("⚠ Continuing without embeddings (sensory memory disabled)")
-            _embeddings = None
-    return _embeddings
+    """Lazy-load embeddings on first use. Falls back gracefully if unavailable."""
+    global _embeddings, _embeddings_failed
+
+    # If we already failed, don't retry
+    if _embeddings_failed:
+        return None
+
+    # If already loaded, return it
+    if _embeddings is not None:
+        return _embeddings
+
+    # Try to load with offline mode enabled (for HF Spaces)
+    try:
+        os.environ["HF_HUB_OFFLINE"] = "0"  # Try online first
+        _embeddings = HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2",
+            model_kwargs={"trust_remote_code": True}
+        )
+        print("✓ Embeddings model loaded successfully")
+        return _embeddings
+    except Exception as e:
+        print(f"⚠ Failed to load embeddings from HF Hub: {e}")
+        print("⚠ Continuing without embeddings (sensory memory will be limited)")
+        _embeddings_failed = True
+        return None
 
 def ingest_text(text: str, metadata: dict = None, user_id: str = "default_user"):
     embeddings = get_embeddings()
