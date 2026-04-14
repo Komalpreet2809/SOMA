@@ -138,7 +138,7 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
             id: n.id,
             label: n.label,
             connections: n.connections || 0,
-            val: Math.max(2, (n.connections || 0) * 1.5),
+            val: Math.min(8, 2 + Math.log2(1 + (n.connections || 0))),
           })),
           links: data.edges.map(e => ({
             source: e.source,
@@ -270,10 +270,10 @@ function KnowledgeGraph({ highlightedNodes = [], currentUser, refreshTick }) {
             nodeColor={getNodeColor}
             nodeVal={node =>
               (pulsingNodes.includes(node.id) || pulsingNodes.includes(node.label))
-                ? (node.val || 5) * 2.2
-                : (node.val || 5)
+                ? (node.val || 3) * 1.5
+                : (node.val || 3)
             }
-            nodeRelSize={5}
+            nodeRelSize={3}
             nodeResolution={16}
             nodeOpacity={0.9}
 

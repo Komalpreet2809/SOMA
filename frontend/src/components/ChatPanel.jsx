@@ -76,6 +76,7 @@ function ChatPanel({ messages, setMessages, setBrainState, brainState, isLoading
             setBrainState(prev => ({ ...prev, reflection: data.message }));
           } else if (evType === 'final_result') {
             setMessages(prev => [...prev, { role: 'soma', content: data.response }]);
+          } else if (evType === 'graph_updated') {
             onChatComplete?.();
           } else if (evType === 'error') {
             throw new Error(data.detail);

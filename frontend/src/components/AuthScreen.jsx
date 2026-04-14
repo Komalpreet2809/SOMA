@@ -3,7 +3,6 @@ import './AuthScreen.css';
 
 function AuthScreen({ onAuth }) {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
 
@@ -16,7 +15,7 @@ function AuthScreen({ onAuth }) {
       const res = await fetch('/api/v1/auth/enter', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ username: username.trim(), password }),
+        body:    JSON.stringify({ username: username.trim() }),
       });
       const data = await res.json();
 
@@ -103,7 +102,7 @@ function AuthScreen({ onAuth }) {
       <section className="landing-auth">
         <h2 className="auth-heading">Enter your neural space</h2>
         <p className="auth-sub">
-          Pick a username and password. New name? We'll create your brain automatically.
+          Enter your name to begin. New here? We'll create your brain automatically.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -117,19 +116,6 @@ function AuthScreen({ onAuth }) {
               placeholder="e.g. komal"
               autoFocus
               autoComplete="username"
-              required
-            />
-          </div>
-
-          <div className="auth-field">
-            <label className="auth-label">Password</label>
-            <input
-              className="auth-input"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Min. 6 characters"
-              autoComplete="current-password"
               required
             />
           </div>
