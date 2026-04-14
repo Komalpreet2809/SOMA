@@ -158,6 +158,19 @@ function App() {
   const handleAuth = (username) => {
     setCurrentUser(username)
     setMessages([])
+    // Refresh graph for new user (clean slate)
+    setGraphRefreshTick(t => t + 1)
+    // Reset brain state
+    setBrainState(prev => ({
+      ...prev,
+      sensoryDocuments: 0,
+      graphRelations: 0,
+      workingMemory: 0,
+      sparks: [],
+      reflection: '',
+      traces: [],
+      highlightedNodes: []
+    }))
   }
 
   const handleLogout = () => {
