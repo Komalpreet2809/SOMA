@@ -1,28 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  /* Colors - Precisely extracted from reference */
-  --bg-app: #dde0eb;
-  --bg-sidebar: rgba(255, 255, 255, 0.4); /* Glass effect hinted */
-  --bg-card: #ffffff;
-  
-  --primary: #5b4cdb;
-  --primary-glow: rgba(91, 76, 219, 0.2);
-  --accent-purple: #8b5cf6;
-  --accent-indigo: #6366f1;
-  --accent-teal: #2dd4bf;
-  --accent-pink: #ec4899;
-  --accent-emerald: #10b981;
-  --accent-orange: #f59e0b;
-  
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --text-light: #94a3b8;
-  
-  --border-card: 1px solid rgba(0, 0, 0, 0.03);
-  --radius-xl: 32px;
-  --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
-  
+  --bg-app: #ede9e3;
+  --bg-card: rgba(255, 255, 255, 0.54);
+  --bg-0: #ede9e3;
+  --primary: #24292f;
+  --secondary: #f48252;
+  --accent-orange: #f48252;
+  --accent-emerald: #5aaa7b;
+  --accent-indigo: #6d8de0;
+  --accent-purple: #9a86f4;
+  --accent-pink: #ef8b72;
+  --accent-teal: #69b8af;
+  --accent-primary: #f48252;
+  --accent-secondary: #69b8af;
+  --text-main: #292522;
+  --text-muted: #69615b;
+  --text-light: #9c938b;
+  --text-0: #292522;
+  --text-1: #69615b;
+  --text-2: #9c938b;
+  --text-secondary: #69615b;
+  --border-card: 1px solid rgba(53, 43, 35, 0.06);
+  --border-light: rgba(53, 43, 35, 0.06);
+  --border-1: rgba(53, 43, 35, 0.08);
+  --border-2: rgba(244, 130, 82, 0.2);
+  --pulse: #f48252;
+  --glow-pulse: 0 0 42px rgba(244, 130, 82, 0.22);
+  --shadow-premium: 0 18px 60px rgba(79, 61, 47, 0.06);
+  --shadow-soft: 0 18px 60px rgba(79, 61, 47, 0.06);
+  --shadow-md: 0 14px 38px rgba(92, 70, 52, 0.1);
+  --shadow-lg: 0 22px 54px rgba(92, 70, 52, 0.12);
+  --radius-md: 24px;
   --font-body: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
   --font-mono: 'Space Mono', monospace;
@@ -35,29 +44,33 @@
   -webkit-font-smoothing: antialiased;
 }
 
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-app);
-  color: var(--text-main);
-  overflow: hidden;
-  height: 100vh;
-  font-size: 14px;
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
-.t-label {
-  font-family: var(--font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.75rem;
-  color: var(--primary);
+body {
+  font-family: var(--font-body);
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.55), transparent 28%), var(--bg-app);
+  color: var(--text-main);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
 }
 
 button {
-  border: none;
+  border: 0;
   background: none;
   cursor: pointer;
-  font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 .material-icons {

@@ -1,45 +1,167 @@
-.knowledge-graph-wrap {
+﻿.graph-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.graph-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.graph-select,
+.graph-icon-button {
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(53, 43, 35, 0.05);
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--text-muted);
+}
+
+.graph-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.graph-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.graph-icon-button {
+  width: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph-network {
+  position: relative;
+  flex: 1;
+  min-height: 480px;
+}
+
+.graph-links {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
-.knowledge-graph-wrap.minimal {
-  background: var(--bg-0);
-  border-radius: var(--radius-md);
+.graph-links line {
+  stroke: rgba(244, 130, 82, 0.32);
+  stroke-width: 0.3;
 }
 
-.graph-overlay-minimal {
+.graph-links .ring-line {
+  stroke: rgba(53, 43, 35, 0.06);
+}
+
+.graph-node {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  pointer-events: none;
+  transform: translate(-50%, -50%);
+  text-align: center;
 }
 
-.legend-pills {
-  display: flex;
-  gap: 12px;
+.graph-center {
+  left: 50%;
+  top: 50%;
 }
 
-.pill {
-  font-size: 0.65rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: white;
-  border: 1px solid var(--border-1);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-1);
+.graph-center strong {
+  display: block;
+  width: 170px;
+  margin-top: 14px;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
 }
 
-.pill::before {
-  content: '';
-  width: 6px;
-  height: 6px;
+.graph-node-core {
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
+  background: rgba(244, 130, 82, 0.16);
+  color: var(--accent-orange);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 0 0 16px rgba(244, 130, 82, 0.06);
 }
 
-.pill.concept::before { background: #8B5CF6; }
-.pill.method::before { background: #6366F1; }
-.pill.relationship::before { background: #EC4899; }
+.graph-orbit {
+  width: 136px;
+}
+
+.graph-orbit strong {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.graph-node-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.graph-orbit.orange .graph-node-dot {
+  background: var(--accent-orange);
+}
+
+.graph-orbit.green .graph-node-dot {
+  background: #5aaa7b;
+}
+
+.graph-loading {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  padding-top: 10px;
+  color: var(--text-light);
+  font-size: 0.78rem;
+}
+
+.legend-item::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-item.concept::before { background: #6d8de0; }
+.legend-item.method::before { background: #69b8af; }
+.legend-item.metric::before { background: var(--accent-orange); }
+.legend-item.relationship::before { background: rgba(244, 130, 82, 0.45); }
+.legend-item.entity::before { background: #8ab892; }
+
+@media (max-width: 900px) {
+  .graph-network {
+    min-height: 420px;
+  }
+
+  .graph-center strong {
+    font-size: 1.55rem;
+  }
+}

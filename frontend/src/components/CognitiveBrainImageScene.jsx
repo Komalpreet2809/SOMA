@@ -6,10 +6,10 @@ function CognitiveBrainImageScene() {
     <div className="brain-viewport">
       {/* Delicate Dotted Neural Paths */}
       <svg className="neural-connections" viewBox="0 0 500 500">
-        <path d="M 60 120 Q 150 140 210 190" className="path-line" />
-        <path d="M 440 150 Q 360 180 310 220" className="path-line" />
-        <path d="M 80 380 Q 180 360 230 300" className="path-line" />
-        <path d="M 420 420 Q 340 380 290 320" className="path-line" />
+        <path d="M 60 100 C 120 100, 180 140, 200 180" className="path-line" />
+        <path d="M 440 120 C 380 120, 340 160, 320 200" className="path-line" />
+        <path d="M 80 400 C 140 400, 200 360, 220 300" className="path-line" />
+        <path d="M 420 440 C 360 440, 320 380, 300 340" className="path-line" />
       </svg>
 
       <div className="neural-labels">

@@ -1,103 +1,124 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import ForceGraph3D from 'react-force-graph-3d';
-import { apiFetch } from '../api';
-import './KnowledgeGraph.css';
+﻿import { useEffect, useState } from 'react'
+import { apiFetch } from '../api'
+import './KnowledgeGraph.css'
 
-function KnowledgeGraph({ highlightedNodes = [], refreshTick, minimal = false }) {
-  const fgRef = useRef();
-  const containerRef = useRef(null);
-
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-  const [loading, setLoading] = useState(true);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight,
-        });
-      }
-    };
-    handleResize();
-    const ro = new ResizeObserver(handleResize);
-    if (containerRef.current) ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-  const fetchGraph = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiFetch('/api/v1/graph');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.nodes.length > 0) {
-          setGraphData({
-            nodes: data.nodes.map(n => ({ id: n.id, label: n.label, val: 5 })),
-            links: data.edges.map(e => ({ source: e.source, target: e.target })),
-          });
-        } else {
-          // Mock data for demo look
-          setGraphData({
-            nodes: [
-              { id: '1', label: 'Transformer Models', val: 10 },
-              { id: '2', label: 'Sparse Attention', val: 7 },
-              { id: '3', label: 'Attention Mechanism', val: 7 },
-              { id: '4', label: 'Long-range Dependencies', val: 7 },
-              { id: '5', label: 'Scaling Laws', val: 7 },
-              { id: '6', label: 'Inference Efficiency', val: 7 },
-            ],
-            links: [
-              { source: '1', target: '2' },
-              { source: '1', target: '3' },
-              { source: '1', target: '4' },
-              { source: '1', target: '5' },
-              { source: '1', target: '6' },
-              { source: '2', target: '3' },
-              { source: '4', target: '3' },
-            ]
-          });
-        }
-      }
-    } catch { }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { fetchGraph(); }, [fetchGraph]);
-  useEffect(() => { if (refreshTick > 0) fetchGraph(); }, [refreshTick, fetchGraph]);
-
-  return (
-    <div className={`knowledge-graph-wrap ${minimal ? 'minimal' : ''}`} ref={containerRef}>
-      <ForceGraph3D
-        ref={fgRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        graphData={graphData}
-        backgroundColor="rgba(0,0,0,0)"
-        nodeColor={node => {
-          if (node.id === '1') return '#8B5CF6'; // Main node purple
-          if (['2', '3'].includes(node.id)) return '#6366F1'; // Indigo
-          return '#EC4899'; // Pink
-        }}
-        nodeRelSize={2}
-        nodeVal={node => node.val}
-        linkColor={() => 'rgba(0, 0, 0, 0.05)'}
-        linkWidth={1}
-        enableNodeDrag={false}
-        showNavInfo={false}
-      />
-      {minimal && (
-        <div className="graph-overlay-minimal">
-           <div className="legend-pills">
-              <span className="pill concept">Concept</span>
-              <span className="pill method">Method</span>
-              <span className="pill relationship">Relationship</span>
-           </div>
-        </div>
-      )}
-    </div>
-  );
+const FALLBACK_GRAPH = {
+  center: 'Transformer Models',
+  nodes: [
+    'Attention Mechanism',
+    'Long-range Dependencies',
+    'Efficiency',
+    'Expressivity',
+    'Sparse Patterns',
+    'Recurrence',
+  ],
 }
 
-export default KnowledgeGraph;
+const POSITIONS = [
+  { x: 50, y: 12 },
+  { x: 80, y: 30 },
+  { x: 80, y: 68 },
+  { x: 50, y: 86 },
+  { x: 20, y: 68 },
+  { x: 20, y: 30 },
+]
+
+function KnowledgeGraph({ refreshTick }) {
+  const [graph, setGraph] = useState(FALLBACK_GRAPH)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchGraph = async () => {
+      setLoading(true)
+      try {
+        const res = await apiFetch('/api/v1/graph')
+        if (!res.ok) {
+          setLoading(false)
+          return
+        }
+
+        const data = await res.json()
+        const labels = Array.from(new Set((data.nodes || []).map((node) => node.label || node.id).filter(Boolean)))
+
+        if (labels.length > 0) {
+          const [center, ...rest] = labels
+          const nodes = [...rest.slice(0, 6)]
+          while (nodes.length < 6) {
+            nodes.push(FALLBACK_GRAPH.nodes[nodes.length])
+          }
+          setGraph({ center, nodes })
+        }
+      } catch (error) {
+        console.error('Graph fetch failed', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGraph()
+  }, [refreshTick])
+
+  return (
+    <div className="graph-stage">
+      <div className="graph-toolbar">
+        <button type="button" className="graph-select">
+          <span>Concept Map</span>
+          <span className="material-icons">expand_more</span>
+        </button>
+        <div className="graph-actions">
+          <button type="button" className="graph-icon-button" aria-label="Expand graph">
+            <span className="material-icons">open_in_full</span>
+          </button>
+          <button type="button" className="graph-icon-button" aria-label="Fit graph">
+            <span className="material-icons">fit_screen</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="graph-network">
+        <svg viewBox="0 0 100 100" className="graph-links" aria-hidden="true">
+          {POSITIONS.map((position) => (
+            <line key={`${position.x}-${position.y}`} x1="50" y1="50" x2={position.x} y2={position.y} />
+          ))}
+          {POSITIONS.map((position, index) => {
+            const next = POSITIONS[(index + 1) % POSITIONS.length]
+            return <line key={`ring-${index}`} x1={position.x} y1={position.y} x2={next.x} y2={next.y} className="ring-line" />
+          })}
+        </svg>
+
+        <div className="graph-node graph-center">
+          <span className="graph-node-core">∿</span>
+          <strong>{graph.center}</strong>
+        </div>
+
+        {graph.nodes.map((label, index) => {
+          const position = POSITIONS[index]
+          const tone = label.toLowerCase().includes('efficiency') ? 'green' : 'orange'
+
+          return (
+            <div
+              key={label}
+              className={`graph-node graph-orbit ${tone}`}
+              style={{ left: `${position.x}%`, top: `${position.y}%` }}
+            >
+              <span className="graph-node-dot" />
+              <strong>{label}</strong>
+            </div>
+          )
+        })}
+
+        {loading && <div className="graph-loading">Loading concept map...</div>}
+      </div>
+
+      <div className="graph-legend">
+        <span className="legend-item concept">Concept</span>
+        <span className="legend-item method">Method</span>
+        <span className="legend-item metric">Metric</span>
+        <span className="legend-item relationship">Relationship</span>
+        <span className="legend-item entity">Entity</span>
+      </div>
+    </div>
+  )
+}
+
+export default KnowledgeGraph

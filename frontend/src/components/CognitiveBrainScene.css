@@ -1,4 +1,4 @@
-.brain-viewport {
+﻿.brain-viewport {
   width: 100%;
   height: 100%;
   position: relative;
@@ -9,7 +9,7 @@
 
 .brain-core {
   width: 100%;
-  max-width: 360px;
+  max-width: 520px;
   position: relative;
   z-index: 1;
 }
@@ -17,73 +17,96 @@
 .brain-visual {
   width: 100%;
   height: auto;
-  filter: contrast(1.05) brightness(1.05);
+  filter: contrast(1.04) brightness(1.03);
 }
 
 .brain-glow-hub {
   position: absolute;
-  inset: 15%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
-  filter: blur(40px);
+  inset: 18%;
+  background: radial-gradient(circle, rgba(244, 130, 82, 0.24) 0%, transparent 70%);
+  filter: blur(36px);
   z-index: -1;
-  animation: brain-pulse-slow 6s infinite ease-in-out;
+  animation: brain-pulse-slow 5s infinite ease-in-out;
 }
 
 @keyframes brain-pulse-slow {
-  0%, 100% { opacity: 0.4; transform: scale(0.9); }
-  50% { opacity: 0.8; transform: scale(1.1); }
+  0%, 100% { opacity: 0.4; transform: scale(0.92); }
+  50% { opacity: 0.82; transform: scale(1.08); }
 }
 
-/* ── Delicate Neural Paths ── */
 .neural-connections {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
   pointer-events: none;
 }
 
 .path-line {
   fill: none;
-  stroke: #cbd5e1;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 8;
+  stroke: rgba(244, 130, 82, 0.28);
+  stroke-width: 1;
+  stroke-dasharray: 2 7;
 }
 
-/* ── Precise Region Labels ── */
 .neural-labels {
   position: absolute;
   inset: 0;
-  z-index: 2;
   pointer-events: none;
 }
 
 .node {
   position: absolute;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
 }
 
 .node-dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  margin-top: 6px;
-  box-shadow: 0 0 10px currentColor;
 }
 
-.node-dot.purple { color: #8b5cf6; background: #8b5cf6; }
-.node-dot.blue { color: #6366f1; background: #6366f1; }
-.node-dot.teal { color: #2dd4bf; background: #2dd4bf; }
-.node-dot.pink { color: #ec4899; background: #ec4899; }
+.node-dot.purple,
+.node-dot.blue,
+.node-dot.teal,
+.node-dot.pink {
+  background: var(--accent-orange);
+  box-shadow: 0 0 0 10px rgba(244, 130, 82, 0.08);
+}
 
-.node-text { display: flex; flex-direction: column; gap: 1px; }
-.node-text strong { font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
-.node-text span { font-size: 0.75rem; font-weight: 600; color: var(--text-light); }
+.node-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-.prefrontal { top: 12%; left: 0%; }
-.parietal { top: 18%; right: 0%; flex-direction: row-reverse; text-align: right; }
-.temporal { bottom: 25%; left: 0%; }
-.hippocampus { bottom: 15%; right: 0%; flex-direction: row-reverse; text-align: right; }
+.node-text strong {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.node-text span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.prefrontal { top: 10%; left: 2%; }
+.parietal { top: 15%; right: 2%; text-align: right; flex-direction: row-reverse; }
+.temporal { bottom: 20%; left: 4%; }
+.hippocampus { bottom: 16%; right: 4%; text-align: right; flex-direction: row-reverse; }
+
+@media (max-width: 900px) {
+  .brain-core {
+    max-width: 380px;
+  }
+
+  .node-text strong {
+    font-size: 0.82rem;
+  }
+
+  .node-text span {
+    font-size: 0.72rem;
+  }
+}

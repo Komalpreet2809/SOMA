@@ -1,31 +1,47 @@
 import './CognitiveTimeline.css';
 
-const PHASES = [
-  { time: '10:42:11', phase: 'PERCEPTION', icon: 'visibility', color: '#8B5CF6', desc: 'Received input and understanding intent' },
-  { time: '10:42:12', phase: 'ATTENTION', icon: 'track_changes', color: '#6366F1', desc: 'Focusing on key concepts and relationships' },
-  { time: '10:42:13', phase: 'RECALL', icon: 'database', color: '#10B981', desc: 'Retrieved 5 memories from sensory and 2 from semantic' },
-  { time: '10:42:15', phase: 'REASONING', icon: 'psychology', color: '#F59E0B', desc: 'Synthesizing information and evaluating trade-offs' },
-  { time: '10:42:18', phase: 'OUTPUT', icon: 'message', color: '#EC4899', desc: 'Generating response' }
-];
+const PHASE_CONFIG = {
+  perception:     { icon: 'visibility',    color: '#8B5CF6' },
+  attention:      { icon: 'track_changes', color: '#3B82F6' },
+  recall:         { icon: 'psychology',    color: '#10B981' },
+  reasoning:      { icon: 'hub',           color: '#F59E0B' },
+  prediction:     { icon: 'auto_awesome',  color: '#3B82F6' },
+  reflection:     { icon: 'architecture',  color: '#EC4899' },
+  working_memory: { icon: 'inventory_2',   color: '#14B8A6' },
+  routing:        { icon: 'shortcut',      color: '#F43F5E' },
+  memory:         { icon: 'save',          color: '#8B5CF6' },
+  graph:          { icon: 'hub',           color: '#EC4899' },
+  output:         { icon: 'forum',         color: '#EC4899' }
+};
 
-function CognitiveTimeline() {
+function CognitiveTimeline({ trace = [] }) {
   return (
     <div className="timeline-container">
-      {PHASES.map((p, i) => (
-        <div key={i} className="timeline-row">
-          <div className="timeline-time">{p.time}</div>
-          <div className="timeline-connector">
-            <div className="timeline-line"></div>
-            <div className="timeline-dot" style={{ borderColor: p.color }}>
-              <span className="material-icons" style={{ color: p.color, fontSize: '18px' }}>{p.icon}</span>
+      {trace.map((item, i) => {
+        const config = PHASE_CONFIG[item.phase] || { icon: 'circle', color: '#64748b' };
+        return (
+          <div key={i} className="timeline-row">
+            <div className="timeline-time">{item.time}</div>
+            <div className="timeline-connector">
+              <div className="timeline-line"></div>
+              <div className="timeline-dot" style={{ borderColor: config.color }}>
+                <span className="material-icons" style={{ color: config.color, fontSize: '18px' }}>
+                  {config.icon}
+                </span>
+              </div>
+            </div>
+            <div className="timeline-content">
+              <div className="phase-title" style={{ color: config.color }}>
+                {item.phase?.toUpperCase()}
+              </div>
+              <div className="phase-desc">{item.message}</div>
             </div>
           </div>
-          <div className="timeline-content">
-            <div className="phase-title" style={{ color: p.color }}>{p.phase}</div>
-            <div className="phase-desc">{p.desc}</div>
-          </div>
-        </div>
-      ))}
+        );
+      })}
+      {trace.length === 0 && (
+        <div className="timeline-empty">Awaiting cognitive signals...</div>
+      )}
     </div>
   );
 }

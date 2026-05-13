@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import './AuthScreen.css';
 
 function AuthScreen({ onAuth }) {
@@ -79,7 +79,7 @@ function AuthScreen({ onAuth }) {
         </div>
       </div>
 
-      {/* ══════ STAGE 1: Splash ══════ */}
+      {/* â•â•â•â•â•â• STAGE 1: Splash â•â•â•â•â•â• */}
       {stage === 'splash' && (
         <div className={`splash-content ${transitioning ? 'exit' : ''}`}>
           {/* Neural orb */}
@@ -95,7 +95,7 @@ function AuthScreen({ onAuth }) {
           <p className="hero-tagline">Cognitive Architecture for AI</p>
           <p className="hero-desc">
             A brain-inspired system that builds memory as you talk.
-            Every conversation shapes a living neural mesh — unique to you.
+            Every conversation shapes a living neural mesh â€” unique to you.
           </p>
 
           {/* Features row */}
@@ -127,7 +127,7 @@ function AuthScreen({ onAuth }) {
         </div>
       )}
 
-      {/* ══════ STAGE 2: Name Input ══════ */}
+      {/* â•â•â•â•â•â• STAGE 2: Name Input â•â•â•â•â•â• */}
       {stage === 'enter' && (
         <div className="name-content">
           {/* Small orb */}
@@ -191,3 +191,4 @@ function AuthScreen({ onAuth }) {
 }
 
 export default AuthScreen;
+
