@@ -1,0 +1,128 @@
+/* ═══════════════════════════════════════════════
+   CognitiveFlow (Neural Gloss 3D)
+   ═══════════════════════════════════════════════ */
+
+.cf-3d-container {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.cf-3d-viz {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* ── HUD Overlay ── */
+.cf-3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cf-3d-overlay > * {
+  pointer-events: all;
+}
+
+/* ── Stage Card ── */
+.cf-stage-card {
+  width: 320px;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: var(--glass);
+  border: 1px solid #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  animation: slide-in-left 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cf-stage-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-0);
+  margin-bottom: 4px;
+}
+
+.stage-loc {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--pulse);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+}
+
+.stage-desc {
+  font-size: 0.95rem;
+  color: var(--text-1);
+  line-height: 1.6;
+}
+
+/* ── Metrics HUD ── */
+.cf-3d-metrics {
+  display: flex;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.mini-stat {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid #fff;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.m-val {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-0);
+}
+
+/* ── Reflection Toast ── */
+.cf-reflection-toast {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  width: 300px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: var(--glass);
+  border: 1px solid #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  animation: slide-in-right 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cf-reflection-toast p {
+  font-size: 0.85rem;
+  color: var(--text-1);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ── Animations ── */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+
+

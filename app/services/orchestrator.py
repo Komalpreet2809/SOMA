@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage
 from app.core.config import settings
 from app.services.memory import retrieve_context
 from app.services.neocortex import retrieve_graph_context
+from app.services.brain_trace import filter_recalled_items
 
 class AgentState(TypedDict):
     input: str
@@ -46,14 +47,17 @@ def retrieve(state: AgentState):
     
     # Phase 3: Association (Semantic Memory)
     graph_context, touched_entities = retrieve_graph_context(state["input"], user_id)
+    filtered = filter_recalled_items(context, graph_context)
     
     return {
-        "context": context, 
-        "graph_context": graph_context,
+        "context": filtered["context"],
+        "graph_context": filtered["graph_context"],
         "touched_entities": touched_entities,
         "trace_data": {
-            "sensory_count": len(context),
-            "graph_count": len(graph_context),
+            "sensory_count": len(filtered["context"]),
+            "graph_count": len(filtered["graph_context"]),
+            "suppressed_sensory": filtered["suppressed_context"],
+            "suppressed_graph": filtered["suppressed_graph"],
             "touched": touched_entities,
             "query": state["input"]
         }

@@ -1,250 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
-/* ═══════════════════════════════════════════════════════════════
-   SOMA — Theme System
-   Inspired by NeuroFlow: clean, glassmorphic, warm cream + coral
-   ═══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg-0:    #F5F2EC;
-  --bg-1:    #FAFAF8;
-  --bg-2:    rgba(255, 255, 255, 0.22);
-  --bg-3:    rgba(255, 255, 255, 0.35);
-
-  --fire:    #E8614D;
-  --pulse:   #E8614D;
-  --calm:    #5A9EAD;
-  --synapse: #9B72C0;
-  --error:   #DC3545;
-  --success: #34C38F;
-
-  --text-0:  #1A1A2E;
-  --text-1:  #3D3D56;
-  --text-2:  #8E8E9A;
-
-  --border-0: rgba(0, 0, 0, 0.04);
-  --border-1: rgba(0, 0, 0, 0.06);
-  --border-2: rgba(232, 97, 77, 0.25);
-
-  --glass-bg:   rgba(255, 255, 255, 0.18);
-  --glass-blur:  30px;
-  --glass-border: rgba(255, 255, 255, 0.35);
-
-  --glow-pulse: 0 8px 32px rgba(232, 97, 77, 0.12);
-  --glow-fire:  0 12px 40px rgba(232, 97, 77, 0.15);
-  --glow-calm:  0 8px 24px rgba(90, 158, 173, 0.12);
-
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.03);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-
-  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
-
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Colors - Precisely extracted from reference */
+  --bg-app: #dde0eb;
+  --bg-sidebar: rgba(255, 255, 255, 0.4); /* Glass effect hinted */
+  --bg-card: #ffffff;
+  
+  --primary: #5b4cdb;
+  --primary-glow: rgba(91, 76, 219, 0.2);
+  --accent-purple: #8b5cf6;
+  --accent-indigo: #6366f1;
+  --accent-teal: #2dd4bf;
+  --accent-pink: #ec4899;
+  --accent-emerald: #10b981;
+  --accent-orange: #f59e0b;
+  
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --border-card: 1px solid rgba(0, 0, 0, 0.03);
+  --radius-xl: 32px;
+  --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+  
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
-[data-theme="dark"] {
-  --bg-0:    #0F0F18;
-  --bg-1:    #16161F;
-  --bg-2:    rgba(25, 25, 40, 0.25);
-  --bg-3:    rgba(35, 35, 55, 0.35);
-
-  --fire:    #FF6B56;
-  --pulse:   #FF6B56;
-  --calm:    #4ECDC4;
-  --synapse: #A87ECF;
-  --error:   #FF5555;
-  --success: #34C38F;
-
-  --text-0:  #F0EEF2;
-  --text-1:  #B0B0C0;
-  --text-2:  #6A6A80;
-
-  --border-0: rgba(255, 255, 255, 0.05);
-  --border-1: rgba(255, 255, 255, 0.08);
-  --border-2: rgba(255, 107, 86, 0.3);
-
-  --glass-bg:   rgba(20, 20, 35, 0.2);
-  --glass-blur:  30px;
-  --glass-border: rgba(255, 255, 255, 0.12);
-
-  --glow-pulse: 0 8px 32px rgba(255, 107, 86, 0.15);
-  --glow-fire:  0 12px 40px rgba(255, 107, 86, 0.18);
-  --glow-calm:  0 8px 24px rgba(78, 205, 196, 0.15);
-
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
-}
-
-/* ── Reset ── */
-*, *::before, *::after {
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   font-family: var(--font-body);
-  font-size: 15px;
-  background: var(--bg-0);
-  color: var(--text-0);
-  height: 100vh;
+  background-color: var(--bg-app);
+  color: var(--text-main);
   overflow: hidden;
-  transition: background 0.4s ease, color 0.4s ease;
-  -webkit-font-smoothing: antialiased;
-  position: relative;
-}
-
-/* ── Animated Mesh Gradient Background ──
-   This is the KEY to glassmorphism — colorful blobs
-   that glass panels blur over. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 600px 600px at 15% 20%, rgba(232, 97, 77, 0.25) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 75% 15%, rgba(155, 114, 192, 0.2) 0%, transparent 70%),
-    radial-gradient(ellipse 550px 550px at 60% 70%, rgba(90, 158, 173, 0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 400px at 25% 80%, rgba(232, 180, 120, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 300px 300px at 90% 50%, rgba(212, 168, 83, 0.15) 0%, transparent 70%);
-  animation: mesh-drift 20s ease-in-out infinite alternate;
-}
-
-[data-theme="dark"] body::before {
-  background:
-    radial-gradient(ellipse 600px 600px at 15% 20%, rgba(255, 107, 86, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 75% 15%, rgba(168, 126, 207, 0.15) 0%, transparent 70%),
-    radial-gradient(ellipse 550px 550px at 60% 70%, rgba(78, 205, 196, 0.15) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 400px at 25% 80%, rgba(255, 140, 60, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 300px 300px at 90% 50%, rgba(212, 168, 83, 0.1) 0%, transparent 70%);
-}
-
-@keyframes mesh-drift {
-  0% {
-    background-position: 0% 0%, 100% 0%, 60% 70%, 20% 80%, 90% 50%;
-  }
-  50% {
-    background-position: 20% 30%, 80% 25%, 40% 60%, 35% 70%, 75% 40%;
-  }
-  100% {
-    background-position: 10% 15%, 90% 10%, 50% 75%, 30% 85%, 85% 55%;
-  }
-}
-
-#root { height: 100%; position: relative; z-index: 1; }
-
-/* ── Typography helpers ── */
-.t-display {
-  font-family: var(--font-display);
-  font-weight: 800;
-}
-
-.t-mono {
-  font-family: var(--font-mono);
+  height: 100vh;
+  font-size: 14px;
 }
 
 .t-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
+  font-family: var(--font-display);
+  font-weight: 800;
   text-transform: uppercase;
-  color: var(--text-2);
-}
-
-.t-section {
+  letter-spacing: 0.1em;
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-1);
-  letter-spacing: 0.02em;
+  color: var(--primary);
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-1); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--pulse); }
-
-/* ── Base button ── */
 button {
-  font-family: var(--font-body);
-  background: transparent;
-  color: var(--text-1);
-  border: 1px solid var(--border-1);
-  border-radius: var(--radius-sm);
-  padding: 8px 16px;
-  font-size: 0.82rem;
-  font-weight: 500;
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  font-family: inherit;
 }
 
-button:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--text-0);
-  border-color: var(--border-2);
-  box-shadow: var(--glow-pulse);
-}
-
-button:active { transform: scale(0.96); }
-
-button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-/* ── Glass panel ── */
-.glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  box-shadow: var(--shadow-sm);
-}
-
-/* ── Enhanced glass card ── */
-.glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-    var(--shadow-md);
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-}
-
-.glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.45);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
-    var(--shadow-lg);
-}
-
-/* ── Shared animations ── */
-@keyframes soma-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.6; transform: scale(0.92); }
-}
-
-@keyframes soma-rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
 }

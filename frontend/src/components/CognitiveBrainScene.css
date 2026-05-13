@@ -1,0 +1,89 @@
+.brain-viewport {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brain-core {
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  z-index: 1;
+}
+
+.brain-visual {
+  width: 100%;
+  height: auto;
+  filter: contrast(1.05) brightness(1.05);
+}
+
+.brain-glow-hub {
+  position: absolute;
+  inset: 15%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
+  filter: blur(40px);
+  z-index: -1;
+  animation: brain-pulse-slow 6s infinite ease-in-out;
+}
+
+@keyframes brain-pulse-slow {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* ── Delicate Neural Paths ── */
+.neural-connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.path-line {
+  fill: none;
+  stroke: #cbd5e1;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 8;
+}
+
+/* ── Precise Region Labels ── */
+.neural-labels {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.node {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.node-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.node-dot.purple { color: #8b5cf6; background: #8b5cf6; }
+.node-dot.blue { color: #6366f1; background: #6366f1; }
+.node-dot.teal { color: #2dd4bf; background: #2dd4bf; }
+.node-dot.pink { color: #ec4899; background: #ec4899; }
+
+.node-text { display: flex; flex-direction: column; gap: 1px; }
+.node-text strong { font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
+.node-text span { font-size: 0.75rem; font-weight: 600; color: var(--text-light); }
+
+.prefrontal { top: 12%; left: 0%; }
+.parietal { top: 18%; right: 0%; flex-direction: row-reverse; text-align: right; }
+.temporal { bottom: 25%; left: 0%; }
+.hippocampus { bottom: 15%; right: 0%; flex-direction: row-reverse; text-align: right; }

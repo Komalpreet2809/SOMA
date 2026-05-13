@@ -1,11 +1,15 @@
+print("Main: Imports starting...")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+print("Main: Config loaded")
 from app.api.endpoints import router as api_router
 from app.api.auth_router import router as auth_router
+print("Main: Routers imported")
 from app.db.session import init_session_db
 from app.services.dreaming import idle_brain_cycle
 import asyncio
+print("Main: Imports done")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

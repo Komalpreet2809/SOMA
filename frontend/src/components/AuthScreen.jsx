@@ -1,13 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './AuthScreen.css';
 
 function AuthScreen({ onAuth }) {
-  const [username, setUsername] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [stage, setStage]       = useState('splash');   // 'splash' | 'enter'
+  const [username, setUsername]  = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const inputRef = useRef(null);
+
+  // Focus input when entering name stage
+  useEffect(() => {
+    if (stage === 'enter' && inputRef.current) {
+      setTimeout(() => inputRef.current.focus(), 600);
+    }
+  }, [stage]);
+
+  const handleEnterClick = () => {
+    setTransitioning(true);
+    setTimeout(() => {
+      setStage('enter');
+      setTransitioning(false);
+    }, 500);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username.trim()) return;
     setError('');
     setLoading(true);
 
@@ -38,7 +57,7 @@ function AuthScreen({ onAuth }) {
   };
 
   return (
-    <div className="landing">
+    <div className={`landing ${transitioning ? 'transitioning' : ''}`}>
 
       {/* Animated background */}
       <div className="landing-bg">
@@ -46,89 +65,122 @@ function AuthScreen({ onAuth }) {
         <div className="bg-orb orb-2" />
         <div className="bg-orb orb-3" />
         <div className="bg-grid" />
+        {/* Floating particles */}
+        <div className="particles">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="particle" style={{
+              '--x': `${Math.random() * 100}%`,
+              '--y': `${Math.random() * 100}%`,
+              '--duration': `${8 + Math.random() * 12}s`,
+              '--delay': `${Math.random() * 5}s`,
+              '--size': `${2 + Math.random() * 3}px`,
+            }} />
+          ))}
+        </div>
       </div>
 
-      {/* ── Hero ── */}
-      <section className="landing-hero">
-        <div className="hero-orb">
-          <div className="hero-ring r1" />
-          <div className="hero-ring r2" />
-          <div className="hero-ring r3" />
-          <div className="hero-core" />
-        </div>
-        <h1 className="hero-title">SOMA</h1>
-        <p className="hero-tagline">Cognitive Architecture for AI</p>
-        <p className="hero-desc">
-          A brain-inspired system that builds memory as you talk.
-          Every conversation shapes a living neural mesh — unique to you.
-        </p>
-      </section>
-
-      {/* ── Features ── */}
-      <section className="landing-features">
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-            </svg>
-          </div>
-          <h3 className="feature-name">Sensory Memory</h3>
-          <p className="feature-desc">Vector-powered recall that finds meaning in your words</p>
-        </div>
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
-              <path d="M8 6h8M6 8v8M18 8v8M8 18h8"/>
-            </svg>
-          </div>
-          <h3 className="feature-name">Knowledge Graph</h3>
-          <p className="feature-desc">Entities and relationships extracted and mapped in real time</p>
-        </div>
-        <div className="feature-card">
-          <div className="feature-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </div>
-          <h3 className="feature-name">Neural Dreaming</h3>
-          <p className="feature-desc">Background sparks weave new connections while you think</p>
-        </div>
-      </section>
-
-      {/* ── Auth Card ── */}
-      <section className="landing-auth">
-        <h2 className="auth-heading">Enter your neural space</h2>
-        <p className="auth-sub">
-          Enter your name to begin. New here? We'll create your brain automatically.
-        </p>
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label className="auth-label">Username</label>
-            <input
-              className="auth-input"
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              placeholder="e.g. komal"
-              autoFocus
-              autoComplete="username"
-              required
-            />
+      {/* ══════ STAGE 1: Splash ══════ */}
+      {stage === 'splash' && (
+        <div className={`splash-content ${transitioning ? 'exit' : ''}`}>
+          {/* Neural orb */}
+          <div className="hero-orb">
+            <div className="hero-ring r1" />
+            <div className="hero-ring r2" />
+            <div className="hero-ring r3" />
+            <div className="hero-pulse-ring" />
+            <div className="hero-core" />
           </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          <h1 className="hero-title">SOMA</h1>
+          <p className="hero-tagline">Cognitive Architecture for AI</p>
+          <p className="hero-desc">
+            A brain-inspired system that builds memory as you talk.
+            Every conversation shapes a living neural mesh — unique to you.
+          </p>
 
-          <button className="auth-submit" type="submit" disabled={loading}>
-            {loading ? 'Initializing...' : 'Enter'}
+          {/* Features row */}
+          <div className="splash-features">
+            <div className="splash-feature">
+              <div className="sf-dot" />
+              <span>Sensory Memory</span>
+            </div>
+            <div className="splash-feature">
+              <div className="sf-dot" />
+              <span>Knowledge Graph</span>
+            </div>
+            <div className="splash-feature">
+              <div className="sf-dot" />
+              <span>Neural Dreaming</span>
+            </div>
+          </div>
+
+          <button className="enter-btn" onClick={handleEnterClick}>
+            <span className="enter-btn-text">Enter</span>
+            <span className="enter-btn-arrow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
           </button>
-        </form>
-      </section>
 
-      {/* ── Footer ── */}
+          <div className="splash-hint">Press Enter or click to begin</div>
+        </div>
+      )}
+
+      {/* ══════ STAGE 2: Name Input ══════ */}
+      {stage === 'enter' && (
+        <div className="name-content">
+          {/* Small orb */}
+          <div className="name-orb">
+            <div className="hero-ring r1" />
+            <div className="hero-ring r2" />
+            <div className="hero-core" />
+          </div>
+
+          <h2 className="name-heading">Who are you?</h2>
+          <p className="name-sub">
+            Enter your name to initialize your neural space.
+            New here? We'll create your brain automatically.
+          </p>
+
+          <form className="name-form" onSubmit={handleSubmit}>
+            <div className="name-input-wrap">
+              <input
+                ref={inputRef}
+                className="name-input"
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="Type your name..."
+                autoComplete="username"
+                required
+              />
+              <div className="name-input-glow" />
+            </div>
+
+            {error && <p className="auth-error">{error}</p>}
+
+            <button className="name-submit" type="submit" disabled={loading || !username.trim()}>
+              {loading ? (
+                <span className="loading-dots">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              ) : 'Initialize'}
+            </button>
+          </form>
+
+          <button className="back-link" onClick={() => setStage('splash')}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+          </button>
+        </div>
+      )}
+
+      {/* Footer */}
       <footer className="landing-footer">
         <span>Soma</span>
         <span className="footer-dot" />

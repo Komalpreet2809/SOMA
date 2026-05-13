@@ -1,17 +1,13 @@
 .onboarding-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: ob-fade 0.35s ease;
-}
-
-[data-theme="light"] .onboarding-overlay {
-  background: rgba(180, 165, 140, 0.55);
+  z-index: 2000;
+  animation: ob-fade 0.5s ease;
 }
 
 @keyframes ob-fade {
@@ -21,60 +17,44 @@
 
 .onboarding-modal {
   width: 90%;
-  max-width: 480px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  padding: 32px;
-  border-radius: 16px;
-  background: var(--bg-2);
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-1);
   border: 1px solid var(--border-1);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-  animation: ob-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes ob-rise {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
 }
 
 .onboarding-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .step-indicator {
   font-family: var(--font-mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
   color: var(--text-2);
 }
 
 .close-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
   background: transparent;
-  border: 1px solid var(--border-1);
-  font-size: 1rem;
+  border: none;
+  font-size: 1.5rem;
   color: var(--text-2);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
   line-height: 1;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .close-btn:hover {
-  color: var(--error);
-  border-color: var(--error);
-  transform: none;
-  box-shadow: none;
-  background: transparent;
+  color: var(--pulse);
 }
 
 .onboarding-body {
@@ -83,94 +63,70 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
+  gap: 20px;
 }
 
 .step-icon {
-  font-size: 2.8rem;
-  margin-bottom: 4px;
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
+  font-size: 3.5rem;
+  margin-bottom: 10px;
 }
 
 .onboarding-body h2 {
   font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.4rem;
-  font-weight: 400;
-  color: var(--pulse);
-  letter-spacing: 0.01em;
-  text-transform: none;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-0);
 }
 
 .onboarding-body p {
-  font-size: 0.88rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.6;
   color: var(--text-1);
-  max-width: 340px;
 }
 
 .onboarding-footer {
-  margin-top: 32px;
+  margin-top: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .onboarding-btn {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 9px 22px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.onboarding-btn.primary {
-  background: var(--pulse);
-  color: var(--bg-0);
-  border-color: var(--pulse);
-  font-weight: 600;
-}
-
-.onboarding-btn.primary:hover {
-  opacity: 0.88;
-  transform: none;
-  box-shadow: var(--glow-pulse);
-}
-
-.onboarding-btn.secondary {
-  background: transparent;
-  border-color: var(--border-1);
-  color: var(--text-2);
-}
-
-.onboarding-btn.secondary:disabled {
-  opacity: 0.2;
+  padding: 10px 24px;
 }
 
 .step-dots {
   display: flex;
-  gap: 7px;
+  gap: 8px;
 }
 
 .step-dots .dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--border-1);
+  background: var(--bg-3);
   transition: all 0.3s ease;
 }
 
 .step-dots .dot.active {
   background: var(--pulse);
   box-shadow: var(--glow-pulse);
-  transform: scale(1.3);
+  transform: scale(1.2);
+}
+
+.neural-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--pulse);
+  box-shadow: 0 0 10px var(--pulse);
+  opacity: 0.3;
+  animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(500px); }
 }

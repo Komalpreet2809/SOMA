@@ -13,8 +13,13 @@ from app.services.sleep_cycle import run_sleep_cycle
 from app.db.neo4j_driver import neo4j_db
 from app.services.vitals import get_brain_vitals
 from app.auth.auth import get_current_user
+from app.services.brain_trace import build_brain_event, predict_intent, route_signal, score_attention
 
 router = APIRouter()
+
+
+def sse_event(event_type: str, payload: dict) -> str:
+    return f"event: {event_type}\ndata: {json.dumps(payload)}\n\n"
 
 
 
@@ -164,6 +169,9 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
     async def event_generator():
         try:
             history = get_recent_messages(current_user, exchanges=5)
+            attention = score_attention(request.text, len(history))
+            routing = route_signal(request.text, attention)
+            prediction = predict_intent(request.text, attention)
             state_input = {
                 "input": request.text,
                 "user_id": current_user,
@@ -175,52 +183,272 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
             }
 
             perception_msg = f"Processing query: {request.text[:50]}..."
-            yield f"event: trace\ndata: {json.dumps({'phase': 'perception', 'message': perception_msg})}\n\n"
+            yield sse_event("brain_trace", build_brain_event(
+                "perception",
+                58,
+                "Raw language input reached the sensory intake layer.",
+                next_regions=["thalamus"],
+                inputs_used=["user_input"],
+                data={"query": request.text}
+            ))
+            yield sse_event("trace", {"phase": "perception", "message": perception_msg, "data": {"query": request.text}})
+            await asyncio.sleep(0.1)
+
+            yield sse_event("brain_trace", build_brain_event(
+                "attention",
+                attention["salience"],
+                "Attention scoring estimated urgency, emotion, memory relevance, complexity, and novelty.",
+                next_regions=["thalamus", "prefrontal_cortex"],
+                inputs_used=["user_input", "recent_history"],
+                data=attention
+            ))
+            yield sse_event("trace", {
+                "phase": "attention",
+                "message": f"Attention salience computed at {attention['salience']}%.",
+                "data": attention
+            })
+            await asyncio.sleep(0.1)
+
+            if attention["emotional_intensity"] >= 70:
+                yield sse_event("brain_trace", build_brain_event(
+                    "emotion",
+                    attention["emotional_intensity"],
+                    f"Detected elevated emotional salience associated with {attention['emotion_label']}.",
+                    next_regions=["hippocampus", "prefrontal_cortex"],
+                    inputs_used=["user_input"],
+                    data={"emotion": attention["emotion_label"]}
+                ))
+                yield sse_event("trace", {
+                    "phase": "emotion",
+                    "message": f"Amygdala analogue flagged {attention['emotion_label']} salience.",
+                    "data": {"emotion": attention["emotion_label"]}
+                })
+                await asyncio.sleep(0.1)
+
+            yield sse_event("brain_trace", build_brain_event(
+                "routing",
+                66,
+                routing["reason"],
+                next_regions=routing["regions"],
+                inputs_used=["attention_scores", "user_input"],
+                data={"regions": routing["regions"]}
+            ))
+            yield sse_event("trace", {
+                "phase": "routing",
+                "message": f"Routed cognition through {', '.join(routing['regions'])}.",
+                "data": {"regions": routing["regions"]}
+            })
+            await asyncio.sleep(0.1)
+
+            yield sse_event("brain_trace", build_brain_event(
+                "prediction",
+                prediction["confidence"],
+                f"Predicted intent: {prediction['intent']}",
+                next_regions=["working_memory", "prefrontal_cortex"],
+                inputs_used=["user_input", "attention_scores"],
+                data=prediction
+            ))
+            yield sse_event("trace", {
+                "phase": "prediction",
+                "message": prediction["intent"],
+                "data": prediction
+            })
+            await asyncio.sleep(0.1)
+
+            yield sse_event("brain_trace", build_brain_event(
+                "working_memory",
+                52 + min(len(history) * 4, 24),
+                f"Loaded {len(history)} recent messages into working memory.",
+                next_regions=["hippocampus", "prefrontal_cortex"],
+                inputs_used=["recent_history"],
+                data={"history_count": len(history)}
+            ))
+            yield sse_event("trace", {
+                "phase": "working_memory",
+                "message": f"Loaded {len(history)} recent messages into working memory.",
+                "data": {"history_count": len(history)}
+            })
             await asyncio.sleep(0.1)
 
             for output in orchestrator.stream(state_input):
                 for node_name, node_output in output.items():
                     if node_name == "reflect":
                         reflection = node_output.get("reflection", "")
-                        yield f"event: reflection\ndata: {json.dumps({'message': reflection})}\n\n"
+                        yield sse_event("reflection", {"message": reflection})
+                        yield sse_event("brain_trace", build_brain_event(
+                            "reflection",
+                            76,
+                            "Prefrontal planning layer formed an internal intent map.",
+                            next_regions=["hippocampus", "neocortex"],
+                            inputs_used=["user_input", "working_memory"],
+                            data={"reflection": reflection}
+                        ))
+                        yield sse_event("trace", {"phase": "reflection", "message": "Intent map formed.", "data": {"reflection": reflection}})
                         await asyncio.sleep(0.3)
 
                     elif node_name == "retrieve":
                         trace_data = node_output.get("trace_data", {})
                         recall_msg = f"Found {trace_data.get('sensory_count')} sensory memories."
                         assoc_msg = f"Extracted {trace_data.get('graph_count')} graph relations."
-                        yield f"event: trace\ndata: {json.dumps({'phase': 'recall', 'message': recall_msg, 'data': node_output.get('context')})}\n\n"
+                        yield sse_event("brain_trace", build_brain_event(
+                            "recall",
+                            72,
+                            f"Hippocampal recall recovered {trace_data.get('sensory_count', 0)} sensory memories.",
+                            next_regions=["neocortex", "prefrontal_cortex"],
+                            inputs_used=["vector_memory", "working_memory"],
+                            data={
+                                "memories": node_output.get("context"),
+                                "count": trace_data.get("sensory_count", 0),
+                            }
+                        ))
+                        yield sse_event("trace", {"phase": "recall", "message": recall_msg, "data": node_output.get("context")})
                         await asyncio.sleep(0.2)
-                        yield f"event: trace\ndata: {json.dumps({'phase': 'association', 'message': assoc_msg, 'data': node_output.get('graph_context'), 'touched': trace_data.get('touched')})}\n\n"
+
+                        suppressed_sensory = trace_data.get("suppressed_sensory", 0)
+                        suppressed_graph = trace_data.get("suppressed_graph", 0)
+                        yield sse_event("brain_trace", build_brain_event(
+                            "inhibition",
+                            61,
+                            f"Suppressed {suppressed_sensory} weak sensory recalls and {suppressed_graph} weak graph associations.",
+                            next_regions=["neocortex", "prefrontal_cortex"],
+                            inputs_used=["retrieved_memories", "graph_candidates"],
+                            data={
+                                "suppressed_sensory": suppressed_sensory,
+                                "suppressed_graph": suppressed_graph,
+                            }
+                        ))
+                        yield sse_event("trace", {
+                            "phase": "inhibition",
+                            "message": f"Suppressed {suppressed_sensory + suppressed_graph} low-salience recalls.",
+                            "data": {
+                                "suppressed_sensory": suppressed_sensory,
+                                "suppressed_graph": suppressed_graph,
+                            }
+                        })
+                        await asyncio.sleep(0.2)
+
+                        yield sse_event("brain_trace", build_brain_event(
+                            "association",
+                            74,
+                            f"Neocortical association found {trace_data.get('graph_count', 0)} semantic links.",
+                            next_regions=["prefrontal_cortex", "language_cortex"],
+                            inputs_used=["graph_memory", "retrieved_memories"],
+                            data={
+                                "graph_context": node_output.get("graph_context"),
+                                "touched": trace_data.get("touched"),
+                            }
+                        ))
+                        yield sse_event("trace", {"phase": "association", "message": assoc_msg, "data": node_output.get("graph_context"), "touched": trace_data.get("touched")})
                         await asyncio.sleep(0.2)
 
                     elif node_name == "call_model":
                         reason_msg = "Synthesizing final response via Cortex Node..."
-                        yield f"event: trace\ndata: {json.dumps({'phase': 'reasoning', 'message': reason_msg})}\n\n"
+                        yield sse_event("brain_trace", build_brain_event(
+                            "reasoning",
+                            82,
+                            "Prefrontal reasoning integrated memory, associations, and user intent into a response plan.",
+                            next_regions=["language_cortex"],
+                            inputs_used=["working_memory", "retrieved_memories", "graph_memory", "reflection"],
+                            data={"prediction": prediction["intent"]}
+                        ))
+                        yield sse_event("trace", {"phase": "reasoning", "message": reason_msg})
                         await asyncio.sleep(0.1)
 
                         final_response = node_output.get("response", "")
                         add_message(current_user, "user", request.text)
                         add_message(current_user, "assistant", final_response)
 
-                        yield f"event: final_result\ndata: {json.dumps({'response': final_response})}\n\n"
+                        yield sse_event("brain_trace", build_brain_event(
+                            "language",
+                            88,
+                            "Language generation layer converted the response plan into natural language.",
+                            next_regions=["memory_consolidation"],
+                            inputs_used=["response_plan"],
+                            data={"response_preview": final_response[:120]}
+                        ))
+                        yield sse_event("final_result", {"response": final_response})
 
                         # Build neural mesh AFTER streaming the response so
                         # the user sees the reply immediately, then the graph
                         # refreshes once knowledge extraction finishes.
                         exchange_text = f"User: {request.text}\nSoma: {final_response}"
                         try:
-                            await asyncio.to_thread(ingest_text, exchange_text, {"type": "chat_exchange"}, current_user)
+                            yield sse_event("brain_trace", build_brain_event(
+                                "memory",
+                                68,
+                                "The completed exchange is being written into episodic and sensory memory.",
+                                next_regions=["neocortex"],
+                                inputs_used=["conversation_exchange"],
+                            ))
+                            yield sse_event("trace", {
+                                "phase": "memory",
+                                "message": "Writing this exchange into episodic and sensory memory."
+                            })
+                            stored_chunks = await asyncio.to_thread(
+                                ingest_text,
+                                exchange_text,
+                                {"type": "chat_exchange"},
+                                current_user
+                            )
+                            yield sse_event("trace", {
+                                "phase": "memory",
+                                "message": f"Stored {stored_chunks} sensory chunks from this exchange.",
+                                "data": {"chunks": stored_chunks}
+                            })
+
+                            yield sse_event("trace", {
+                                "phase": "graph",
+                                "message": "Extracting relationships for semantic memory."
+                            })
                             triples = await asyncio.to_thread(extract_and_store_knowledge, exchange_text, current_user)
-                            yield f"event: graph_updated\ndata: {json.dumps({'triples': triples})}\n\n"
+                            yield sse_event("brain_trace", build_brain_event(
+                                "graph",
+                                71,
+                                f"Semantic cortex encoded {triples} new graph relations from the exchange.",
+                                next_regions=[],
+                                inputs_used=["conversation_exchange", "semantic_extraction"],
+                                data={"triples": triples, "chunks": stored_chunks}
+                            ))
+                            yield sse_event("trace", {
+                                "phase": "graph",
+                                "message": f"Updated the knowledge graph with {triples} new relations.",
+                                "data": {"triples": triples}
+                            })
+                            yield sse_event("graph_updated", {"triples": triples, "chunks": stored_chunks})
                         except Exception as e:
                             print(f"Memory build error: {e}")
-                            yield f"event: graph_updated\ndata: {json.dumps({'triples': 0})}\n\n"
+                            yield sse_event("trace", {
+                                "phase": "graph",
+                                "message": f"Memory writeback degraded: {str(e)}"
+                            })
+                            yield sse_event("graph_updated", {"triples": 0, "chunks": 0})
 
         except Exception as e:
-            yield f"event: error\ndata: {json.dumps({'detail': str(e)})}\n\n"
+            yield sse_event("error", {"detail": str(e)})
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+# ── Memory Explorer ─────────────────────────────────────────────
+
+@router.get("/memory/sensory")
+async def get_sensory_memories(current_user: str = Depends(get_current_user)):
+    try:
+        from app.db.chroma import get_collection
+        collection = get_collection()
+        results = collection.get(where={"user_id": current_user})
+        
+        memories = []
+        if results and "documents" in results:
+            for i in range(len(results["documents"])):
+                memories.append({
+                    "id": results["ids"][i],
+                    "content": results["documents"][i],
+                    "metadata": results["metadatas"][i] if results["metadatas"] else {}
+                })
+        return {"memories": memories}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ── History ───────────────────────────────────────────────────────
