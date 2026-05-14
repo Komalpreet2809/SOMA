@@ -1,47 +1,47 @@
 import './CognitiveTimeline.css';
 
 const PHASE_CONFIG = {
-  perception:     { icon: 'visibility',    color: '#8B5CF6' },
-  attention:      { icon: 'track_changes', color: '#3B82F6' },
-  recall:         { icon: 'psychology',    color: '#10B981' },
-  reasoning:      { icon: 'hub',           color: '#F59E0B' },
-  prediction:     { icon: 'auto_awesome',  color: '#3B82F6' },
-  reflection:     { icon: 'architecture',  color: '#EC4899' },
-  working_memory: { icon: 'inventory_2',   color: '#14B8A6' },
-  routing:        { icon: 'shortcut',      color: '#F43F5E' },
-  memory:         { icon: 'save',          color: '#8B5CF6' },
-  graph:          { icon: 'hub',           color: '#EC4899' },
-  output:         { icon: 'forum',         color: '#EC4899' }
+  perception:     { icon: 'visibility',    color: '#ff6b35', label: 'Perception' },
+  attention:      { icon: 'track_changes', color: '#3b82f6', label: 'Attention' },
+  recall:         { icon: 'psychology',    color: '#10b981', label: 'Recall' },
+  reasoning:      { icon: 'hub',           color: '#ff6b35', label: 'Reasoning' },
+  output:         { icon: 'chat_bubble_outline', color: '#8ab892', label: 'Output' }
 };
 
-function CognitiveTimeline({ trace = [] }) {
+function CognitiveTimeline({ trace }) {
+  if (!trace || trace.length === 0) {
+    return (
+      <div className="timeline-empty">
+        No cognitive activity recorded yet...
+      </div>
+    );
+  }
+
   return (
-    <div className="timeline-container">
-      {trace.map((item, i) => {
-        const config = PHASE_CONFIG[item.phase] || { icon: 'circle', color: '#64748b' };
+    <div className="timeline-container fade-in">
+      {trace.map((item, index) => {
+        const config = PHASE_CONFIG[item.phase.toLowerCase()] || { icon: 'circle', color: '#ccc', label: item.phase };
+        
         return (
-          <div key={i} className="timeline-row">
+          <div key={index} className="timeline-row">
             <div className="timeline-time">{item.time}</div>
-            <div className="timeline-connector">
-              <div className="timeline-line"></div>
-              <div className="timeline-dot" style={{ borderColor: config.color }}>
-                <span className="material-icons" style={{ color: config.color, fontSize: '18px' }}>
-                  {config.icon}
-                </span>
-              </div>
+            <div className="timeline-dot-wrap">
+              <div className="timeline-dot" style={{ backgroundColor: config.color }}></div>
             </div>
             <div className="timeline-content">
-              <div className="phase-title" style={{ color: config.color }}>
-                {item.phase?.toUpperCase()}
+              <div className="phase-header">
+                <div className="phase-icon" style={{ color: config.color }}>
+                  <span className="material-icons">{config.icon}</span>
+                </div>
+                <div className="phase-title">{config.label}</div>
               </div>
-              <div className="phase-desc">{item.message}</div>
+              <div className="phase-desc">
+                {item.content || item.desc || 'Processing information...'}
+              </div>
             </div>
           </div>
         );
       })}
-      {trace.length === 0 && (
-        <div className="timeline-empty">Awaiting cognitive signals...</div>
-      )}
     </div>
   );
 }

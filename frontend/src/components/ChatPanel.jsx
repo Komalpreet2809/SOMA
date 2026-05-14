@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import './ChatPanel.css';
 
-function ChatPanel({ messages, onSendMessage, isTyping }) {
+/**
+ * ChatPanel
+ * 
+ * Layer 3: Interaction (Utility Layer)
+ * Handles live conversation and input.
+ */
+function ChatPanel({ messages, onSendMessage, isTyping, onInputStateChange }) {
   const [input, setInput] = useState('');
   const scrollRef = useRef(null);
 
@@ -12,11 +18,20 @@ function ChatPanel({ messages, onSendMessage, isTyping }) {
     }
   }, [messages, isTyping]);
 
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setInput(val);
+    if (onInputStateChange) {
+      onInputStateChange(val.length > 0);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.trim() || isTyping) return;
     onSendMessage(input);
     setInput('');
+    if (onInputStateChange) onInputStateChange(false);
   };
 
   return (
@@ -26,9 +41,11 @@ function ChatPanel({ messages, onSendMessage, isTyping }) {
           <div key={i} className={`chat-bubble-group ${msg.role}`}>
             <div className="avatar-wrap">
               <div className="chat-avatar">
-                <span className="material-icons">
-                  {msg.role === 'user' ? 'person' : 'psychology'}
-                </span>
+                {msg.role === 'user' ? (
+                  <span className="material-icons">account_circle</span>
+                ) : (
+                  <span className="material-icons">lens_blur</span>
+                )}
               </div>
             </div>
             <div className="bubble-body">
@@ -40,10 +57,10 @@ function ChatPanel({ messages, onSendMessage, isTyping }) {
             </div>
           </div>
         ))}
-        {isTyping && (
+        {isTyping && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
           <div className="chat-bubble-group soma typing">
              <div className="chat-avatar">
-                <span className="material-icons">psychology</span>
+                <span className="material-icons">lens_blur</span>
              </div>
              <div className="bubble-body">
                 <div className="typing-dots">
@@ -60,15 +77,13 @@ function ChatPanel({ messages, onSendMessage, isTyping }) {
             type="text" 
             placeholder="Message Soma..." 
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             disabled={isTyping}
           />
-          <div className="send-btn-wrap">
-            <button className="send-btn" type="submit" disabled={!input.trim() || isTyping}>
-              <span className="material-icons">send</span>
-            </button>
-          </div>
         </div>
+        <button className="send-btn" type="submit" disabled={!input.trim() || isTyping}>
+          <span className="material-icons">north</span>
+        </button>
       </form>
     </div>
   );

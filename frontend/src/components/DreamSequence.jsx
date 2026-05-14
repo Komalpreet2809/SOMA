@@ -1,59 +1,77 @@
-import React, { useState } from 'react';
+import CognitiveBrainImageScene from './CognitiveBrainImageScene';
 import './DreamSequence.css';
 
-function DreamSequence({ sparks }) {
-  const [fullscreenImage, setFullscreenImage] = useState(null);
+export function SleepProgress({ phaseIndex }) {
+  const steps = ['Analyzing Memories', 'Linking Concepts', 'Pruning Redundancies'];
 
   return (
-    <div className="dream-gallery-container">
-      <div className="gallery-header">
-        <h2>Subconscious Visualizations</h2>
-        <p className="label-mono">Live render from Semantic Memory Sparks (Generative Module)</p>
+    <div className="sleep-layout fade-in">
+      <div className="sleep-brain-wrap">
+        <CognitiveBrainImageScene scale={1.3} />
       </div>
-      
-      {sparks.length === 0 ? (
-        <div className="empty-gallery">
-          <p className="label-mono" style={{ opacity: 0.5 }}>Awaiting neural sparks during deep idle cycles...</p>
-        </div>
-      ) : (
-        <div className="masonry-grid">
-          {sparks.map((spark, idx) => {
-            // Seed avoids caching issues, nologo removes watermark
-            const prompt = `Sci-Fi cinematic lighting, neon cyberpunk, highly detailed digital concept art of: ${spark.content}`;
-            const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true&seed=${new Date(spark.timestamp).getTime()}`;
-            
-            return (
-              <div key={idx} className="dream-card" onClick={() => setFullscreenImage(imgUrl)}>
-                <div className="image-wrapper">
-                  <img src={imgUrl} alt="Neural Dream" loading="lazy" />
-                  <div className="image-overlay">
-                    <span className="label-mono zoom-icon">⤢</span>
-                  </div>
-                </div>
-                <div className="dream-meta">
-                  <span className="spark-time label-mono">[{new Date(spark.timestamp).toLocaleTimeString()}]</span>
-                  <p className="spark-text">{spark.content}</p>
-                  <div className="spark-tags">
-                    {spark.entities.map(e => <span key={e} className="label-mono entity-tag">#{e}</span>)}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div className="sleep-copy">
+        <h3>Soma is consolidating memories...</h3>
+        <p>Cleaning, linking and strengthening knowledge.</p>
+      </div>
+      <div className="sleep-steps">
+        {steps.map((step, index) => {
+          const completed = index < phaseIndex;
+          const active = index === phaseIndex;
 
-      {/* Fullscreen Lightbox */}
-      {fullscreenImage && (
-        <div className="lightbox" onClick={() => setFullscreenImage(null)}>
-          <div className="lightbox-content">
-            <span className="close-btn label-mono">✕ CLOSE</span>
-            <img src={fullscreenImage} alt="Fullscreen Dream" />
-          </div>
-        </div>
-      )}
+          return (
+            <div key={step} className="sleep-step">
+              <div className={`sleep-step-dot ${completed ? 'completed' : active ? 'active' : ''}`}>
+                {completed ? <span className="material-icons" style={{fontSize: '14px'}}>check</span> : (index + 1)}
+              </div>
+              <div className={`sleep-step-label ${active ? 'active' : ''}`}>{step}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-export default DreamSequence;
+export function SleepSummary({ summary, onClose }) {
+  const data = summary || { linked: 12, consolidated: 28, pruned: 17, strengthened: 34 };
+  const items = [
+    { label: 'Linked Together', value: `${data.linked} new connections created`, icon: 'hub', tone: 'green' },
+    { label: 'Consolidated', value: `${data.consolidated} memories merged`, icon: 'inventory_2', tone: 'teal' },
+    { label: 'Pruned', value: `${data.pruned} redundant items removed`, icon: 'filter_alt', tone: 'orange' },
+    { label: 'Strengthened', value: `${data.strengthened} memory traces updated`, icon: 'auto_awesome', tone: 'amber' },
+  ];
+
+  return (
+    <div className="summary-overlay fade-in">
+      <div className="summary-card">
+        <button className="summary-close" onClick={onClose}><span className="material-icons">close</span></button>
+        
+        <div className="summary-header">
+          <div className="summary-header-icon">
+            <span className="material-icons">bedtime</span>
+          </div>
+          <div className="summary-header-copy">
+            <h3>Sleep Cycle Complete</h3>
+            <p>Memory consolidation finished</p>
+          </div>
+        </div>
+
+        <div className="summary-list">
+          {items.map((item) => (
+            <div key={item.label} className="summary-item">
+              <div className={`summary-item-icon ${item.tone}`}>
+                <span className="material-icons">{item.icon}</span>
+              </div>
+              <div className="summary-item-copy">
+                <strong>{item.label}</strong>
+                <span>{item.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button className="summary-view-btn" onClick={onClose}>View Summary</button>
+      </div>
+    </div>
+  );
+}

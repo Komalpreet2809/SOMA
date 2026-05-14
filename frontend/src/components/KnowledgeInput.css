@@ -1,0 +1,115 @@
+/* KnowledgeInput.css - Refined for Page 6 */
+
+.knowledge-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.knowledge-icon-large {
+  width: 88px;
+  height: 88px;
+  background-color: #eee;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.knowledge-icon-large .material-icons {
+  font-size: 44px;
+  color: #1a1a1a;
+}
+
+.knowledge-layout h3 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.knowledge-layout p {
+  font-size: 1.1rem;
+  color: #888;
+  margin-bottom: 48px;
+  max-width: 500px;
+}
+
+.knowledge-composer {
+  width: 100%;
+  max-width: 760px;
+  background-color: white;
+  border-radius: 32px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.knowledge-composer textarea {
+  width: 100%;
+  min-height: 280px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1.15rem;
+  color: #1a1a1a;
+  resize: none;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.knowledge-composer textarea::placeholder {
+  color: #ccc;
+}
+
+.knowledge-composer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.char-count {
+  font-size: 0.85rem;
+  color: #bbb;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.add-memory-btn {
+  background-color: #ff6b35;
+  color: white;
+  padding: 16px 36px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+}
+
+.add-memory-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 107, 53, 0.3);
+}
+
+.add-memory-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.knowledge-status-text {
+  margin-top: 32px;
+  font-size: 0.95rem;
+  color: #ff6b35;
+  font-weight: 700;
+  animation: fadeIn 0.4s ease;
+}

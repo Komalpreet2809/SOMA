@@ -1,71 +1,85 @@
-﻿.graph-stage {
-  flex: 1;
-  min-height: 0;
+/* KnowledgeGraph.css - Refined for Page 5 (Biological Mesh) */
+
+.graph-stage {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
 }
 
 .graph-toolbar {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.graph-select,
-.graph-icon-button {
-  height: 42px;
-  border-radius: 14px;
-  border: 1px solid rgba(53, 43, 35, 0.05);
-  background: rgba(255, 255, 255, 0.58);
-  color: var(--text-muted);
+  justify-content: space-between;
+  margin-bottom: 32px;
 }
 
 .graph-select {
-  display: inline-flex;
+  background-color: #eee;
+  border-radius: 18px;
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 14px;
+  gap: 12px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 
 .graph-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .graph-icon-button {
-  width: 42px;
-  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  background-color: #eee;
+  border-radius: 18px;
+  display: flex;
   align-items: center;
   justify-content: center;
+  color: #888;
+  transition: all 0.2s;
 }
 
+.graph-icon-button:hover {
+  background-color: #e8e8e8;
+  color: #1a1a1a;
+}
+
+/* ── Network ── */
 .graph-network {
-  position: relative;
   flex: 1;
-  min-height: 480px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .graph-links {
   position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .graph-links line {
-  stroke: rgba(244, 130, 82, 0.32);
-  stroke-width: 0.3;
-}
-
-.graph-links .ring-line {
-  stroke: rgba(53, 43, 35, 0.06);
+  stroke: rgba(0, 0, 0, 0.05);
+  stroke-width: 1;
+  stroke-dasharray: 2 10;
 }
 
 .graph-node {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transform: translate(-50%, -50%);
-  text-align: center;
+  z-index: 1;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .graph-center {
@@ -73,95 +87,97 @@
   top: 50%;
 }
 
-.graph-center strong {
-  display: block;
-  width: 170px;
-  margin-top: 14px;
-  font-size: 2rem;
-  line-height: 1.1;
-  letter-spacing: -0.05em;
-}
-
 .graph-node-core {
-  width: 88px;
-  height: 88px;
+  width: 100px;
+  height: 100px;
+  background-color: #1a1a1a;
   border-radius: 50%;
-  background: rgba(244, 130, 82, 0.16);
-  color: var(--accent-orange);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  box-shadow: 0 0 0 16px rgba(244, 130, 82, 0.06);
+  color: white;
+  font-size: 2.2rem;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+  animation: core-float 6s infinite ease-in-out;
+}
+
+@keyframes core-float {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); filter: brightness(1.1); }
 }
 
 .graph-orbit {
-  width: 136px;
+  width: 44px;
+  height: 44px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.03);
+  animation: orbit-float 8s infinite ease-in-out;
+}
+
+@keyframes orbit-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .graph-orbit strong {
-  display: block;
-  margin-top: 12px;
-  font-size: 0.96rem;
-  line-height: 1.35;
+  position: absolute;
+  top: 56px;
+  width: 140px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .graph-node-dot {
-  width: 22px;
-  height: 22px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  display: inline-flex;
-  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.6);
+  background-color: #ff6b35;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.3);
 }
 
-.graph-orbit.orange .graph-node-dot {
-  background: var(--accent-orange);
-}
-
-.graph-orbit.green .graph-node-dot {
-  background: #5aaa7b;
-}
-
-.graph-loading {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  color: var(--text-light);
-  font-size: 0.85rem;
-}
-
+/* ── Legend ── */
 .graph-legend {
   display: flex;
-  flex-wrap: wrap;
+  gap: 32px;
   justify-content: center;
-  gap: 18px;
-  padding-top: 10px;
-  color: var(--text-light);
-  font-size: 0.78rem;
+  margin-top: 48px;
+  background-color: white;
+  padding: 16px 32px;
+  border-radius: 99px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  width: fit-content;
+  align-self: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .legend-item::before {
   content: '';
-  width: 7px;
-  height: 7px;
-  margin-right: 8px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  display: inline-block;
 }
 
-.legend-item.concept::before { background: #6d8de0; }
-.legend-item.method::before { background: #69b8af; }
-.legend-item.metric::before { background: var(--accent-orange); }
-.legend-item.relationship::before { background: rgba(244, 130, 82, 0.45); }
-.legend-item.entity::before { background: #8ab892; }
-
-@media (max-width: 900px) {
-  .graph-network {
-    min-height: 420px;
-  }
-
-  .graph-center strong {
-    font-size: 1.55rem;
-  }
-}
+.legend-item.concept::before { background-color: #3b82f6; }
+.legend-item.method::before { background-color: #10b981; }
+.legend-item.metric::before { background-color: #ff6b35; }
+.legend-item.relationship::before { background-color: #eee; height: 2px; border-radius: 0; }
+.legend-item.entity::before { background-color: #f59e0b; }

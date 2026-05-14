@@ -1,72 +1,115 @@
-﻿.timeline-container {
+/* CognitiveTimeline.css - Refined for Scientific Elegance */
+
+.timeline-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  height: 100%;
+  gap: 32px;
+  padding: 16px 0;
 }
 
 .timeline-row {
-  display: grid;
-  grid-template-columns: 58px 24px 1fr;
-  gap: 12px;
-  min-height: 58px;
-}
-
-.timeline-time {
-  color: var(--text-light);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding-top: 3px;
-}
-
-.timeline-connector {
+  display: flex;
+  gap: 24px;
   position: relative;
-  display: flex;
-  justify-content: center;
+  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.timeline-line {
+.timeline-row::before {
+  content: '';
   position: absolute;
-  top: 0;
-  bottom: -14px;
+  left: 65px; /* Alignment with dot */
+  top: 12px;
+  bottom: -44px;
   width: 1px;
-  background: rgba(244, 130, 82, 0.22);
-}
-
-.timeline-row:last-child .timeline-line {
-  bottom: 20px;
-}
-
-.timeline-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #eee;
   z-index: 1;
 }
 
+.timeline-row:last-child::before {
+  display: none;
+}
+
+.timeline-time {
+  width: 55px;
+  font-size: 0.75rem;
+  color: #bbb;
+  font-family: var(--font-mono);
+  padding-top: 4px;
+  text-align: right;
+}
+
+.timeline-dot-wrap {
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 8px;
+  background-color: #ccc;
+  box-shadow: 0 0 0 4px white;
+}
+
 .timeline-content {
-  padding-bottom: 12px;
+  flex: 1;
+  background-color: white;
+  padding: 20px 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.03);
+  transition: transform 0.3s ease;
+}
+
+.timeline-content:hover {
+  transform: translateX(8px);
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.phase-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phase-icon .material-icons {
+  font-size: 18px;
 }
 
 .phase-title {
   font-size: 0.95rem;
   font-weight: 700;
-  margin-bottom: 3px;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
 }
 
 .phase-desc {
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
 }
 
 .timeline-empty {
-  color: var(--text-light);
-  font-size: 0.88rem;
+  color: #bbb;
+  font-size: 0.9rem;
   text-align: center;
-  padding: 36px 0;
+  padding: 80px 0;
+  font-weight: 500;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }

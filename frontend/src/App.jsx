@@ -1,264 +1,240 @@
-﻿import { useEffect, useState } from 'react'
-import ChatPanel from './components/ChatPanel'
-import CognitiveBrainImageScene from './components/CognitiveBrainImageScene'
-import CognitiveTimeline from './components/CognitiveTimeline'
-import MemoryExplorer from './components/MemoryExplorer'
-import KnowledgeGraph from './components/KnowledgeGraph'
-import AuthScreen from './components/AuthScreen'
-import { apiFetch } from './api'
-import './App.css'
+import { useEffect, useState, useCallback } from 'react';
+import ChatPanel from './components/ChatPanel';
+import CognitiveBrainImageScene from './components/CognitiveBrainImageScene';
+import CognitiveTimeline from './components/CognitiveTimeline';
+import MemoryExplorer from './components/MemoryExplorer';
+import KnowledgeGraph from './components/KnowledgeGraph';
+import CognitiveDashboard from './components/CognitiveDashboard';
+import KnowledgeInput from './components/KnowledgeInput';
+import { SleepProgress, SleepSummary } from './components/DreamSequence';
+import AuthScreen from './components/AuthScreen';
+import { apiFetch } from './api';
+import './App.css';
 
 const NAV_ITEMS = [
   { id: 'console', label: 'Console', icon: 'chat_bubble_outline' },
-  { id: 'memory', label: 'Memory', icon: 'storage' },
-  { id: 'graph', label: 'Graph', icon: 'device_hub' },
+  { id: 'memory', label: 'Memory', icon: 'layers' },
+  { id: 'graph', label: 'Graph', icon: 'share' },
   { id: 'knowledge', label: 'Knowledge', icon: 'description' },
-  { id: 'status', label: 'Status', icon: 'show_chart' },
-]
+  { id: 'status', label: 'Status', icon: 'analytics' },
+];
 
-const STATUS_POINTS = [62, 28, 58, 40, 57, 39, 51]
+const COGNITIVE_PHASES = {
+  PERCEPTION: 'perception',
+  ATTENTION: 'attention',
+  RECALL: 'recall',
+  REASONING: 'reasoning',
+  RESPONDING: 'responding',
+  IDLE: 'idle',
+  LISTENING: 'listening'
+};
 
 function App() {
-  const [activePage, setActivePage] = useState('console')
-  const [username, setUsername] = useState(localStorage.getItem('soma_username'))
-  const [messages, setMessages] = useState([])
-  const [vitals, setVitals] = useState(null)
-  const [trace, setTrace] = useState([])
-  const [isTyping, setIsTyping] = useState(false)
-  const [refreshTick, setRefreshTick] = useState(0)
-  const [knowledgeText, setKnowledgeText] = useState('')
-  const [knowledgeStatus, setKnowledgeStatus] = useState('')
-  const [sleepPhaseIndex, setSleepPhaseIndex] = useState(1)
-  const [sleepSummary, setSleepSummary] = useState(null)
+  const [activePage, setActivePage] = useState('console');
+  const [username, setUsername] = useState(localStorage.getItem('soma_username'));
+  const [messages, setMessages] = useState([]);
+  const [vitals, setVitals] = useState(null);
+  const [trace, setTrace] = useState([]);
+  const [cognitiveState, setCognitiveState] = useState(COGNITIVE_PHASES.IDLE);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [knowledgeStatus, setKnowledgeStatus] = useState('');
+  const [sleepPhaseIndex, setSleepPhaseIndex] = useState(0);
+  const [sleepSummary, setSleepSummary] = useState(null);
 
   useEffect(() => {
-    const handleAuthExpired = () => {
-      setUsername(null)
-      setMessages([])
-      setTrace([])
-    }
-
-    window.addEventListener('soma-auth-expired', handleAuthExpired)
-    return () => window.removeEventListener('soma-auth-expired', handleAuthExpired)
-  }, [])
-
-  useEffect(() => {
-    if (!username) {
-      return undefined
-    }
-
-    fetchHistory()
-    fetchVitals()
-
-    const interval = setInterval(fetchVitals, 10000)
-    return () => clearInterval(interval)
-  }, [username])
+    if (!username) return;
+    fetchHistory();
+    fetchVitals();
+    const interval = setInterval(fetchVitals, 10000);
+    return () => clearInterval(interval);
+  }, [username]);
 
   const fetchHistory = async () => {
     try {
-      const res = await apiFetch('/api/v1/history')
-      if (!res.ok) {
-        return
+      const res = await apiFetch('/api/v1/history');
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
       }
-
-      const data = await res.json()
-      setMessages(data.messages || [])
-    } catch (error) {
-      console.error('History fetch failed', error)
-    }
-  }
+    } catch (error) { console.error('History fetch failed', error); }
+  };
 
   const fetchVitals = async () => {
     try {
-      const res = await apiFetch('/api/v1/brain/vitals')
-      if (!res.ok) {
-        return
+      const res = await apiFetch('/api/v1/brain/vitals');
+      if (res.ok) {
+        const data = await res.json();
+        setVitals(data);
       }
-
-      const data = await res.json()
-      setVitals(data)
-    } catch (error) {
-      console.error('Vitals fetch failed', error)
-    }
-  }
+    } catch (error) { console.error('Vitals fetch failed', error); }
+  };
 
   const handleSendMessage = async (text) => {
-    if (!text.trim()) {
-      return
-    }
+    if (!text.trim()) return;
+    const timestamp = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    setMessages(prev => [...prev, { role: 'user', content: text, timestamp }]);
+    setTrace([]);
 
-    const timestamp = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-    setMessages((prev) => [...prev, { role: 'user', content: text, timestamp }])
-    setTrace([])
-    setIsTyping(true)
+    // ── STEP 3: Message Sent (Transition to Cognition) ──
+    
+    // Phase A: Perception (~0.4s)
+    setCognitiveState(COGNITIVE_PHASES.PERCEPTION);
+    setTrace([{ phase: 'Perception', content: 'Parsing input and identifying intent...', time: 'NOW' }]);
+    await new Promise(r => setTimeout(r, 400));
+
+    // Phase B: Attention (~0.6s)
+    setCognitiveState(COGNITIVE_PHASES.ATTENTION);
+    setTrace(prev => [{ phase: 'Attention', content: 'Focusing on key concepts and relationships...', time: 'NOW' }, ...prev]);
+    await new Promise(r => setTimeout(r, 600));
+
+    // Phase C: Memory Recall (Initiate API)
+    setCognitiveState(COGNITIVE_PHASES.RECALL);
+    setTrace(prev => [{ phase: 'Recall', content: 'Retrieving related memories and associations...', time: 'NOW' }, ...prev]);
 
     try {
-      const token = localStorage.getItem('soma_token')
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+      const token = localStorage.getItem('soma_token');
       const response = await fetch('/api/v1/query/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ text }),
-      })
+        signal: controller.signal
+      });
 
-      if (!response.ok || !response.body) {
-        throw new Error(`Query failed with status ${response.status}`)
-      }
+      clearTimeout(timeoutId);
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
+      if (!response.ok || !response.body) throw new Error('Query failed');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      // Phase D: Reasoning (During Stream Start)
+      setCognitiveState(COGNITIVE_PHASES.REASONING);
+      setTrace(prev => [{ phase: 'Reasoning', content: 'Synthesizing context and evaluating response...', time: 'NOW' }, ...prev]);
 
       while (true) {
-        const { value, done } = await reader.read()
-        if (done) {
-          break
-        }
-
-        buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (!line.startsWith('data: ')) {
-            continue
-          }
-
-          const data = JSON.parse(line.slice(6))
-          if (data.phase) {
-            setTrace((prev) => [
-              ...prev,
-              {
-                time: new Date().toLocaleTimeString([], { hour12: false }),
-                ...data,
-              },
-            ])
-          } else if (data.response) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: 'soma',
-                content: data.response,
-                timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-              },
-            ])
-            setIsTyping(false)
-            fetchVitals()
-            setRefreshTick((prev) => prev + 1)
+          if (!line.startsWith('data: ')) continue;
+          const dataStr = line.slice(6).trim();
+          if (!dataStr) continue;
+          
+          try {
+            const data = JSON.parse(dataStr);
+            if (data.phase) {
+              // Live trace and state updates from backend
+              setCognitiveState(data.phase);
+              setTrace(prev => [{ time: new Date().toLocaleTimeString([], { hour12: false }), ...data }, ...prev]);
+            } else if (data.response) {
+              // Phase E: Response Generation
+              setCognitiveState(COGNITIVE_PHASES.RESPONDING);
+              setMessages(prev => [...prev, { 
+                role: 'soma', 
+                content: data.response, 
+                timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) 
+              }]);
+              
+              fetchVitals();
+              setRefreshTick(prev => prev + 1);
+            }
+          } catch (e) {
+            console.error('JSON parse error', e);
           }
         }
       }
     } catch (error) {
-      console.error('Query failed', error)
-      setIsTyping(false)
+      console.error('Query failed', error);
+      setTrace(prev => [{ phase: 'Error', content: 'Neural connection interrupted.', time: 'ERROR' }, ...prev]);
+    } finally {
+      // Ensure we always return to idle
+      setTimeout(() => setCognitiveState(COGNITIVE_PHASES.IDLE), 1000);
     }
-  }
+  };
 
-  const handleKnowledgeSubmit = async () => {
-    if (!knowledgeText.trim()) {
-      return
-    }
-
-    setKnowledgeStatus('Adding knowledge to memory...')
-
+  const handleKnowledgeSubmit = async (text) => {
+    setKnowledgeStatus('Adding knowledge to memory...');
     try {
       const res = await apiFetch('/api/v1/ingest', {
         method: 'POST',
-        body: JSON.stringify({ text: knowledgeText }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.detail || 'Ingestion failed')
-      }
-
-      setKnowledgeStatus(data.message || 'Knowledge stored successfully.')
-      setKnowledgeText('')
-      fetchVitals()
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Ingestion failed');
+      setKnowledgeStatus('Knowledge stored successfully.');
+      setTimeout(() => setKnowledgeStatus(''), 3000);
+      fetchVitals();
     } catch (error) {
-      console.error('Knowledge input failed', error)
-      setKnowledgeStatus('Could not add knowledge right now.')
+      setKnowledgeStatus('Could not add knowledge right now.');
     }
-  }
+  };
 
   const handleSleepCycle = async () => {
-    setActivePage('sleep')
-    setSleepSummary(null)
-    setSleepPhaseIndex(0)
-
-    window.setTimeout(() => setSleepPhaseIndex(1), 900)
-    window.setTimeout(() => setSleepPhaseIndex(2), 1800)
+    setCognitiveState('consolidating');
+    setActivePage('sleep');
+    setSleepPhaseIndex(0);
+    setTimeout(() => setSleepPhaseIndex(1), 1200);
+    setTimeout(() => setSleepPhaseIndex(2), 2400);
 
     try {
-      const res = await apiFetch('/api/v1/sleep', { method: 'POST' })
-      const data = await res.json()
-
+      const res = await apiFetch('/api/v1/sleep', { method: 'POST' });
+      const data = await res.json();
       setSleepSummary({
-        linked: data.graph_relations_extracted ?? 12,
-        consolidated: data.messages_pruned ? Math.max(8, data.messages_pruned + 11) : 28,
-        pruned: data.messages_pruned ?? 17,
-        strengthened: data.graph_relations_extracted ? data.graph_relations_extracted + 22 : 34,
-      })
-      fetchVitals()
-    } catch (error) {
-      console.error('Sleep cycle failed', error)
-      setSleepSummary({
-        linked: 12,
+        linked: data.graph_relations_extracted || 12,
         consolidated: 28,
-        pruned: 17,
-        strengthened: 34,
-      })
+        pruned: data.messages_pruned || 17,
+        strengthened: 34
+      });
+    } catch (error) {
+      setSleepSummary({ linked: 12, consolidated: 28, pruned: 17, strengthened: 34 });
     } finally {
-      window.setTimeout(() => setActivePage('sleep-summary'), 2600)
+      setTimeout(() => setActivePage('sleep-summary'), 3600);
     }
-  }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('soma_token')
-    localStorage.removeItem('soma_username')
-    setUsername(null)
-    setMessages([])
-    setTrace([])
-    setActivePage('console')
-  }
+    localStorage.clear();
+    setUsername(null);
+    setMessages([]);
+    setActivePage('console');
+  };
 
-  const selectedNavId = getSelectedNav(activePage)
-  const isKnowledgeBusy = knowledgeStatus === 'Adding knowledge to memory...'
-  const statusText = isTyping ? 'Thinking' : 'Online'
-  const processingText = isTyping ? 'Processing your request...' : 'Standing by for input...'
+  if (!username) return <AuthScreen onAuth={setUsername} />;
 
   const stats = [
-    { label: 'Working Memory', value: formatMetric(vitals?.working_memory_pct, 36), icon: 'neurology' },
-    { label: 'Sensory Memory', value: formatMetric(vitals?.sensory_count, 1248), icon: 'cloud_queue' },
-    { label: 'Semantic Memory', value: formatMetric(vitals?.graph_node_count, 3562), icon: 'device_hub' },
-    { label: 'Neural Sparks', value: formatMetric(vitals?.recent_sparks, 24), icon: 'hub' },
-  ]
-
-  if (!username) {
-    return <AuthScreen onAuth={setUsername} />
-  }
+    { label: 'Working Memory', value: vitals?.working_memory_pct?.toFixed(0) || '36', icon: 'neurology' },
+    { label: 'Sensory Memory', value: vitals?.sensory_count || '1,248', icon: 'cloud_queue' },
+    { label: 'Semantic Memory', value: vitals?.graph_node_count || '3,562', icon: 'device_hub' },
+    { label: 'Neural Sparks', value: vitals?.recent_sparks || '24', icon: 'hub' },
+  ];
 
   return (
     <div className="soma-shell">
       <aside className="soma-sidebar">
         <div className="brand-block">
           <div className="brand-mark">
-            <span className="brand-wave">∿</span>
+            <span className="material-icons">lens_blur</span>
           </div>
-          <div>
-            <h1 className="brand-name">SOMA</h1>
-            <p className="brand-subtitle">Cognitive Console</p>
+          <div className="brand-copy">
+            <h1>SOMA</h1>
+            <p>Cognitive Console</p>
           </div>
         </div>
 
         <nav className="sidebar-nav">
-          {NAV_ITEMS.map((item) => (
-            <button
+          {NAV_ITEMS.map(item => (
+            <button 
               key={item.id}
-              type="button"
-              className={`sidebar-link ${selectedNavId === item.id ? 'active' : ''}`}
+              className={`sidebar-link ${activePage === item.id || (activePage === 'activity' && item.id === 'console') ? 'active' : ''}`}
               onClick={() => setActivePage(item.id)}
             >
               <span className="material-icons">{item.icon}</span>
@@ -267,366 +243,129 @@ function App() {
           ))}
         </nav>
 
-        <div className="session-card">
-          <div className="session-avatar">
-            <span className="material-icons">person</span>
+        <div className="sidebar-footer">
+          <div className="session-card">
+            <div className="session-avatar">
+              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`} alt="Avatar" />
+            </div>
+            <div className="session-copy">
+              <strong>{username}</strong>
+              <span>Session: GUEST-7F3A</span>
+            </div>
+            <button style={{marginLeft: 'auto', color: '#999', background: 'transparent'}} onClick={handleLogout}>
+              <span className="material-icons" style={{fontSize: '18px'}}>logout</span>
+            </button>
           </div>
-          <div className="session-copy">
-            <strong>{username}</strong>
-            <span>Session: GUEST-7F3A</span>
-          </div>
-          <button type="button" className="session-action" onClick={handleLogout} aria-label="Log out">
-            <span className="material-icons">logout</span>
-          </button>
         </div>
       </aside>
 
       <main className="soma-main-panel">
-        {renderPage({
-          activePage,
-          isTyping,
-          statusText,
-          processingText,
-          messages,
-          trace,
-          stats,
-          refreshTick,
-          knowledgeText,
-          setKnowledgeText,
-          knowledgeStatus,
-          isKnowledgeBusy,
-          handleKnowledgeSubmit,
-          handleSleepCycle,
-          sleepPhaseIndex,
-          sleepSummary,
-          setActivePage,
-          handleSendMessage,
-        })}
+        {activePage === 'console' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header">
+              <h2>1. Console (Chat)</h2>
+              <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
+                <div className="status-pill">
+                  <span className="label">Status</span>
+                  <div className="value">
+                    <div className={`status-dot ${cognitiveState !== COGNITIVE_PHASES.IDLE ? 'pulse' : ''}`} />
+                    <span style={{textTransform: 'capitalize'}}>{cognitiveState}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{display: 'flex', gap: '48px', flex: 1, position: 'relative', minHeight: 0}}>
+              {/* Interaction Layer (Utility) */}
+              <div style={{flex: 1.2, display: 'flex', flexDirection: 'column', zIndex: 50}}>
+                <ChatPanel 
+                  messages={messages} 
+                  onSendMessage={handleSendMessage} 
+                  isTyping={[COGNITIVE_PHASES.PERCEPTION, COGNITIVE_PHASES.ATTENTION, COGNITIVE_PHASES.RECALL, COGNITIVE_PHASES.REASONING, COGNITIVE_PHASES.RESPONDING].includes(cognitiveState)} 
+                  onInputStateChange={(isTyping) => {
+                    if (cognitiveState === COGNITIVE_PHASES.IDLE && isTyping) setCognitiveState(COGNITIVE_PHASES.LISTENING);
+                    if (cognitiveState === COGNITIVE_PHASES.LISTENING && !isTyping) setCognitiveState(COGNITIVE_PHASES.IDLE);
+                  }}
+                />
+              </div>
+
+              {/* Cognitive Layer (The Brain) */}
+              <div style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: '80px'}}>
+                <CognitiveBrainImageScene state={cognitiveState} />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {activePage === 'activity' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header">
+              <h2>2. Brain Activity</h2>
+              <button className="sidebar-link" style={{background: 'white'}} onClick={() => setActivePage('console')}>
+                Back to Console
+              </button>
+            </div>
+            <div style={{display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px', height: '100%'}}>
+              <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <CognitiveBrainImageScene state={cognitiveState} />
+              </div>
+              <div className="status-card" style={{display: 'flex', flexDirection: 'column', height: '90%', padding: '0'}}>
+                 <h3 style={{fontSize: '0.7rem', textTransform: 'uppercase', color: '#999', marginBottom: '32px', letterSpacing: '0.1em', fontWeight: 700}}>Full Activity Log</h3>
+                 <div style={{flex: 1, overflowY: 'auto'}}><CognitiveTimeline trace={trace} /></div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {activePage === 'status' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header"><h2>3. Status</h2></div>
+            <CognitiveDashboard statusText={cognitiveState} stats={stats} />
+          </section>
+        )}
+
+        {activePage === 'memory' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header"><h2>4. Memory View</h2></div>
+            <MemoryExplorer />
+          </section>
+        )}
+
+        {activePage === 'graph' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header"><h2>5. Graph View</h2></div>
+            <KnowledgeGraph refreshTick={refreshTick} />
+          </section>
+        )}
+
+        {activePage === 'knowledge' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header">
+              <h2>6. Knowledge Input</h2>
+              <button className="sidebar-link" style={{background: 'white'}} onClick={handleSleepCycle}>
+                Run Sleep Cycle
+              </button>
+            </div>
+            <KnowledgeInput onKnowledgeSubmit={handleKnowledgeSubmit} isBusy={knowledgeStatus.includes('Adding')} status={knowledgeStatus} />
+          </section>
+        )}
+
+        {activePage === 'sleep' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header"><h2>7. Sleep (Consolidation)</h2></div>
+            <SleepProgress phaseIndex={sleepPhaseIndex} />
+          </section>
+        )}
+
+        {activePage === 'sleep-summary' && (
+          <section className="page-canvas fade-in">
+            <div className="page-header"><h2>8. Consolidation Summary</h2></div>
+            <SleepSummary summary={sleepSummary} onClose={() => setActivePage('knowledge')} />
+          </section>
+        )}
       </main>
     </div>
-  )
+  );
 }
 
-function renderPage({
-  activePage,
-  isTyping,
-  statusText,
-  processingText,
-  messages,
-  trace,
-  stats,
-  refreshTick,
-  knowledgeText,
-  setKnowledgeText,
-  knowledgeStatus,
-  isKnowledgeBusy,
-  handleKnowledgeSubmit,
-  handleSleepCycle,
-  sleepPhaseIndex,
-  sleepSummary,
-  setActivePage,
-  handleSendMessage,
-}) {
-  switch (activePage) {
-    case 'console':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>1. Console (Chat)</h2>
-            <div className="page-header-actions">
-              <button type="button" className="subtle-action" onClick={() => setActivePage('activity')}>
-                Brain Activity
-              </button>
-              <StatusPill label="Status" value={statusText} active={isTyping} />
-            </div>
-          </header>
-
-          <div className="console-layout">
-            <div className="console-chat">
-              <ChatPanel messages={messages} onSendMessage={handleSendMessage} isTyping={isTyping} />
-            </div>
-
-            <div className="console-visual">
-              <CognitiveBrainImageScene />
-              <div className="processing-badge">
-                <span className="status-dot" />
-                <span>{processingText}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      )
-
-    case 'activity':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>2. Brain Activity</h2>
-            <button type="button" className="subtle-action" onClick={() => setActivePage('console')}>
-              Back to Console
-            </button>
-          </header>
-
-          <div className="activity-layout">
-            <div className="activity-brain">
-              <CognitiveBrainImageScene />
-            </div>
-
-            <div className="feed-card">
-              <p className="feed-label">Activity Feed</p>
-              <CognitiveTimeline trace={trace} />
-            </div>
-          </div>
-
-          <div className="status-footer">
-            <StatusPill label="Status" value={statusText} active={isTyping} />
-          </div>
-        </section>
-      )
-
-    case 'memory':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>4. Memory View</h2>
-          </header>
-          <MemoryExplorer />
-        </section>
-      )
-
-    case 'graph':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>5. Graph View</h2>
-          </header>
-          <KnowledgeGraph refreshTick={refreshTick} />
-        </section>
-      )
-
-    case 'knowledge':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>6. Knowledge Input</h2>
-            <button type="button" className="subtle-action" onClick={handleSleepCycle}>
-              Run Sleep Cycle
-            </button>
-          </header>
-
-          <div className="knowledge-layout">
-            <div className="knowledge-icon">
-              <span className="material-icons">note_add</span>
-            </div>
-            <h3>Add knowledge to Soma</h3>
-            <p>Paste text or notes for Soma to remember and integrate into its memory.</p>
-
-            <div className="knowledge-composer">
-              <textarea
-                value={knowledgeText}
-                onChange={(event) => setKnowledgeText(event.target.value)}
-                placeholder="Paste anything here... (articles, notes, ideas, research)"
-                maxLength={10000}
-              />
-              <div className="knowledge-composer-footer">
-                <span>{knowledgeText.length} / 10000</span>
-                <button type="button" className="primary-action" onClick={handleKnowledgeSubmit} disabled={isKnowledgeBusy || !knowledgeText.trim()}>
-                  Add to Memory
-                </button>
-              </div>
-            </div>
-
-            {knowledgeStatus && <p className="knowledge-status">{knowledgeStatus}</p>}
-          </div>
-        </section>
-      )
-
-    case 'sleep':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>7. Sleep (Consolidation)</h2>
-          </header>
-          <SleepProgress phaseIndex={sleepPhaseIndex} />
-        </section>
-      )
-
-    case 'sleep-summary':
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>8. Consolidation Summary</h2>
-          </header>
-          <SleepSummary summary={sleepSummary} onClose={() => setActivePage('knowledge')} />
-        </section>
-      )
-
-    case 'status':
-    default:
-      return (
-        <section className="page-canvas">
-          <header className="page-header">
-            <h2>3. Status</h2>
-          </header>
-
-          <div className="status-layout">
-            <div className="status-brain">
-              <CognitiveBrainImageScene />
-            </div>
-
-            <div className="status-sidebar">
-              <div className="status-card">
-                <p className="feed-label">System Status</p>
-                <SystemStatusChart />
-                <div className="status-copy">
-                  <span>Current State</span>
-                  <strong>{statusText}</strong>
-                </div>
-              </div>
-
-              <div className="status-card">
-                <p className="feed-label">Memory &amp; Knowledge</p>
-                <div className="metric-list">
-                  {stats.map((item) => (
-                    <div key={item.label} className="metric-row">
-                      <div className="metric-icon">
-                        <span className="material-icons">{item.icon}</span>
-                      </div>
-                      <div className="metric-copy">
-                        <span>{item.label}</span>
-                        <strong>{item.value}</strong>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )
-  }
-}
-
-function StatusPill({ label, value, active }) {
-  return (
-    <div className={`status-pill ${active ? 'active' : ''}`}>
-      <div className="status-pill-label">{label}</div>
-      <div className="status-pill-value">
-        <span className="status-dot" />
-        <span>{value}</span>
-      </div>
-    </div>
-  )
-}
-
-function SystemStatusChart() {
-  const points = STATUS_POINTS.map((point, index) => `${index * 44},${90 - point}`).join(' ')
-  const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-  return (
-    <div className="system-chart">
-      <svg viewBox="0 0 264 96" className="system-chart-svg" aria-hidden="true">
-        <polyline points={points} />
-        <circle cx="132" cy={90 - STATUS_POINTS[3]} r="4" />
-      </svg>
-      <div className="chart-labels">
-        {labels.map((label) => (
-          <span key={label}>{label}</span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function SleepProgress({ phaseIndex }) {
-  const steps = ['Analyzing Memories', 'Linking Concepts', 'Pruning Redundancies']
-
-  return (
-    <div className="sleep-layout">
-      <div className="sleep-brain">
-        <CognitiveBrainImageScene />
-      </div>
-      <div className="sleep-copy">
-        <h3>Soma is consolidating memories...</h3>
-        <p>Cleaning, linking and strengthening knowledge.</p>
-      </div>
-      <div className="sleep-steps">
-        {steps.map((step, index) => {
-          const completed = index < phaseIndex
-          const active = index === phaseIndex
-
-          return (
-            <div key={step} className="sleep-step">
-              <span className={`sleep-step-dot ${completed ? 'completed' : active ? 'active' : ''}`}>
-                {completed ? '✓' : ''}
-              </span>
-              <span className={`sleep-step-label ${active ? 'active' : ''}`}>{step}</span>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function SleepSummary({ summary, onClose }) {
-  const data = summary || { linked: 12, consolidated: 28, pruned: 17, strengthened: 34 }
-  const items = [
-    { label: 'Linked Together', value: `${data.linked} new connections created`, icon: 'device_hub', tone: 'green' },
-    { label: 'Consolidated', value: `${data.consolidated} memories merged`, icon: 'inventory_2', tone: 'teal' },
-    { label: 'Pruned', value: `${data.pruned} redundant items removed`, icon: 'filter_alt', tone: 'orange' },
-    { label: 'Strengthened', value: `${data.strengthened} memory traces updated`, icon: 'hub', tone: 'green' },
-  ]
-
-  return (
-    <div className="summary-shell">
-      <div className="summary-card">
-        <button type="button" className="summary-close" onClick={onClose} aria-label="Close summary">
-          ×
-        </button>
-        <div className="summary-header">
-          <span className="material-icons">bedtime</span>
-          <div>
-            <h3>Sleep Cycle Complete</h3>
-            <p>Memory consolidation finished</p>
-          </div>
-        </div>
-        <div className="summary-list">
-          {items.map((item) => (
-            <div key={item.label} className="summary-item">
-              <div className={`summary-icon ${item.tone}`}>
-                <span className="material-icons">{item.icon}</span>
-              </div>
-              <div>
-                <strong>{item.label}</strong>
-                <span>{item.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button type="button" className="summary-button" onClick={onClose}>
-          View Summary
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function getSelectedNav(page) {
-  if (page === 'activity') {
-    return 'console'
-  }
-
-  if (page === 'sleep' || page === 'sleep-summary') {
-    return 'knowledge'
-  }
-
-  return page
-}
-
-function formatMetric(value, fallback) {
-  const rawValue = value ?? fallback
-  return Number(rawValue).toLocaleString()
-}
-
-export default App
+export default App;
