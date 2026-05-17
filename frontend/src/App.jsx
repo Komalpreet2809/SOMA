@@ -1,3 +1,4 @@
+// Soma Cognitive Console: Refined Responsive Shell
 import { useEffect, useState, useCallback } from 'react';
 import ChatPanel from './components/ChatPanel';
 import CognitiveBrainImageScene from './components/CognitiveBrainImageScene';
