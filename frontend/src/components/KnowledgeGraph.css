@@ -480,3 +480,20 @@
     }
   }
 }
+
+/* ── Dark Theme Overrides for Graph Controls ── */
+body.dark-theme .graph-actions {
+  background: rgba(24, 24, 24, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .graph-icon-button {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ccc;
+}
+
+body.dark-theme .graph-icon-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ff6b35;
+}
