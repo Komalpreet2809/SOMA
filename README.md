@@ -16,7 +16,7 @@ pinned: false
 </p>
 
 <p align="center">
-  <img src="somasnap.png" alt="Soma Neural Console" width="850">
+  <img src="https://raw.githubusercontent.com/Komalpreet2809/SOMA/main/somasnap.png" alt="Soma Neural Console" width="850">
 </p>
 
 ---
