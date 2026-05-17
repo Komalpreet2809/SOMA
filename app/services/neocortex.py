@@ -16,26 +16,39 @@ def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
     api_key = settings.GROQ_API_KEY if settings.GROQ_API_KEY else "dummy_key"
     llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
     
+    # Strip conversational prefixes so the LLM sees clean text, not chat format.
+    import re as _re
+    clean_text = _re.sub(r'^(User|Soma|Assistant|AI|Human):\s*', '', text, flags=_re.MULTILINE).strip()
+
     # Skip extraction for very short inputs (e.g. just a name) — not enough
     # content to contain meaningful relationships.
-    if len(text.strip().split()) < 4:
-        print(f"Neocortex: Input too short for extraction ({len(text.strip().split())} words), skipping.")
+    if len(clean_text.split()) < 5:
+        print(f"Neocortex: Input too short for extraction ({len(clean_text.split())} words), skipping.")
         return 0
 
-    prompt = f"""You are the semantic logic center of a brain. Extract factual entities and their relationships from the text below.
-Return ONLY a valid JSON array of objects. Each object must have "subject", "relation", and "object" keys.
-Use concise, CAPITALIZED entity names.
+    prompt = f"""Extract real-world knowledge entities and their factual relationships from the text below.
 
-RULES:
-1. ONLY extract facts that are EXPLICITLY stated in the text. Do NOT invent, guess, or assume anything.
-2. If the text does not contain clear factual relationships, return an empty array: []
-3. Do NOT use any example data. Every triple you return must come directly from the text.
+You must extract ONLY concrete knowledge — people, places, organizations, concepts, skills, events, and their relationships.
 
-Text: {text}
+STRICT RULES:
+1. DO NOT create nodes for conversational actors (e.g. "USER", "SOMA", "AI", "ASSISTANT", "BOT").
+2. DO NOT create relationships about who said what, who asked whom, or who responded to whom.
+3. ONLY extract factual, real-world knowledge that someone would put in an encyclopedia or knowledge base.
+4. Entity names must be SHORT (1-3 words max), CAPITALIZED, and represent real concepts — NOT sentences or phrases.
+5. If the text is just casual chat with no real knowledge content, return an empty array: []
 
-Return format: [{{"subject": "ENTITY_A", "relation": "RELATION_TYPE", "object": "ENTITY_B"}}]
-If no relationships exist, return: []
-"""
+Text:
+{clean_text}
+
+Return ONLY a valid JSON array: [{{"subject": "ENTITY", "relation": "RELATION", "object": "ENTITY"}}]
+If no real-world knowledge exists, return: []"""
+
+    # Nodes to block — meta-conversational entities that pollute the graph
+    BLOCKED_NODES = {
+        "USER", "SOMA", "AI", "ASSISTANT", "BOT", "HUMAN", "SYSTEM",
+        "CHATBOT", "NEURAL CORE", "COGNITIVE CONSOLE", "BRAIN",
+    }
+
     try:
         response = llm.invoke([HumanMessage(content=prompt)])
         content = response.content.strip()
@@ -58,6 +71,12 @@ If no relationships exist, return: []
             
             # Neo4j relation names can't have spaces or special non-alphanumeric chars
             rel = rel.replace(" ", "_").replace("-", "_")
+            
+            # Block meta-conversational nodes and overly long node names
+            if subj in BLOCKED_NODES or obj in BLOCKED_NODES:
+                continue
+            if len(subj) > 50 or len(obj) > 50:  # Node names shouldn't be sentences
+                continue
             
             if subj and rel and obj:
                 cypher = f"""
