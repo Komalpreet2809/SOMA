@@ -164,6 +164,12 @@ function MemoryExplorer() {
               <span className="material-icons pulse">settings_input_component</span>
               <p style={{fontSize: '0.7rem'}}>Calibrating neural paths...</p>
             </div>
+          ) : filteredMemories.length === 0 ? (
+            <div className="empty-detail" style={{ height: '100%', gap: '8px' }}>
+              <span className="material-icons" style={{ fontSize: '32px', opacity: 0.5 }}>folder_open</span>
+              <p style={{ fontSize: '0.8rem', color: '#aaa', fontWeight: 600 }}>No memories found</p>
+              <p style={{ fontSize: '0.7rem', color: '#bbb', textAlign: 'center' }}>Query the sensory cortex or select another layer above.</p>
+            </div>
           ) : (
             filteredMemories.map((memory) => {
               const theme = getMemoryTheme(memory.metadata?.type);
