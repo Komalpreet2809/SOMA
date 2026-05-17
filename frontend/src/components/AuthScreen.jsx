@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './AuthScreen.css';
 
 function AuthScreen({ onAuth }) {
@@ -95,7 +95,7 @@ function AuthScreen({ onAuth }) {
           <p className="hero-tagline">Cognitive Architecture for AI</p>
           <p className="hero-desc">
             A brain-inspired system that builds memory as you talk.
-            Every conversation shapes a living neural mesh â€” unique to you.
+            Every conversation shapes a living neural mesh — unique to you.
           </p>
 
           {/* Features row */}
