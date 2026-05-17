@@ -478,7 +478,7 @@
    ═══════════════════════════════════════════════ */
 
 .landing.dark {
-  background: #0c0e14;
+  background: #000000;
 }
 
 /* Background orbs — deeper, richer glows */
@@ -499,7 +499,7 @@
 /* Glass panel — dark frosted glass */
 .landing.dark .splash-content,
 .landing.dark .name-content {
-  background: rgba(20, 22, 32, 0.6);
+  background: rgba(18, 18, 18, 0.75);
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
