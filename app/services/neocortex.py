@@ -23,13 +23,44 @@ def _clean_text(text: str) -> str:
 
 
 def _is_valid_node(name: str) -> bool:
-    """Check if a node name is a clean, short concept — not junk."""
+    """
+    STRICT validation: only allow clean, short concept names as graph nodes.
+    Blocks sentences, conversational text, and anything that isn't a real concept.
+    """
     if not name or name in BLOCKED_NODES:
         return False
-    if len(name) > 40:      # Nodes must be short concepts, not sentences
+
+    # Hard length limits — concepts are SHORT
+    if len(name) > 30 or len(name.split()) > 3:
         return False
-    if len(name.split()) > 4:  # Max 4 words
+
+    # Block anything with sentence punctuation (periods, question marks, exclamation, commas)
+    if re.search(r'[.!?,;:\'"()]', name):
         return False
+
+    # Block anything that looks like a sentence/phrase (contains common filler words)
+    FILLER_WORDS = {
+        "THE", "A", "AN", "IS", "ARE", "WAS", "WERE", "BE", "BEEN",
+        "HAVE", "HAS", "HAD", "DO", "DOES", "DID", "WILL", "WOULD",
+        "COULD", "SHOULD", "MAY", "MIGHT", "SHALL", "CAN",
+        "THIS", "THAT", "THESE", "THOSE", "IT", "ITS",
+        "VERY", "REALLY", "JUST", "ALSO", "TOO", "SO",
+        "HOW", "WHAT", "WHERE", "WHEN", "WHY", "WHO",
+        "YOUR", "MY", "OUR", "THEIR", "HIS", "HER",
+        "NOT", "BUT", "AND", "OR", "IF", "THEN",
+        "THERE", "HERE", "NICE", "MEET", "GOING",
+        "ABOUT", "WITH", "FROM", "INTO", "OVER",
+    }
+    words = set(name.split())
+    # If more than half the words are filler, it's a sentence not a concept
+    filler_count = len(words & FILLER_WORDS)
+    if filler_count >= 2 or (len(words) == 1 and name in FILLER_WORDS):
+        return False
+
+    # Must contain at least one letter
+    if not re.search(r'[A-Z]', name):
+        return False
+
     return True
 
 
