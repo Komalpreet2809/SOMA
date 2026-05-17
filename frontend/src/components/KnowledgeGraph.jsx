@@ -140,7 +140,7 @@ function KnowledgeGraph({ refreshTick }) {
         d3Force('gravity', (alpha) => {
           graphData.nodes.forEach(node => {
             node.vx = (node.vx || 0) + (0 - node.x) * 0.05 * alpha;
-            node.vy = (node.vy || 0) + (350 - node.y) * 0.05 * alpha; // Pull up to Y=350
+            node.vy = (node.vy || 0) + (0 - node.y) * 0.05 * alpha;
             node.vz = (node.vz || 0) + (0 - node.z) * 0.05 * alpha;
           });
         });
@@ -149,8 +149,8 @@ function KnowledgeGraph({ refreshTick }) {
       // Auto-fit camera with appropriate padding to ensure complete visibility
       setTimeout(() => {
         if (window.innerWidth < 768) {
-          // Fixed camera position on mobile to ensure centering on (0,0,0)
-          fgRef.current.cameraPosition({ x: 0, y: 0, z: 300 }, { x: 0, y: 0, z: 0 }, 600);
+          // Shift camera down on mobile to make objects at (0,0,0) appear higher
+          fgRef.current.cameraPosition({ x: 0, y: -150, z: 300 }, { x: 0, y: -150, z: 0 }, 600);
         } else {
           const padding = 20;
           fgRef.current.zoomToFit(800, padding);
