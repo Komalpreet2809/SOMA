@@ -325,14 +325,14 @@ function KnowledgeGraph({ refreshTick }) {
           
           // Outlined holographic label rendered natively floating beside cursor on hover (100% stable!)
           nodeLabel={node => `
-            <span style="color: ${getNodeColor(node)}; font-size: 24px; font-weight: 800;">
+            <span style="color: ${getNodeColor(node)}; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
               ${node.label || node.id}
             </span>
           `}
           
           // Outlined relationship tag rendered on link hover (100% stable!)
           linkLabel={link => `
-            <span style="color: #ff6b35; font-size: 16px; font-weight: 800;">
+            <span style="color: #ff6b35; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
               ${link.label || 'RELATED_TO'}
             </span>
           `}
