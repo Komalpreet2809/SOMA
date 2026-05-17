@@ -1,5 +1,9 @@
 /* KnowledgeGraph.css - Premium Sci-Fi 3D Semantic Mesh styling */
 
+.mobile-scroll-spacer {
+  display: none;
+}
+
 .graph-stage {
   display: flex;
   flex-direction: column;
@@ -109,6 +113,20 @@
   background: white;
   color: #ff6b35;
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+}
+
+.graph-actions {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  gap: 10px;
+  background: rgba(18, 18, 18, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 6px 12px;
 }
 
 /* ── Network Container ── */
@@ -405,6 +423,8 @@
   
   .graph-actions {
     position: absolute !important;
+    top: auto !important;
+    right: auto !important;
     bottom: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -421,12 +441,16 @@
   }
   
   .graph-network-container {
-    padding-left: 0 !important; /* Remove shifted padding */
+    padding-left: 0 !important;
     border-radius: 16px !important;
-    height: 600px !important;
-    min-height: 600px !important;
+    height: 400px !important;
+    min-height: 400px !important;
     width: 100% !important;
     flex: none !important;
+    position: relative !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 16px !important;
   }
   
   .graph-hud-overlay {
@@ -444,6 +468,10 @@
     width: 100% !important;
     box-sizing: border-box !important;
     padding: 12px !important;
+  }
+  
+  .mobile-scroll-spacer {
+    display: block !important;
   }
   
   /* On very small screens stack the HUD panels */

@@ -55,8 +55,9 @@ function KnowledgeGraph({ refreshTick }) {
       for (let entry of entries) {
         const { width, height } = entry.contentRect;
         const isMobile = window.innerWidth < 768;
-        const adjustedHeight = isMobile ? Math.max(height - 100, 300) : height;
-        setDimensions({ width: width || 800, height: adjustedHeight || 500 });
+        const adjustedWidth = isMobile ? (window.innerWidth - 32) : width;
+        const adjustedHeight = isMobile ? 400 : height;
+        setDimensions({ width: adjustedWidth || 800, height: adjustedHeight || 500 });
       }
     });
     resizeObserver.observe(containerRef.current);
@@ -135,11 +136,11 @@ function KnowledgeGraph({ refreshTick }) {
         d3Force('charge').strength(-20).distanceMax(100);
         d3Force('link').distance(30);
         
-        // Custom gravity force to pull unconnected clusters to the upper center
+        // Custom gravity force to pull unconnected clusters to the center
         d3Force('gravity', (alpha) => {
           graphData.nodes.forEach(node => {
             node.vx = (node.vx || 0) + (0 - node.x) * 0.05 * alpha;
-            node.vy = (node.vy || 0) + (150 - node.y) * 0.05 * alpha; // Pull up to Y=150
+            node.vy = (node.vy || 0) + (0 - node.y) * 0.05 * alpha;
             node.vz = (node.vz || 0) + (0 - node.z) * 0.05 * alpha;
           });
         });
@@ -147,20 +148,8 @@ function KnowledgeGraph({ refreshTick }) {
       
       // Auto-fit camera with appropriate padding to ensure complete visibility
       setTimeout(() => {
-        const padding = window.innerWidth < 768 ? 120 : 20;
+        const padding = window.innerWidth < 768 ? 60 : 20;
         fgRef.current.zoomToFit(800, padding);
-        
-        // Shift camera down on mobile to pull the graph content up
-        if (window.innerWidth < 768) {
-          setTimeout(() => {
-            const currentPos = fgRef.current.cameraPosition();
-            fgRef.current.cameraPosition(
-              { x: currentPos.x, y: currentPos.y - 100, z: currentPos.z },
-              null,
-              300
-            );
-          }, 900); // Wait for zoomToFit to complete
-        }
       }, 600);
     }
   }, [graphData]);
@@ -214,76 +203,7 @@ function KnowledgeGraph({ refreshTick }) {
           )}
         </div>
 
-        <div className="graph-actions">
-          <button 
-            className="graph-icon-button" 
-            onClick={() => {
-              if (fgRef.current) fgRef.current.zoomToFit(600, 20);
-            }}
-            title="Recenter Camera"
-          >
-            <span className="material-icons">zoom_out_map</span>
-          </button>
-          <button 
-            className="graph-icon-button" 
-            onClick={() => {
-              if (fgRef.current) {
-                const currentPos = fgRef.current.cameraPosition();
-                fgRef.current.cameraPosition(
-                  { x: currentPos.x * 0.75, y: currentPos.y * 0.75, z: currentPos.z * 0.75 },
-                  null,
-                  300
-                );
-              }
-            }}
-            title="Zoom In"
-          >
-            <span className="material-icons">zoom_in</span>
-          </button>
-          <button 
-            className="graph-icon-button" 
-            onClick={() => {
-              if (fgRef.current) {
-                const currentPos = fgRef.current.cameraPosition();
-                fgRef.current.cameraPosition(
-                  { x: currentPos.x * 1.35, y: currentPos.y * 1.35, z: currentPos.z * 1.35 },
-                  null,
-                  300
-                );
-              }
-            }}
-            title="Zoom Out"
-          >
-            <span className="material-icons">zoom_out</span>
-          </button>
-          <button 
-            className="graph-icon-button" 
-            onClick={() => {
-              const newActive = !physicsActive;
-              setPhysicsActive(newActive);
-              if (fgRef.current) {
-                if (physicsActive) {
-                  fgRef.current.d3PauseSimulation();
-                } else {
-                  fgRef.current.d3ResumeSimulation();
-                }
-              }
-            }}
-            title={physicsActive ? "Pause Simulation" : "Resume Simulation"}
-          >
-            <span className="material-icons">{physicsActive ? "pause" : "play_arrow"}</span>
-          </button>
-          <button 
-            className="graph-icon-button" 
-            onClick={() => {
-              fetchGraph();
-              fetchStats();
-            }}
-            title="Sync Mesh"
-          >
-            <span className="material-icons">sync</span>
-          </button>
-        </div>
+
       </div>
 
       <div className="graph-network-container" ref={containerRef}>
@@ -394,6 +314,77 @@ function KnowledgeGraph({ refreshTick }) {
             <span>Synchronizing cognitive mesh...</span>
           </div>
         )}
+
+        <div className="graph-actions">
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) fgRef.current.zoomToFit(600, 20);
+            }}
+            title="Recenter Camera"
+          >
+            <span className="material-icons">zoom_out_map</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) {
+                const currentPos = fgRef.current.cameraPosition();
+                fgRef.current.cameraPosition(
+                  { x: currentPos.x * 0.75, y: currentPos.y * 0.75, z: currentPos.z * 0.75 },
+                  null,
+                  300
+                );
+              }
+            }}
+            title="Zoom In"
+          >
+            <span className="material-icons">zoom_in</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) {
+                const currentPos = fgRef.current.cameraPosition();
+                fgRef.current.cameraPosition(
+                  { x: currentPos.x * 1.35, y: currentPos.y * 1.35, z: currentPos.z * 1.35 },
+                  null,
+                  300
+                );
+              }
+            }}
+            title="Zoom Out"
+          >
+            <span className="material-icons">zoom_out</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              const newActive = !physicsActive;
+              setPhysicsActive(newActive);
+              if (fgRef.current) {
+                if (physicsActive) {
+                  fgRef.current.d3PauseSimulation();
+                } else {
+                  fgRef.current.d3ResumeSimulation();
+                }
+              }
+            }}
+            title={physicsActive ? "Pause Simulation" : "Resume Simulation"}
+          >
+            <span className="material-icons">{physicsActive ? "pause" : "play_arrow"}</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              fetchGraph();
+              fetchStats();
+            }}
+            title="Sync Mesh"
+          >
+            <span className="material-icons">sync</span>
+          </button>
+        </div>
       </div>
     </div>
   );
