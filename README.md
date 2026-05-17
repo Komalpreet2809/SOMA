@@ -15,6 +15,10 @@ pinned: false
   <img src="https://img.shields.io/badge/Deploy-Docker%20%2F%20HuggingFace-blueviolet?style=for-the-badge" alt="Docker Deployment">
 </p>
 
+<p align="center">
+  <img src="somasnap.png" alt="Soma Neural Console" width="850">
+</p>
+
 ---
 
 ## 🌌 Introduction
