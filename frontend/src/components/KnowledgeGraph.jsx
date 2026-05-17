@@ -148,8 +148,13 @@ function KnowledgeGraph({ refreshTick }) {
       
       // Auto-fit camera with appropriate padding to ensure complete visibility
       setTimeout(() => {
-        const padding = window.innerWidth < 768 ? 60 : 20;
-        fgRef.current.zoomToFit(800, padding);
+        if (window.innerWidth < 768) {
+          // Fixed camera position on mobile to ensure centering on (0,0,0)
+          fgRef.current.cameraPosition({ x: 0, y: 0, z: 300 }, { x: 0, y: 0, z: 0 }, 600);
+        } else {
+          const padding = 20;
+          fgRef.current.zoomToFit(800, padding);
+        }
       }, 600);
     }
   }, [graphData]);
