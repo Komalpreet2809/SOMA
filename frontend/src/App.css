@@ -555,12 +555,24 @@
   
   .session-card {
     padding: 4px !important;
-    border-radius: 50% !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
   }
   
-  .session-copy, 
-  .session-card button {
+  .session-copy {
     display: none !important;
+  }
+  
+  .session-card button {
+    display: flex !important;
+    color: #ff6b35 !important;
+    padding: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
   }
   
   .soma-main-panel {
