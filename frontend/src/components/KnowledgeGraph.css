@@ -122,11 +122,12 @@
   z-index: 100;
   display: flex;
   gap: 10px;
-  background: rgba(18, 18, 18, 0.75);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 100px;
   padding: 6px 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 /* ── Network Container ── */
@@ -431,12 +432,12 @@
     z-index: 100 !important;
     display: flex !important;
     justify-content: center !important;
-    background: rgba(18, 18, 18, 0.75) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
     border-radius: 100px !important;
     padding: 6px 12px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
     width: auto !important;
   }
   
