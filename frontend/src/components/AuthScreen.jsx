@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './AuthScreen.css';
 
-function AuthScreen({ onAuth }) {
+function AuthScreen({ onAuth, darkMode, setDarkMode }) {
   const [stage, setStage]       = useState('splash');   // 'splash' | 'enter'
   const [username, setUsername]  = useState('');
   const [error, setError]       = useState('');
@@ -57,7 +57,16 @@ function AuthScreen({ onAuth }) {
   };
 
   return (
-    <div className={`landing ${transitioning ? 'transitioning' : ''}`}>
+    <div className={`landing ${transitioning ? 'transitioning' : ''} ${darkMode ? 'dark' : ''}`}>
+
+      {/* Dark Mode Toggle */}
+      <button 
+        className="landing-theme-toggle"
+        onClick={() => setDarkMode(!darkMode)}
+        title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      >
+        <span className="material-icons">{darkMode ? 'light_mode' : 'dark_mode'}</span>
+      </button>
 
       {/* Animated background */}
       <div className="landing-bg">

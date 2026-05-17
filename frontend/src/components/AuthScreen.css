@@ -426,3 +426,167 @@
     flex-shrink: 0;
   }
 }
+
+
+/* ═══════════════════════════════════════════════
+   Dark Mode Toggle Button (Top-Right)
+   ═══════════════════════════════════════════════ */
+
+.landing-theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.landing-theme-toggle .material-icons {
+  font-size: 20px;
+  color: #64748b;
+  transition: color 0.3s;
+}
+
+.landing-theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 107, 53, 0.3);
+}
+
+.landing-theme-toggle:hover .material-icons {
+  color: #ff6b35;
+}
+
+.landing-theme-toggle:active {
+  transform: translateY(0);
+}
+
+
+/* ═══════════════════════════════════════════════
+   Dark Theme Overrides (.landing.dark)
+   ═══════════════════════════════════════════════ */
+
+.landing.dark {
+  background: #0c0e14;
+}
+
+/* Background orbs — deeper, richer glows */
+.landing.dark .orb-1 {
+  background: rgba(255, 107, 53, 0.08);
+}
+.landing.dark .orb-2 {
+  background: rgba(255, 139, 84, 0.06);
+}
+.landing.dark .orb-3 {
+  background: rgba(255, 107, 53, 0.04);
+}
+
+.landing.dark .bg-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Glass panel — dark frosted glass */
+.landing.dark .splash-content,
+.landing.dark .name-content {
+  background: rgba(20, 22, 32, 0.6);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+/* Typography */
+.landing.dark .hero-title {
+  color: #f1f5f9;
+}
+
+.landing.dark .hero-desc {
+  color: #94a3b8;
+}
+
+.landing.dark .name-heading {
+  color: #f1f5f9;
+}
+
+.landing.dark .name-sub {
+  color: #94a3b8;
+}
+
+/* Feature badges */
+.landing.dark .splash-feature {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+/* Hint text */
+.landing.dark .splash-hint {
+  color: #475569;
+}
+
+/* Name input */
+.landing.dark .name-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+}
+
+.landing.dark .name-input::placeholder {
+  color: #475569 !important;
+}
+
+.landing.dark .name-input:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #ff6b35 !important;
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.15) !important;
+}
+
+/* Back link */
+.landing.dark .back-link {
+  color: #94a3b8;
+}
+
+.landing.dark .back-link:hover {
+  color: #ff6b35;
+}
+
+/* Footer */
+.landing.dark .landing-footer {
+  color: #475569;
+}
+
+/* Theme toggle in dark mode */
+.landing.dark .landing-theme-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.landing.dark .landing-theme-toggle .material-icons {
+  color: #94a3b8;
+}
+
+.landing.dark .landing-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 107, 53, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Pulse ring in dark mode */
+.landing.dark .hero-pulse-ring {
+  border-color: rgba(255, 107, 53, 0.15);
+}
+
+/* Error text stays visible */
+.landing.dark .auth-error {
+  color: #f87171;
+}

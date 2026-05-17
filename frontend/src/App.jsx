@@ -218,7 +218,7 @@ function App() {
     setActivePage('console');
   };
 
-  if (!username) return <AuthScreen onAuth={setUsername} />;
+  if (!username) return <AuthScreen onAuth={setUsername} darkMode={darkMode} setDarkMode={setDarkMode} />;
 
   const stats = [
     { label: 'Working Memory', value: vitals?.working || '0', icon: 'psychology' },
