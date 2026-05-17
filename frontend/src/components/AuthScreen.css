@@ -353,3 +353,64 @@
   filter: blur(10px);
   transition: all 0.5s ease-in-out;
 }
+
+/* ── Mobile Responsive Overrides for iPhone 14 ── */
+@media (max-width: 480px) {
+  .landing {
+    align-items: flex-start !important;
+    padding: 30px 16px !important;
+    overflow-y: auto !important;
+  }
+  
+  .splash-content, .name-content {
+    margin: 20px auto 60px auto !important;
+    padding: 36px 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px !important;
+  }
+  
+  .hero-orb {
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .hero-title {
+    font-size: 2.6rem !important;
+  }
+  
+  .hero-tagline {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.3em !important;
+    margin-bottom: 18px !important;
+  }
+  
+  .hero-desc {
+    font-size: 0.8rem !important;
+    margin-bottom: 24px !important;
+    line-height: 1.5 !important;
+  }
+  
+  .splash-features {
+    gap: 8px !important;
+    margin-bottom: 28px !important;
+  }
+  
+  .splash-feature {
+    padding: 4px 10px !important;
+    font-size: 0.62rem !important;
+  }
+  
+  .enter-btn, .name-submit {
+    padding: 10px 24px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .landing-footer {
+    position: relative !important;
+    bottom: auto !important;
+    margin: 20px auto 40px auto !important;
+    justify-content: center !important;
+  }
+}

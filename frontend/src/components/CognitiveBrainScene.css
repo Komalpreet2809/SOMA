@@ -204,3 +204,35 @@
   from { opacity: 0.1; transform: scale(1); }
   to { opacity: 0.3; transform: scale(1.05); }
 }
+
+/* ── Mobile Responsive Overrides for iPhone 14 ── */
+@media (max-width: 480px) {
+  .brain-core {
+    width: 240px !important;
+    height: 240px !important;
+    margin: 0 auto;
+  }
+  
+  .signal-node {
+    gap: 8px !important;
+  }
+  
+  /* Bring offsets inward so they fit cleanly within the 390px iPhone 14 viewport */
+  .prefrontal { top: -10px !important; left: -20px !important; }
+  .parietal { top: -10px !important; right: -20px !important; }
+  .temporal { bottom: 10px !important; left: -20px !important; }
+  .thalamus-label { bottom: 10px !important; right: -20px !important; }
+  
+  .signal-copy strong {
+    font-size: 0.58rem !important;
+  }
+  
+  .signal-copy span {
+    font-size: 0.48rem !important;
+  }
+  
+  .glow-hub {
+    width: 260px !important;
+    height: 260px !important;
+  }
+}
