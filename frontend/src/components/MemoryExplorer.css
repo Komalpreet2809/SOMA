@@ -540,13 +540,14 @@
   .list-surface {
     height: 400px !important;
     min-height: 400px !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 16px !important;
   }
   
   .detail-surface {
     height: auto !important;
+    min-height: 280px !important;
     overflow-y: visible !important;
-    padding: 16px !important;
+    padding: 24px 16px !important;
   }
   
   .instrument-grid {
@@ -606,9 +607,23 @@
 @media (max-width: 1024px) {
   .empty-detail {
     height: auto !important;
-    min-height: 200px !important;
-    padding: 32px 16px !important;
+    min-height: 240px !important;
+    padding: 40px 20px !important;
     box-sizing: border-box !important;
   }
-}
 
+  .empty-detail .material-icons {
+    font-size: 36px !important;
+  }
+
+  .empty-detail h3 {
+    font-size: 0.95rem !important;
+    margin: 0 !important;
+  }
+
+  .empty-detail p {
+    font-size: 0.7rem !important;
+    max-width: 250px !important;
+    line-height: 1.5 !important;
+  }
+}
