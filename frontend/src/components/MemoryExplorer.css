@@ -603,3 +603,12 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .empty-detail {
+    height: auto !important;
+    min-height: 200px !important;
+    padding: 32px 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+
