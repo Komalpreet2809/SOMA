@@ -164,6 +164,58 @@ async def process_ingest(request: IngestRequest, current_user: str = Depends(get
 
 # ── Stream Query ──────────────────────────────────────────────────
 
+@router.post("/analyze")
+async def analyze_text(request: QueryRequest, current_user: str = Depends(get_current_user)):
+    """
+    Analyzes text to preview potential semantic links and cognitive metrics.
+    Checks existing graph to find potential overlaps.
+    """
+    try:
+        from langchain_groq import ChatGroq
+        from langchain_core.messages import HumanMessage
+        from app.core.config import settings
+        
+        api_key = settings.GROQ_API_KEY if settings.GROQ_API_KEY else "dummy_key"
+        llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
+        
+        # 1. Extract potential entities
+        prompt = f"Extract 5-8 key entities (names, concepts, places) from this text as a comma-separated list. Return ONLY the list: {request.text}"
+        response = await llm.ainvoke([HumanMessage(content=prompt)])
+        entities = [e.strip() for e in response.content.split(',') if e.strip()]
+        
+        # 2. Check for existing overlaps in Neo4j
+        existing_links = []
+        if neo4j_db.driver:
+            # Look for entities that already exist for this user
+            check_query = """
+            MATCH (n:Entity)
+            WHERE n.user_id = $user_id AND toLower(n.name) IN $entities
+            RETURN n.name AS name, count{(n)--()} AS connections
+            """
+            overlaps = neo4j_db.query(check_query, {
+                "user_id": current_user, 
+                "entities": [e.lower() for e in entities]
+            }) or []
+            existing_links = [{"name": o["name"], "connections": o["connections"]} for o in overlaps]
+
+        # 3. Calculate metrics
+        char_count = len(request.text)
+        chunk_count = (char_count // 500) + 1
+        
+        return {
+            "entities": entities,
+            "existing_links": existing_links,
+            "metrics": {
+                "density": min(char_count / 2000, 1.0),
+                "chunks": chunk_count,
+                "estimated_links": len(entities) * 1.5,
+                "reinforcement_index": len(existing_links) / max(len(entities), 1)
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/query/stream")
 async def process_query_stream(request: QueryRequest, current_user: str = Depends(get_current_user)):
     async def event_generator():
@@ -192,7 +244,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                 data={"query": request.text}
             ))
             yield sse_event("trace", {"phase": "perception", "message": perception_msg, "data": {"query": request.text}})
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.4)
 
             yield sse_event("brain_trace", build_brain_event(
                 "attention",
@@ -207,7 +259,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                 "message": f"Attention salience computed at {attention['salience']}%.",
                 "data": attention
             })
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.4)
 
             if attention["emotional_intensity"] >= 70:
                 yield sse_event("brain_trace", build_brain_event(
@@ -223,7 +275,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                     "message": f"Amygdala analogue flagged {attention['emotion_label']} salience.",
                     "data": {"emotion": attention["emotion_label"]}
                 })
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.4)
 
             yield sse_event("brain_trace", build_brain_event(
                 "routing",
@@ -238,7 +290,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                 "message": f"Routed cognition through {', '.join(routing['regions'])}.",
                 "data": {"regions": routing["regions"]}
             })
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.4)
 
             yield sse_event("brain_trace", build_brain_event(
                 "prediction",
@@ -253,7 +305,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                 "message": prediction["intent"],
                 "data": prediction
             })
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.4)
 
             yield sse_event("brain_trace", build_brain_event(
                 "working_memory",
@@ -268,7 +320,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                 "message": f"Loaded {len(history)} recent messages into working memory.",
                 "data": {"history_count": len(history)}
             })
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.4)
 
             for output in orchestrator.stream(state_input):
                 for node_name, node_output in output.items():
@@ -284,7 +336,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                             data={"reflection": reflection}
                         ))
                         yield sse_event("trace", {"phase": "reflection", "message": "Intent map formed.", "data": {"reflection": reflection}})
-                        await asyncio.sleep(0.3)
+                        await asyncio.sleep(0.4)
 
                     elif node_name == "retrieve":
                         trace_data = node_output.get("trace_data", {})
@@ -302,7 +354,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                             }
                         ))
                         yield sse_event("trace", {"phase": "recall", "message": recall_msg, "data": node_output.get("context")})
-                        await asyncio.sleep(0.2)
+                        await asyncio.sleep(0.4)
 
                         suppressed_sensory = trace_data.get("suppressed_sensory", 0)
                         suppressed_graph = trace_data.get("suppressed_graph", 0)
@@ -325,7 +377,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                                 "suppressed_graph": suppressed_graph,
                             }
                         })
-                        await asyncio.sleep(0.2)
+                        await asyncio.sleep(0.4)
 
                         yield sse_event("brain_trace", build_brain_event(
                             "association",
@@ -339,7 +391,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                             }
                         ))
                         yield sse_event("trace", {"phase": "association", "message": assoc_msg, "data": node_output.get("graph_context"), "touched": trace_data.get("touched")})
-                        await asyncio.sleep(0.2)
+                        await asyncio.sleep(0.4)
 
                     elif node_name == "call_model":
                         reason_msg = "Synthesizing final response via Cortex Node..."
@@ -352,7 +404,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                             data={"prediction": prediction["intent"]}
                         ))
                         yield sse_event("trace", {"phase": "reasoning", "message": reason_msg})
-                        await asyncio.sleep(0.1)
+                        await asyncio.sleep(0.4)
 
                         final_response = node_output.get("response", "")
                         add_message(current_user, "user", request.text)
@@ -366,6 +418,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                             inputs_used=["response_plan"],
                             data={"response_preview": final_response[:120]}
                         ))
+                        yield sse_event("trace", {"phase": "language", "message": "Generating natural language output."})
                         yield sse_event("final_result", {"response": final_response})
 
                         # Build neural mesh AFTER streaming the response so
@@ -431,6 +484,31 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
 
 # ── Memory Explorer ─────────────────────────────────────────────
 
+@router.get("/memory/search")
+async def process_memory_search(q: str, current_user: str = Depends(get_current_user)):
+    try:
+        from app.db.chroma import search_memories
+        results = search_memories(q, current_user)
+        
+        memories = []
+        if results and "documents" in results and results["documents"]:
+            docs = results["documents"][0]
+            ids = results["ids"][0]
+            metadatas = results["metadatas"][0] if results["metadatas"] else []
+            distances = results["distances"][0] if results["distances"] else []
+            
+            for i in range(len(docs)):
+                memories.append({
+                    "id": ids[i],
+                    "content": docs[i],
+                    "metadata": metadatas[i] if i < len(metadatas) else {},
+                    "similarity": round(1 - distances[i], 2) if i < len(distances) else 0
+                })
+        return {"memories": memories}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/memory/sensory")
 async def get_sensory_memories(current_user: str = Depends(get_current_user)):
     try:
@@ -447,6 +525,18 @@ async def get_sensory_memories(current_user: str = Depends(get_current_user)):
                     "metadata": results["metadatas"][i] if results["metadatas"] else {}
                 })
         return {"memories": memories}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/memory/{memory_id}")
+async def purge_memory_chunk(memory_id: str, current_user: str = Depends(get_current_user)):
+    try:
+        from app.db.chroma import delete_vector
+        success = delete_vector(memory_id, current_user)
+        if not success:
+            raise HTTPException(status_code=404, detail="Memory chunk not found or unauthorized.")
+        return {"message": "Memory chunk purged successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

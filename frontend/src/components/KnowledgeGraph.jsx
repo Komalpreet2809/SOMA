@@ -1,115 +1,371 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import ForceGraph3D from 'react-force-graph-3d';
+import * as THREE from 'three';
 import { apiFetch } from '../api';
 import './KnowledgeGraph.css';
 
-const FALLBACK_GRAPH = {
-  center: 'Transformer Models',
+// Stunning conceptual mock graph representing SOMA's cognitive architecture
+const MOCK_GRAPH = {
   nodes: [
-    { label: 'Attention Mechanism', tone: 'orange' },
-    { label: 'Long-range Dependencies', tone: 'orange' },
-    { label: 'Efficiency', tone: 'green' },
-    { label: 'Expressivity', tone: 'orange' },
-    { label: 'Sparse Patterns', tone: 'orange' },
-    { label: 'Recurrence', tone: 'orange' }
+    { id: 'SOMA', label: 'SOMA (Core)', connections: 10, type: 'core' },
+    { id: 'Cortex', label: 'Cortex Layer', connections: 8, type: 'core' },
+    { id: 'Thalamus', label: 'Thalamus (Routing)', connections: 6, type: 'entity' },
+    { id: 'Hippocampus', label: 'Hippocampus', connections: 7, type: 'entity' },
+    { id: 'Neocortex', label: 'Neocortex', connections: 6, type: 'entity' },
+    { id: 'Sensory Cortex', label: 'Sensory Cortex', connections: 4, type: 'concept' },
+    { id: 'Working Memory', label: 'Working Memory', connections: 5, type: 'concept' },
+    { id: 'Episodic Memory', label: 'Episodic Memory', connections: 4, type: 'concept' },
+    { id: 'Sleep Cycle', label: 'Sleep Cycle', connections: 3, type: 'method' },
+    { id: 'Neural Inscription', label: 'Inscription Layer', connections: 3, type: 'method' },
+    { id: 'Llama 3.1', label: 'Llama 3.1', connections: 3, type: 'metric' },
+    { id: 'Groq API', label: 'Groq API', connections: 2, type: 'metric' }
+  ],
+  links: [
+    { source: 'SOMA', target: 'Cortex', label: 'ORCHESTRATES' },
+    { source: 'SOMA', target: 'Neural Inscription', label: 'ACCEPTS' },
+    { source: 'Cortex', target: 'Thalamus', label: 'ROUTES_BY' },
+    { source: 'Cortex', target: 'Hippocampus', label: 'CONSOLIDATES' },
+    { source: 'Cortex', target: 'Neocortex', label: 'STORES_IN' },
+    { source: 'Sensory Cortex', target: 'Hippocampus', label: 'WRITES_TO' },
+    { source: 'Working Memory', target: 'Thalamus', label: 'SYNCS_WITH' },
+    { source: 'Episodic Memory', target: 'Hippocampus', label: 'LOGS_IN' },
+    { source: 'Sleep Cycle', target: 'Hippocampus', label: 'OPTIMIZES' },
+    { source: 'Sleep Cycle', target: 'Neocortex', label: 'REINFORCES' },
+    { source: 'Cortex', target: 'Llama 3.1', label: 'COMPUTES' },
+    { source: 'Llama 3.1', target: 'Groq API', label: 'HOSTED_ON' }
   ]
 };
 
-const POSITIONS = [
-  { x: 50, y: 15 }, // Top
-  { x: 80, y: 35 }, // Top Right
-  { x: 80, y: 65 }, // Bottom Right
-  { x: 50, y: 85 }, // Bottom
-  { x: 20, y: 65 }, // Bottom Left
-  { x: 20, y: 35 }, // Top Left
-];
-
 function KnowledgeGraph({ refreshTick }) {
-  const [graph, setGraph] = useState(FALLBACK_GRAPH);
+  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [loading, setLoading] = useState(true);
+  const [dbStatus, setDbStatus] = useState('connecting');
+  const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
+  const [stats, setStats] = useState({ node_count: 0, edge_count: 0, top_entities: [] });
+  const [physicsActive, setPhysicsActive] = useState(true);
+  
+  const containerRef = useRef(null);
+  const fgRef = useRef();
+
+  // Measure container dimensions to auto-resize the canvas
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width: width || 800, height: height || 500 });
+      }
+    });
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  // Fetch graph database from backend
+  const fetchGraph = async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch('/api/v1/graph');
+      if (!res.ok) {
+        throw new Error('Graph fetch returned unhealthy status');
+      }
+      
+      const data = await res.json();
+      
+      if (data.status === 'offline' || data.status === 'error' || !data.nodes || data.nodes.length === 0) {
+        setDbStatus(data.status || 'offline');
+        const nodes = MOCK_GRAPH.nodes.map(n => ({ ...n }));
+        const links = MOCK_GRAPH.links.map(l => ({ ...l }));
+        setGraphData({ nodes, links });
+      } else {
+        setDbStatus('online');
+        const nodes = data.nodes.map(n => ({
+          id: n.id,
+          label: n.label || n.id,
+          connections: n.connections || 1,
+          type: 'entity'
+        }));
+        
+        const links = data.edges.map(e => ({
+          source: e.source,
+          target: e.target,
+          label: e.label || 'RELATED_TO'
+        }));
+        
+        setGraphData({ nodes, links });
+      }
+    } catch (error) {
+      console.error('Graph fetch failed', error);
+      setDbStatus('offline');
+      setGraphData({
+        nodes: MOCK_GRAPH.nodes.map(n => ({ ...n })),
+        links: MOCK_GRAPH.links.map(l => ({ ...l }))
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const res = await apiFetch('/api/v1/graph/stats');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'online') {
+          setStats(data);
+        }
+      }
+    } catch (err) {
+      console.error('Stats fetch failed', err);
+    }
+  };
 
   useEffect(() => {
-    const fetchGraph = async () => {
-      setLoading(true);
-      try {
-        const res = await apiFetch('/api/v1/graph');
-        if (!res.ok) { setLoading(false); return; }
-        
-        const data = await res.json();
-        const labels = Array.from(new Set((data.nodes || []).map(n => n.label || n.id).filter(Boolean)));
-        
-        if (labels.length > 0) {
-          const [center, ...rest] = labels;
-          const nodes = rest.slice(0, 6).map(l => ({
-            label: l,
-            tone: l.toLowerCase().includes('efficiency') ? 'green' : 'orange'
-          }));
-          while (nodes.length < 6) {
-            nodes.push(FALLBACK_GRAPH.nodes[nodes.length]);
-          }
-          setGraph({ center, nodes });
-        }
-      } catch (error) {
-        console.error('Graph fetch failed', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGraph();
+    fetchStats();
   }, [refreshTick]);
+
+  // Physics force configurations to pull the neural cluster into a tight, brain-like shape
+  useEffect(() => {
+    if (fgRef.current) {
+      const d3Force = fgRef.current.d3Force;
+      if (d3Force) {
+        d3Force('charge').strength(-50);   // Gentle repulsion for an ultra-compact molecular look
+        d3Force('link').distance(30);      // Extremely tight connection paths to pull nodes together
+      }
+      
+      // Auto-fit camera with very tight padding to zoom in close and eliminate empty workspace
+      setTimeout(() => {
+        fgRef.current.zoomToFit(800, 20);
+      }, 600);
+    }
+  }, [graphData]);
+
+  // Calculate max connections dynamically to scale color thresholds
+  const maxConnections = graphData.nodes && graphData.nodes.length > 0
+    ? Math.max(...graphData.nodes.map(n => n.connections || 1), 1)
+    : 1;
+
+  // Color mapper based on node type & degree
+  const getNodeColor = (node) => {
+    if (node.id === 'SOMA') return '#6366f1'; // Core Hub (Deep Indigo) is always SOMA!
+    
+    // For offline/mock mode, retain the pre-assigned structural category colors
+    if (dbStatus !== 'online') {
+      if (node.type === 'core') return '#6366f1';
+      if (node.type === 'method') return '#10b981'; // Green
+      if (node.type === 'concept') return '#3b82f6'; // Blue
+      if (node.type === 'metric') return '#f59e0b'; // Amber
+      return '#0891b2'; // Cyan
+    }
+    
+    // For live Neo4j data, dynamically scale colors based on relative synaptic density!
+    const connections = node.connections || 1;
+    const ratio = connections / maxConnections;
+    
+    if (ratio >= 0.8) return '#ec4899'; // High centrality (Hot pink)
+    if (ratio >= 0.4) return '#f59e0b'; // Medium centrality (Orange)
+    return '#0891b2'; // Low centrality (Cyan)
+  };
 
   return (
     <div className="graph-stage fade-in">
       <div className="graph-toolbar">
-        <button className="graph-select">
-          <span>Concept Map</span>
-          <span className="material-icons">expand_more</span>
-        </button>
+        <div className="graph-title-block">
+          <button className="graph-select">
+            <span className="material-icons">hub</span>
+            <span>{dbStatus === 'online' ? 'Real-time 3D Neo4j Graph' : '3D SOMA Cognitive Architecture Model'}</span>
+          </button>
+          {dbStatus !== 'online' && (
+            <span className="db-status-badge warning pulse">
+              <span className="dot" />
+              Neo4j Offline - Displaying Interactive System Concept
+            </span>
+          )}
+          {dbStatus === 'online' && (
+            <span className="db-status-badge success">
+              <span className="dot" />
+              Neo4j Synchronized (Live)
+            </span>
+          )}
+        </div>
+
         <div className="graph-actions">
-          <button className="graph-icon-button"><span className="material-icons">open_in_full</span></button>
-          <button className="graph-icon-button"><span className="material-icons">fit_screen</span></button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) fgRef.current.zoomToFit(600, 20);
+            }}
+            title="Recenter Camera"
+          >
+            <span className="material-icons">zoom_out_map</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) {
+                const currentPos = fgRef.current.cameraPosition();
+                fgRef.current.cameraPosition(
+                  { x: currentPos.x * 0.75, y: currentPos.y * 0.75, z: currentPos.z * 0.75 },
+                  null,
+                  300
+                );
+              }
+            }}
+            title="Zoom In"
+          >
+            <span className="material-icons">zoom_in</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              if (fgRef.current) {
+                const currentPos = fgRef.current.cameraPosition();
+                fgRef.current.cameraPosition(
+                  { x: currentPos.x * 1.35, y: currentPos.y * 1.35, z: currentPos.z * 1.35 },
+                  null,
+                  300
+                );
+              }
+            }}
+            title="Zoom Out"
+          >
+            <span className="material-icons">zoom_out</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              const newActive = !physicsActive;
+              setPhysicsActive(newActive);
+              if (fgRef.current) {
+                if (physicsActive) {
+                  fgRef.current.d3PauseSimulation();
+                } else {
+                  fgRef.current.d3ResumeSimulation();
+                }
+              }
+            }}
+            title={physicsActive ? "Pause Simulation" : "Resume Simulation"}
+          >
+            <span className="material-icons">{physicsActive ? "pause" : "play_arrow"}</span>
+          </button>
+          <button 
+            className="graph-icon-button" 
+            onClick={() => {
+              fetchGraph();
+              fetchStats();
+            }}
+            title="Sync Mesh"
+          >
+            <span className="material-icons">sync</span>
+          </button>
         </div>
       </div>
 
-      <div className="graph-network">
-        <svg viewBox="0 0 100 100" className="graph-links">
-          {POSITIONS.map((pos, i) => (
-            <line key={i} x1="50" y1="50" x2={pos.x} y2={pos.y} />
-          ))}
-          {POSITIONS.map((pos, i) => {
-            const next = POSITIONS[(i + 1) % POSITIONS.length];
-            return <line key={`r-${i}`} x1={pos.x} y1={pos.y} x2={next.x} y2={next.y} className="ring-line" />;
-          })}
-        </svg>
-
-        <div className="graph-node graph-center">
-          <div className="graph-node-core">∿</div>
-          <strong>{graph.center}</strong>
-        </div>
-
-        {graph.nodes.map((node, i) => {
-          const pos = POSITIONS[i];
-          return (
-            <div 
-              key={i} 
-              className={`graph-node graph-orbit ${node.tone}`}
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-            >
-              <div className="graph-node-dot" />
-              <strong>{node.label}</strong>
+      <div className="graph-network-container" ref={containerRef}>
+        {/* Live Telemetry HUD Overlay */}
+        <div className="graph-hud-overlay">
+          <div className="hud-panel">
+            <div className="hud-header">
+              <span className="material-icons">analytics</span>
+              <span>Semantic Telemetry</span>
             </div>
-          );
-        })}
-        
-        {loading && <div className="graph-loading" style={{ position: 'absolute', bottom: '10px', fontSize: '0.7rem' }}>Refreshing graph...</div>}
-      </div>
+            <div className="hud-row">
+              <span className="hud-label">Nodes:</span>
+              <span className="hud-value">{dbStatus === 'online' ? stats.node_count : graphData.nodes.length}</span>
+            </div>
+            <div className="hud-row">
+              <span className="hud-label">Synapses:</span>
+              <span className="hud-value">{dbStatus === 'online' ? stats.edge_count : graphData.links.length}</span>
+            </div>
+            <div className="hud-row">
+              <span className="hud-label">Storage:</span>
+              <span className="hud-value status-glow">{dbStatus === 'online' ? 'LTM (Neo4j)' : 'STM (Cache)'}</span>
+            </div>
+          </div>
+          
+          {dbStatus === 'online' && stats.top_entities && stats.top_entities.length > 0 && (
+            <div className="hud-panel top-entities">
+              <div className="hud-header">
+                <span className="material-icons">star</span>
+                <span>Primary Hubs</span>
+              </div>
+              <div className="hud-entity-list">
+                {stats.top_entities.map((ent, idx) => (
+                  <div key={idx} className="hud-entity-row">
+                    <span className="entity-rank">#{idx+1}</span>
+                    <span className="entity-name">{ent.entity}</span>
+                    <span className="entity-connections">{ent.connections} rx</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-      <div className="graph-legend">
-        <span className="legend-item concept">Concept</span>
-        <span className="legend-item method">Method</span>
-        <span className="legend-item metric">Metric</span>
-        <span className="legend-item relationship">Relationship</span>
-        <span className="legend-item entity">Entity</span>
+        <ForceGraph3D
+          ref={fgRef}
+          graphData={graphData}
+          width={dimensions.width}
+          height={dimensions.height}
+          backgroundColor="rgba(0, 0, 0, 0)" // Glassmorphic translucent rendering
+          
+          // Render gorgeous glowing 3D spheres with emissive materials (100% stable!)
+          nodeThreeObject={node => {
+            const size = Math.max(3.2, Math.min(node.connections * 1.6, 9.5)); // Perfectly scaled spheres
+            const geom = new THREE.SphereGeometry(size, 24, 24);
+            const mat = new THREE.MeshLambertMaterial({
+              color: getNodeColor(node),
+              transparent: true,
+              opacity: 0.95,
+              emissive: getNodeColor(node),
+              emissiveIntensity: 0.45
+            });
+            return new THREE.Mesh(geom, mat);
+          }}
+          
+          // Outlined holographic label rendered natively floating beside cursor on hover (100% stable!)
+          nodeLabel={node => `
+            <span style="color: ${getNodeColor(node)}; font-size: 24px; font-weight: 800;">
+              ${node.label || node.id}
+            </span>
+          `}
+          
+          // Outlined relationship tag rendered on link hover (100% stable!)
+          linkLabel={link => `
+            <span style="color: #6366f1; font-size: 16px; font-weight: 800;">
+              ${link.label || 'RELATED_TO'}
+            </span>
+          `}
+          
+          nodeRelSize={3}
+          linkColor={() => 'rgba(99, 102, 241, 0.25)'} // Soft, clean axon link fibers
+          linkWidth={1.8} // Sleek link line thickness
+          
+          // Glowing Thought Flows (sliding directional particles along axons)
+          linkDirectionalParticles={3}
+          linkDirectionalParticleSpeed={0.006}
+          linkDirectionalParticleWidth={1.5}
+          linkDirectionalParticleColor={() => '#6366f1'}
+          
+          showNavInfo={false}
+          enablePointerInteraction={true}
+          enableNodeDrag={true}
+        />
+        
+        {/* Beautiful Glassmorphic Legend HUD */}
+        <div className="graph-legend">
+          <div className="legend-item core">Core Hub</div>
+          <div className="legend-item high">High Density</div>
+          <div className="legend-item medium">Medium Density</div>
+          <div className="legend-item entity">Low Density</div>
+        </div>
+
+        {loading && (
+          <div className="graph-loading">
+            <span className="material-icons pulse">refresh</span>
+            <span>Synchronizing cognitive mesh...</span>
+          </div>
+        )}
       </div>
     </div>
   );

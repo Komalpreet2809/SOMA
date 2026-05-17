@@ -33,7 +33,7 @@ PHASE_REGIONS = {
     "language": "language_cortex",
     "memory": "memory_consolidation",
     "graph": "neocortex",
-    "dreaming": "default_mode_network",
+    "dreaming": "default_mode_network", 
     "sleep": "memory_consolidation",
 }
 

@@ -1,19 +1,15 @@
 import './CognitiveDashboard.css';
-import CognitiveBrainImageScene from './CognitiveBrainImageScene';
+import { useState, useEffect, useRef } from 'react';
 
 function CognitiveDashboard({ statusText, stats }) {
   return (
     <div className="status-layout fade-in">
-      <div className="status-visual">
-        <CognitiveBrainImageScene state="reasoning" />
-      </div>
-
       <div className="status-sidebar">
-        <div className="status-card">
+        <div className="status-card highlight">
           <h3>Neural Vitals</h3>
-          <SystemStatusChart />
+          <SystemStatusChart state={statusText} />
           <div className="current-state">
-            <span>Current Status</span>
+            <span>Neural Frequency</span>
             <strong>{statusText}</strong>
           </div>
         </div>
@@ -39,17 +35,62 @@ function CognitiveDashboard({ statusText, stats }) {
   );
 }
 
-function SystemStatusChart() {
-  // SVG points for smooth overlapping waves
-  const wave1 = "M0,40 Q30,5 60,40 T120,40 T180,40 T240,40 T300,40";
-  const wave2 = "M0,50 Q40,25 80,50 T160,50 T240,50 T320,50 T400,50";
+function SystemStatusChart({ state }) {
+  const [path1, setPath1] = useState("");
+  const [path2, setPath2] = useState("");
+  const frameRef = useRef(0);
+
+  const intensity = ['reasoning', 'language', 'reflection'].includes(state) ? 'high' : 
+                    ['recall', 'association', 'attention'].includes(state) ? 'medium' : 'low';
+
+  useEffect(() => {
+    let animationFrame;
+    
+    const generateWave = (time, freq, amp, jitter, complexity = 1) => {
+      let d = "M0,40 ";
+      const step = complexity > 1 ? 5 : 10;
+      for (let x = 0; x <= 300; x += step) {
+        // Complex brainwave math: Base Sine + Harmonics for interference
+        let yBase = Math.sin(x * freq + time) * amp;
+        if (complexity > 1) {
+          yBase += Math.sin(x * freq * 2.3 + time * 1.4) * (amp * 0.4);
+          yBase += Math.sin(x * freq * 3.9 + time * 2.1) * (amp * 0.2);
+        }
+        
+        const noise = (Math.random() - 0.5) * jitter;
+        const y = 40 + yBase + noise;
+        d += `L${x},${y} `;
+      }
+      return d;
+    };
+
+    const animate = () => {
+      frameRef.current += intensity === 'high' ? 0.28 : intensity === 'medium' ? 0.14 : 0.06;
+      const t = frameRef.current;
+      
+      const config = {
+        high:   { freq: 0.12, amp: 26, jitter: 14, comp: 3 },
+        medium: { freq: 0.08, amp: 18, jitter: 4,  comp: 1 },
+        low:    { freq: 0.03, amp: 10, jitter: 1,  comp: 1 }
+      }[intensity];
+
+      setPath1(generateWave(t, config.freq, config.amp, config.jitter, config.comp));
+      setPath2(generateWave(t * 0.8, config.freq * 0.6, config.amp * 0.5, config.jitter * 0.4, 1));
+      
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => cancelAnimationFrame(animationFrame);
+  }, [intensity]);
+
   const labels = ['ALPHA', 'BETA', 'GAMMA', 'DELTA', 'THETA'];
 
   return (
-    <div className="system-chart">
+    <div className={`system-chart intensity-${intensity}`}>
       <svg viewBox="0 0 300 80" className="system-chart-svg">
-        <path d={wave2} className="secondary" />
-        <path d={wave1} />
+        <path d={path2} className="secondary" />
+        <path d={path1} />
       </svg>
       <div className="chart-labels">
         {labels.map(l => <span key={l}>{l}</span>)}

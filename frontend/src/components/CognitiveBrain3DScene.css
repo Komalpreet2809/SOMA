@@ -1,0 +1,110 @@
+/* CognitiveBrain3DScene.css - Sci-fi Organic 3D Brain simulation styling */
+
+.brain-3d-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.05) 0%, rgba(10, 10, 15, 0) 70%);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+/* Micro HUD floating overlay */
+.brain-hud-metrics {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 14px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+}
+
+.hud-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.05em;
+  font-family: var(--font-mono), monospace;
+}
+
+.hud-val {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.hud-val.uppercase {
+  text-transform: uppercase;
+}
+
+/* Utility Colors */
+.text-cyan { color: #06b6d4 !important; }
+.text-pink { color: #ec4899 !important; }
+
+/* Micro-HUD tooltips */
+.brain-tooltip-hud {
+  background: rgba(10, 10, 15, 0.95) !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  color: #fff !important;
+  font-family: var(--font-mono), monospace !important;
+  font-size: 0.7rem !important;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brain-tooltip-hud strong {
+  color: #06b6d4;
+  font-size: 0.75rem;
+}
+
+.hud-category {
+  color: #888;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+/* Loading label */
+.brain-loading-label {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  animation: pulse-hud 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-hud {
+  0% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}

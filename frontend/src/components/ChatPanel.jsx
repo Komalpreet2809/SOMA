@@ -7,7 +7,7 @@ import './ChatPanel.css';
  * Layer 3: Interaction (Utility Layer)
  * Handles live conversation and input.
  */
-function ChatPanel({ messages, onSendMessage, isTyping, onInputStateChange }) {
+function ChatPanel({ messages, onSendMessage, onNewChat, userAvatar, isTyping, onInputStateChange }) {
   const [input, setInput] = useState('');
   const scrollRef = useRef(null);
 
@@ -37,16 +37,23 @@ function ChatPanel({ messages, onSendMessage, isTyping, onInputStateChange }) {
   return (
     <div className="chat-interface">
       <div className="chat-messages" ref={scrollRef}>
+        {messages.length === 0 && (
+          <div className="welcome-state">
+            <div className="welcome-icon">
+              <span className="material-icons">lens_blur</span>
+            </div>
+            <h3>Neural Core Initialized.</h3>
+            <p>Feed me a thought to begin building your neural pathways.</p>
+          </div>
+        )}
         {messages.map((msg, i) => (
           <div key={i} className={`chat-bubble-group ${msg.role}`}>
-            <div className="avatar-wrap">
-              <div className="chat-avatar">
-                {msg.role === 'user' ? (
-                  <span className="material-icons">account_circle</span>
-                ) : (
-                  <span className="material-icons">lens_blur</span>
-                )}
-              </div>
+            <div className="chat-avatar">
+              {msg.role === 'user' ? (
+                <img src={userAvatar} alt="User" />
+              ) : (
+                <span className="material-icons">lens_blur</span>
+              )}
             </div>
             <div className="bubble-body">
               <div className="bubble-meta">
@@ -72,6 +79,15 @@ function ChatPanel({ messages, onSendMessage, isTyping, onInputStateChange }) {
       </div>
 
       <form className="chat-input-row" onSubmit={handleSubmit}>
+        <button 
+          className="new-chat-btn" 
+          type="button" 
+          onClick={onNewChat}
+          title="New Chat"
+          disabled={isTyping}
+        >
+          <span className="material-icons">add</span>
+        </button>
         <div className="input-field-wrap">
           <input 
             type="text" 

@@ -123,7 +123,7 @@ def run_sleep_cycle(keep_recent: int = 10):
             "graph_triples": triples,
         })
 
-        print(f"  Sleep Cycle: Session {session_id} — summarized, {triples} triples, pruned {pruned} messages.")
+        print(f"  Sleep Cycle: Session {session_id} - summarized, {triples} triples, pruned {pruned} messages.")
 
     report["message"] = f"Sleep Cycle complete. Processed {report['sessions_processed']} sessions."
     return report
@@ -132,7 +132,7 @@ def run_sleep_cycle(keep_recent: int = 10):
 # Allow running as a standalone script
 if __name__ == "__main__":
     print("=" * 60)
-    print("Soma Sleep Cycle — Starting consolidation...")
+    print("Soma Sleep Cycle - Starting consolidation...")
     print("=" * 60)
     result = run_sleep_cycle()
     print(f"\n{'=' * 60}")

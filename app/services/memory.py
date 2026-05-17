@@ -28,18 +28,18 @@ def get_embeddings():
             model_name="all-MiniLM-L6-v2",
             model_kwargs={"trust_remote_code": True}
         )
-        print("✓ Embeddings model loaded successfully")
+        print("[OK] Embeddings model loaded successfully")
         return _embeddings
     except Exception as e:
-        print(f"⚠ Failed to load embeddings from HF Hub: {e}")
-        print("⚠ Continuing without embeddings (sensory memory will be limited)")
+        print(f"[!] Failed to load embeddings from HF Hub: {e}")
+        print("[!] Continuing without embeddings (sensory memory will be limited)")
         _embeddings_failed = True
         return None
 
 def ingest_text(text: str, metadata: dict = None, user_id: str = "default_user"):
     embeddings = get_embeddings()
     if embeddings is None:
-        print(f"⚠ Skipping sensory memory ingestion (embeddings unavailable)")
+        print(f"[!] Skipping sensory memory ingestion (embeddings unavailable)")
         return 0
 
     # Step 1: Chunk the text (Soma's parsing)
@@ -75,7 +75,7 @@ def ingest_text(text: str, metadata: dict = None, user_id: str = "default_user")
 def retrieve_context(query: str, user_id: str = "default_user", n_results: int = 3):
     embeddings = get_embeddings()
     if embeddings is None:
-        print(f"⚠ Cannot retrieve context (embeddings unavailable)")
+        print(f"[!] Cannot retrieve context (embeddings unavailable)")
         return []
 
     collection = get_collection()

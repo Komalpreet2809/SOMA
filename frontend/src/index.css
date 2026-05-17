@@ -34,8 +34,12 @@ body,
 
 body {
   font-family: var(--font-body);
-  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.55), transparent 28%), var(--bg-app);
+  background: 
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 50%),
+    radial-gradient(circle at bottom right, rgba(255, 107, 53, 0.08), transparent 50%),
+    #f2f2f2;
   color: var(--text-main);
+  overflow: hidden;
 }
 
 button,
@@ -69,3 +73,645 @@ img {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
 }
+
+/* ── SOMA Premium Glassmorphic Dark Theme ── */
+body.dark-theme {
+  --bg-app: #000000;
+  --bg-sidebar: #050505;
+  --bg-card: rgba(18, 18, 18, 0.75);
+  --primary: #f8fafc;
+  --secondary: #ff7d4d;
+  --accent: #ff7d4d;
+  --text-main: #f8fafc;
+  --text-muted: #a3a3a3; /* Neutral light grey, no blue/slate tint */
+  --text-light: #737373; /* Neutral dark grey, no blue/slate tint */
+  --border-card: 1px solid rgba(255, 255, 255, 0.06);
+  --shadow-premium: 0 40px 100px rgba(0, 0, 0, 0.6);
+  
+  background: 
+    radial-gradient(circle at top left, rgba(255, 107, 53, 0.04), transparent 50%),
+    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.015), transparent 50%),
+    #000000;
+  color: var(--text-main);
+}
+
+/* Header & Sidebar Titles */
+body.dark-theme .page-header h2 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .brand-copy h1 {
+  color: #f8fafc !important;
+}
+
+/* Brain Ambient Node Labels Contrast Correction */
+body.dark-theme .signal-copy strong {
+  color: #e2e8f0 !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+body.dark-theme .signal-node {
+  opacity: 0.38 !important; /* Raised from 0.2 to prevent faintness */
+}
+
+body.dark-theme .signal-node.active,
+body.dark-theme .signal-node.hot {
+  opacity: 1 !important;
+}
+
+body.dark-theme .signal-dot {
+  background-color: #475569 !important;
+}
+
+/* Timeline & Feed Overrides */
+body.dark-theme .phase-title {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .phase-desc {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .timeline-row::before {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .timeline-dot {
+  box-shadow: 0 0 0 4px #050505 !important;
+  background-color: #ff6b35 !important; /* Active accent node dot */
+}
+
+body.dark-theme .timeline-empty {
+  color: #737373 !important;
+}
+
+/* Chat bubble dark mode overrides */
+body.dark-theme .bubble-body {
+  background-color: rgba(24, 24, 24, 0.75) !important; /* Pure neutral dark-grey glass bubble, no navy blue */
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+}
+
+body.dark-theme .chat-bubble-group.user .bubble-body {
+  background-color: rgba(28, 28, 28, 0.85) !important; /* Elegant neutral deep charcoal, completely mud-free */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark-theme .bubble-text {
+  color: #e5e5e5 !important;
+}
+
+body.dark-theme .bubble-meta strong {
+  color: #e5e5e5 !important;
+}
+
+body.dark-theme .chat-bubble-group.soma .bubble-meta strong {
+  color: #ff8b54 !important; /* Elegant warm orange highlight for Soma in pure dark mode */
+}
+
+/* Input elements dark mode overrides */
+body.dark-theme .input-field-wrap {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+}
+
+body.dark-theme .input-field-wrap input {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .new-chat-btn {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .new-chat-btn:hover {
+  background-color: rgba(255, 107, 53, 0.1) !important;
+  color: #ff6b35 !important;
+}
+
+body.dark-theme .suggested-starters button {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #e5e5e5 !important;
+}
+
+body.dark-theme .suggested-starters button:hover {
+  background-color: rgba(255, 107, 53, 0.1) !important;
+  color: #ff7d4d !important;
+  border-color: rgba(255, 107, 53, 0.3) !important;
+}
+
+body.dark-theme .welcome-icon {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-theme .welcome-icon span {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .welcome-state h3 {
+  color: #f8fafc !important;
+}
+
+/* Sidebar overrides */
+body.dark-theme .session-card {
+  background-color: rgba(18, 18, 18, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+body.dark-theme .session-avatar {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .session-copy strong {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .sidebar-link {
+  color: var(--text-muted);
+}
+
+body.dark-theme .sidebar-link:hover {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-theme .sidebar-link.active {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Memory & Dashboard dynamic panels */
+body.dark-theme .dashboard-metric-card,
+body.dark-theme .memory-list-card,
+body.dark-theme .memory-detail-card,
+body.dark-theme .knowledge-card {
+  background-color: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .timeline-node {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+body.dark-theme .sleep-telemetry-card {
+  background-color: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .summary-card-combined,
+body.dark-theme .summary-card-inline {
+  background-color: rgba(18, 18, 18, 0.85) !important;
+}
+
+body.dark-theme .telemetry-card-value {
+  color: #f8fafc !important;
+}
+
+/* Graph online indicator */
+body.dark-theme .graph-container-glow {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .input-area-card {
+  background-color: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .text-input-field {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .theme-toggle-btn {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── SOMA Memory Explorer Dark UI Overrides ── */
+body.dark-theme .memory-surface {
+  background: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-theme .memory-search-wrap {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .memory-search-wrap input {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .filter-tabs {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-theme .filter-tab {
+  color: #737373 !important;
+}
+
+body.dark-theme .filter-tab.active {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-theme .memory-row {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .memory-row:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+body.dark-theme .memory-row.active {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-theme .memory-row-copy strong {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .memory-row-meta {
+  color: #737373 !important;
+}
+
+body.dark-theme .memory-id-badge {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .memory-detail-title {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .memory-content-box {
+  background-color: rgba(24, 24, 24, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  color: #e5e5e5 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-theme .instrument-card {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .instrument-card h4 {
+  color: #737373 !important;
+}
+
+body.dark-theme .meter-track {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .metric-value {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .neighbor-card {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .neighbor-card strong {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .neighbor-card span {
+  color: #737373 !important;
+}
+
+body.dark-theme .metadata-tag {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .metadata-tag span:first-child {
+  color: #737373 !important;
+}
+
+body.dark-theme .metadata-tag span:last-child {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .empty-detail {
+  color: #737373 !important;
+}
+
+body.dark-theme .insight-close {
+  color: #737373 !important;
+}
+
+body.dark-theme .neural-insight-modal {
+  background-color: #0f1115 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .insight-header h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .insight-body p {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .insight-btn {
+  background-color: #ff6b35 !important;
+  color: white !important;
+}
+
+/* ── SOMA Knowledge Graph Dark UI Overrides ── */
+body.dark-theme .graph-network-container {
+  background: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 0 80px rgba(255, 255, 255, 0.02) !important;
+}
+
+body.dark-theme .graph-select {
+  background: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .graph-icon-button {
+  background: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .graph-icon-button:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ff6b35 !important;
+}
+
+body.dark-theme .graph-legend {
+  background: rgba(24, 24, 24, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-theme .legend-item {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .hud-panel {
+  background: rgba(18, 18, 18, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-theme .hud-header {
+  color: #ff8b54 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .hud-label {
+  color: #737373 !important;
+}
+
+body.dark-theme .hud-value {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .entity-name {
+  color: #e5e5e5 !important;
+}
+
+body.dark-theme .entity-connections {
+  color: #ffaa80 !important;
+  background: rgba(255, 107, 53, 0.1) !important;
+}
+
+body.dark-theme .graph-tooltip {
+  text-shadow: 
+    -3px -3px 0 #000, 
+     3px -3px 0 #000, 
+    -3px  3px 0 #000, 
+     3px  3px 0 #000,
+    -3px  0px 0 #000,
+     3px  0px 0 #000,
+     0px -3px 0 #000,
+     0px  3px 0 #000 !important;
+}
+
+body.dark-theme .graph-loading {
+  background: rgba(18, 18, 18, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #ff6b35 !important;
+}
+
+/* ── SOMA Neural Inscription Dark UI Overrides ── */
+body.dark-theme .inscription-icon {
+  background-color: rgba(24, 24, 24, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .inscription-title h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .inscription-composer {
+  background: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-theme .inscription-composer textarea {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .inscription-composer textarea::placeholder {
+  color: #525252 !important;
+}
+
+body.dark-theme .inscription-footer {
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .analysis-panel {
+  background: rgba(18, 18, 18, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-theme .analysis-section label,
+body.dark-theme .analysis-metric label {
+  color: #737373 !important;
+}
+
+body.dark-theme .mini-meter {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .metric-sub {
+  color: #737373 !important;
+}
+
+body.dark-theme .link-tag {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .link-tag.reinforced {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+}
+
+body.dark-theme .impact-item {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .impact-val {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .impact-label {
+  color: #737373 !important;
+}
+
+body.dark-theme .layer-item {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .empty-tag {
+  color: #737373 !important;
+}
+
+body.dark-theme .existing-link-item {
+  background-color: rgba(24, 24, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .link-info strong {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .link-info span {
+  color: #737373 !important;
+}
+
+body.dark-theme .panel-footer {
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
+  color: #737373 !important;
+}
+
+/* ── SOMA Sleep Page & Consolidation Dark UI Overrides ── */
+body.dark-theme .sleep-page-container {
+  background-color: #000000 !important;
+}
+
+body.dark-theme .sleep-page-header h2 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .sleep-copy-combined h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .sleep-copy-combined p {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .sleep-step-text {
+  color: #737373 !important;
+}
+
+body.dark-theme .sleep-step-item-vertical.active .sleep-step-text {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .sleep-step-circle {
+  background-color: #000000 !important;
+}
+
+body.dark-theme .sleep-step-circle.pending {
+  border-color: #404040 !important;
+}
+
+body.dark-theme .connector-line {
+  background-color: #404040 !important;
+}
+
+body.dark-theme .summary-overlay-combined {
+  background-color: #000000 !important;
+}
+
+body.dark-theme .sleep-page-header-summary h2 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .summary-card-combined {
+  background-color: rgba(18, 18, 18, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-theme .summary-close-combined {
+  color: #737373 !important;
+}
+
+body.dark-theme .summary-close-combined:hover {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .summary-header-copy-combined h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .summary-header-copy-combined p {
+  color: #737373 !important;
+}
+
+body.dark-theme .summary-item-combined {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-theme .summary-item-copy-combined strong {
+  color: #e5e5e5 !important;
+}
+
+body.dark-theme .summary-item-copy-combined span {
+  color: #737373 !important;
+}
+
+body.dark-theme .summary-view-btn-combined {
+  background-color: rgba(255, 107, 53, 0.1) !important;
+  color: #ff6b35 !important;
+}
+
+body.dark-theme .summary-view-btn-combined:hover {
+  background-color: rgba(255, 107, 53, 0.15) !important;
+}
+
+body.dark-theme .summary-footer-combined p {
+  color: #a3a3a3 !important;
+}
+
+body.dark-theme .sleep-trigger-btn {
+  background: linear-gradient(135deg, #ff6b35, #ff5714) !important;
+}
+
+body.dark-theme .sleep-trigger-btn:hover {
+  box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4) !important;
+}
+
+body.dark-theme .sleep-brain-image-asset {
+  background: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  border-radius: 0 !important;
+}
+

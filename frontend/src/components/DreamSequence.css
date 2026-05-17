@@ -1,220 +1,515 @@
-/* DreamSequence.css - Refined for Page 7 & 8 */
+/* ── Sleep & Consolidation Page Styles (Split Layout) ── */
 
-.sleep-layout {
+.sleep-page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 600px;
+  background-color: #eaeaea; /* Exact light gray background as in Image 1 */
+  width: 100%;
   height: 100%;
-  text-align: center;
-}
-
-.sleep-brain-wrap {
+  padding: 40px;
+  box-sizing: border-box;
   position: relative;
-  margin-bottom: 56px;
-  transform: scale(1.1);
+  border-radius: 24px;
 }
 
-/* ── Progress ── */
-.sleep-copy h3 {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
+.sleep-page-header {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.sleep-page-header h2 {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.2rem; /* Exact page header font-size as Console */
   font-weight: 700;
-  margin-bottom: 12px;
   color: #1a1a1a;
+  margin: 0;
   letter-spacing: -0.01em;
 }
 
-.sleep-copy p {
-  font-size: 1.1rem;
-  color: #888;
-  margin-bottom: 64px;
-}
-
-.sleep-steps {
-  display: flex;
-  gap: 80px;
-  justify-content: center;
+/* ── Split Layout Grid ── */
+.sleep-split-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 60px;
   width: 100%;
-  max-width: 800px;
-  padding-top: 48px;
-  border-top: 1px solid #f0f0f0;
+  max-width: 960px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
 }
 
-.sleep-step {
+.sleep-left-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sleep-brain-wrap-combined {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sleep-brain-image-asset {
+  max-width: 380px;
+  height: auto;
+  display: block;
+  mix-blend-mode: normal; /* Blends perfectly because background colors match exactly */
+  opacity: 0.95;
+}
+
+.sleep-right-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.sleep-copy-combined {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.sleep-copy-combined h3 {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.15rem; /* Exact block header font-size as Console */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
+}
+
+.sleep-copy-combined p {
+  font-size: 0.75rem; /* Exact body font-size as Console */
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* ── Vertical Progress Steps (Optimized for Split Panel) ── */
+.sleep-steps-vertical {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 28px;
+}
+
+.sleep-step-item-wrap-vertical {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.sleep-step-item-vertical {
   display: flex;
   align-items: center;
   gap: 16px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+  z-index: 2;
 }
 
-.sleep-step-dot {
-  width: 28px;
-  height: 28px;
+.sleep-step-item-vertical.active {
+  opacity: 1;
+}
+
+.sleep-step-circle {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid #ddd;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #bbb;
-  transition: all 0.3s;
+  box-sizing: border-box;
+  background-color: #eaeaea; /* matches parent background to blend connector lines */
+  transition: all 0.3s ease;
 }
 
-.sleep-step-dot.active {
-  border-color: #ff6b35;
-  color: #ff6b35;
-  box-shadow: 0 0 15px rgba(255, 107, 53, 0.2);
-}
-
-.sleep-step-dot.completed {
-  border-color: #10b981;
+/* 1. Completed step (Green Checkmark) */
+.sleep-step-circle.completed {
+  border: 2px solid #10b981;
   color: #10b981;
-  background-color: transparent;
 }
 
-.sleep-step-label {
-  font-size: 1rem;
-  color: #999;
+.sleep-step-circle.completed .material-icons {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* 2. Active step (Orange Ring with Dot) */
+.sleep-step-circle.active {
+  border: 2px solid #ff6b35;
+  position: relative;
+}
+
+.active-dot-inner {
+  width: 8px;
+  height: 8px;
+  background-color: #ff6b35;
+  border-radius: 50%;
+}
+
+/* 3. Pending step (Grey Ring) */
+.sleep-step-circle.pending {
+  border: 2px solid #cbd5e1;
+}
+
+.sleep-step-text {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 0.8rem; /* Exact list font-size as Console activity items */
+  color: #444;
   font-weight: 600;
 }
 
-.sleep-step-label.active {
+.sleep-step-item-vertical.active .sleep-step-text {
   color: #1a1a1a;
+  font-weight: 700;
 }
 
-/* ── Summary Card (Page 8) ── */
-.summary-overlay {
+/* Vertical connector lines */
+.sleep-step-connector-vertical {
+  position: absolute;
+  left: 11px;
+  top: -28px;
+  height: 28px;
+  width: 2px;
+  z-index: 1;
+}
+
+.connector-line {
+  width: 100%;
+  height: 100%;
+  background-color: #cbd5e1;
+}
+
+/* ── Consolidation Summary Overlay (Image 2) ── */
+.summary-overlay-combined {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(229, 229, 229, 0.9);
+  background-color: #eaeaea; /* Exact solid color to overlay completely as shown in Image 2 */
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  backdrop-filter: blur(12px);
+  padding: 40px;
+  box-sizing: border-box;
 }
 
-.summary-card {
+.sleep-page-header-summary {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.sleep-page-header-summary h2 {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.2rem; /* Matches unified page header size */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.summary-card-combined,
+.summary-card-inline {
   width: 100%;
-  max-width: 520px;
-  background-color: white;
-  border-radius: 40px;
-  padding: 48px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+  max-width: 380px; /* Slimmer card width for better alignment */
+  background-color: #f3f3f3;
+  border-radius: 24px;
+  padding: 22px; /* Denser, high-fidelity margins */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
   position: relative;
   text-align: left;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
 }
 
-.summary-close {
+.summary-close-combined {
   position: absolute;
-  top: 32px;
-  right: 32px;
-  color: #bbb;
-  font-size: 1.8rem;
+  top: 24px;
+  right: 24px;
+  color: #888;
   background: none;
-}
-
-.summary-close:hover {
-  color: #1a1a1a;
-}
-
-.summary-header {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 40px;
-}
-
-.summary-header-icon {
-  width: 64px;
-  height: 64px;
-  background-color: #f5f5f5;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1a1a1a;
-}
-
-.summary-header-icon .material-icons {
-  font-size: 32px;
-}
-
-.summary-header-copy h3 {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: #1a1a1a;
-}
-
-.summary-header-copy p {
-  font-size: 1rem;
-  color: #888;
-}
-
-.summary-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
-.summary-item {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  border-radius: 20px;
-  background-color: #f8f8f8;
-  border: 1px solid rgba(0,0,0,0.02);
-}
-
-.summary-item-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.summary-item-copy strong {
-  display: block;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 2px;
+.summary-close-combined .material-icons {
+  font-size: 20px;
 }
 
-.summary-item-copy span {
-  font-size: 0.85rem;
-  color: #888;
+.summary-close-combined:hover {
+  color: #1a1a1a;
+}
+
+.summary-header-combined {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  align-items: center;
+}
+
+.summary-header-icon-combined {
+  width: 36px;
+  height: 36px;
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+.summary-header-icon-combined .material-icons {
+  font-size: 24px;
+}
+
+.summary-header-copy-combined h3 {
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 1.05rem; /* Balanced, high-density title */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.summary-header-copy-combined p {
+  font-size: 0.72rem; /* Matches unified small captions */
+  color: #666;
+  margin: 0;
   font-weight: 500;
 }
 
-.summary-view-btn {
+.summary-list-combined {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.summary-item-combined {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Denser item gap */
+  padding: 10px 14px; /* Highly compact padding */
+  border-radius: 14px;
+  background-color: rgba(0, 0, 0, 0.025);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+.summary-item-icon-combined {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summary-item-icon-combined .material-icons {
+  font-size: 16px; /* Compact action icons */
+}
+
+.summary-item-copy-combined strong {
+  display: block;
+  font-size: 0.78rem; /* Matches premium compact metadata headers */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1px;
+}
+
+.summary-item-copy-combined span {
+  display: block;
+  font-size: 0.68rem; /* Highly readable compact value subtext */
+  color: #666;
+  font-weight: 500;
+}
+
+/* Tone styling matching pastel buttons */
+.summary-item-icon-combined.green { color: #10b981; background-color: rgba(16, 185, 129, 0.08); }
+.summary-item-icon-combined.teal { color: #0d9488; background-color: rgba(13, 148, 136, 0.08); }
+.summary-item-icon-combined.orange { color: #ff6b35; background-color: rgba(255, 107, 53, 0.08); }
+.summary-item-icon-combined.amber { color: #f59e0b; background-color: rgba(245, 158, 11, 0.08); }
+
+.summary-view-btn-combined {
   width: 100%;
-  height: 64px;
+  height: 40px; /* Slim, premium button height */
   background-color: #fff1eb;
   color: #ff6b35;
-  border-radius: 20px;
+  border-radius: 14px;
+  border: none;
   font-weight: 700;
-  font-size: 1.1rem;
-  transition: all 0.2s;
+  font-size: 0.8rem; /* Compact label size matching Console buttons */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.summary-view-btn:hover {
+.summary-view-btn-combined:hover {
   background-color: #ffe4d9;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-/* Item Tones */
-.summary-item-icon.green { color: #10b981; background-color: #e6f7f0; }
-.summary-item-icon.teal { color: #0d9488; background-color: #e0f2f1; }
-.summary-item-icon.orange { color: #ff6b35; background-color: #fff1eb; }
-.summary-item-icon.amber { color: #f59e0b; background-color: #fff8e1; }
+/* ── Sleep Trigger Landing State Styles ── */
+.sleep-landing-combined {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.sleep-trigger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #ff6b35, #ff5714);
+  color: white;
+  border: none;
+  padding: 12px 30px; /* Highly compact padding */
+  border-radius: 16px;
+  font-family: var(--font-display), 'Inter', sans-serif;
+  font-size: 0.8rem; /* Exact button text size as Console inputs */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(255, 107, 53, 0.25);
+}
+
+.sleep-trigger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4);
+  background: linear-gradient(135deg, #ff5714, #e04400);
+}
+
+.sleep-trigger-btn:active {
+  transform: translateY(0);
+}
+
+.sleep-trigger-btn .material-icons {
+  font-size: 22px;
+}
+
+/* ── Sleep Telemetry Metric Dashboard Styles ── */
+.sleep-telemetry-grid {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  gap: 24px;
+  margin-top: 40px;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.sleep-telemetry-card {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: left;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sleep-telemetry-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+.telemetry-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.telemetry-card-header h4 {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+  font-weight: 700;
+}
+
+.telemetry-card-header .material-icons {
+  font-size: 16px;
+  color: #999;
+}
+
+.telemetry-card-value {
+  font-size: 1.15rem; /* Compact instrument value font-size */
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.telemetry-card-subtext {
+  font-size: 0.68rem; /* Highly compact detail text */
+  color: #888;
+}
+
+/* Adenosine Progress Bar */
+.adenosine-progress-container {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.adenosine-progress-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-in-out;
+}
+
+/* Status Badge */
+.telemetry-status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.telemetry-status-badge.optimal {
+  background-color: #e3f9e5;
+  color: #1e7e34;
+}
+
+.telemetry-status-badge.ready {
+  background-color: #fff3cd;
+  color: #856404;
+  animation: pulseOrange 2s infinite;
+}
+
+@keyframes pulseOrange {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 0.8; }
+}

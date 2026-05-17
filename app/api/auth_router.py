@@ -22,7 +22,7 @@ class AuthRequest(BaseModel):
     def validate_username(cls, v: str) -> str:
         v = v.strip()
         if not 3 <= len(v) <= 30:
-            raise ValueError("Username must be 3–30 characters")
+            raise ValueError("Username must be 3-30 characters")
         if not re.match(r"^[a-zA-Z0-9_]+$", v):
             raise ValueError("Username can only contain letters, numbers, and underscores")
         return v.lower()

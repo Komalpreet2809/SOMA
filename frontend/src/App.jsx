@@ -6,7 +6,7 @@ import MemoryExplorer from './components/MemoryExplorer';
 import KnowledgeGraph from './components/KnowledgeGraph';
 import CognitiveDashboard from './components/CognitiveDashboard';
 import KnowledgeInput from './components/KnowledgeInput';
-import { SleepProgress, SleepSummary } from './components/DreamSequence';
+import { SleepProgress } from './components/DreamSequence';
 import AuthScreen from './components/AuthScreen';
 import { apiFetch } from './api';
 import './App.css';
@@ -15,8 +15,8 @@ const NAV_ITEMS = [
   { id: 'console', label: 'Console', icon: 'chat_bubble_outline' },
   { id: 'memory', label: 'Memory', icon: 'layers' },
   { id: 'graph', label: 'Graph', icon: 'share' },
-  { id: 'knowledge', label: 'Knowledge', icon: 'description' },
-  { id: 'status', label: 'Status', icon: 'analytics' },
+  { id: 'knowledge', label: 'Inscription', icon: 'auto_awesome' },
+  { id: 'sleep', label: 'Sleep', icon: 'bedtime' },
 ];
 
 const COGNITIVE_PHASES = {
@@ -40,6 +40,18 @@ function App() {
   const [knowledgeStatus, setKnowledgeStatus] = useState('');
   const [sleepPhaseIndex, setSleepPhaseIndex] = useState(0);
   const [sleepSummary, setSleepSummary] = useState(null);
+  const [showStatus, setShowStatus] = useState(false);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem('soma_dark') === 'true');
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-theme');
+      localStorage.setItem('soma_dark', 'true');
+    } else {
+      document.body.classList.remove('dark-theme');
+      localStorage.setItem('soma_dark', 'false');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     if (!username) return;
@@ -75,21 +87,7 @@ function App() {
     setMessages(prev => [...prev, { role: 'user', content: text, timestamp }]);
     setTrace([]);
 
-    // ── STEP 3: Message Sent (Transition to Cognition) ──
-    
-    // Phase A: Perception (~0.4s)
-    setCognitiveState(COGNITIVE_PHASES.PERCEPTION);
-    setTrace([{ phase: 'Perception', content: 'Parsing input and identifying intent...', time: 'NOW' }]);
-    await new Promise(r => setTimeout(r, 400));
-
-    // Phase B: Attention (~0.6s)
-    setCognitiveState(COGNITIVE_PHASES.ATTENTION);
-    setTrace(prev => [{ phase: 'Attention', content: 'Focusing on key concepts and relationships...', time: 'NOW' }, ...prev]);
-    await new Promise(r => setTimeout(r, 600));
-
-    // Phase C: Memory Recall (Initiate API)
-    setCognitiveState(COGNITIVE_PHASES.RECALL);
-    setTrace(prev => [{ phase: 'Recall', content: 'Retrieving related memories and associations...', time: 'NOW' }, ...prev]);
+    // Remove artificial frontend phases since backend now streams them.
 
     try {
       const controller = new AbortController();
@@ -113,10 +111,6 @@ function App() {
       const decoder = new TextDecoder();
       let buffer = '';
 
-      // Phase D: Reasoning (During Stream Start)
-      setCognitiveState(COGNITIVE_PHASES.REASONING);
-      setTrace(prev => [{ phase: 'Reasoning', content: 'Synthesizing context and evaluating response...', time: 'NOW' }, ...prev]);
-
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
@@ -134,7 +128,9 @@ function App() {
             if (data.phase) {
               // Live trace and state updates from backend
               setCognitiveState(data.phase);
-              setTrace(prev => [{ time: new Date().toLocaleTimeString([], { hour12: false }), ...data }, ...prev]);
+              if (data.message) {
+                setTrace(prev => [{ time: new Date().toLocaleTimeString([], { hour12: false }), ...data }, ...prev]);
+              }
             } else if (data.response) {
               // Phase E: Response Generation
               setCognitiveState(COGNITIVE_PHASES.RESPONDING);
@@ -157,12 +153,12 @@ function App() {
       setTrace(prev => [{ phase: 'Error', content: 'Neural connection interrupted.', time: 'ERROR' }, ...prev]);
     } finally {
       // Ensure we always return to idle
-      setTimeout(() => setCognitiveState(COGNITIVE_PHASES.IDLE), 1000);
+      setCognitiveState(COGNITIVE_PHASES.IDLE);
     }
   };
 
   const handleKnowledgeSubmit = async (text) => {
-    setKnowledgeStatus('Adding knowledge to memory...');
+    setKnowledgeStatus('Integrating knowledge into neural layers...');
     try {
       const res = await apiFetch('/api/v1/ingest', {
         method: 'POST',
@@ -170,11 +166,11 @@ function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Ingestion failed');
-      setKnowledgeStatus('Knowledge stored successfully.');
-      setTimeout(() => setKnowledgeStatus(''), 3000);
+      setKnowledgeStatus(data.message || 'Knowledge stored successfully.');
+      setTimeout(() => setKnowledgeStatus(''), 10000);
       fetchVitals();
     } catch (error) {
-      setKnowledgeStatus('Could not add knowledge right now.');
+      setKnowledgeStatus('Neural integration failed: ' + error.message);
     }
   };
 
@@ -182,22 +178,35 @@ function App() {
     setCognitiveState('consolidating');
     setActivePage('sleep');
     setSleepPhaseIndex(0);
-    setTimeout(() => setSleepPhaseIndex(1), 1200);
-    setTimeout(() => setSleepPhaseIndex(2), 2400);
+    setSleepSummary(null);
+
+    // Animate checklist steps gracefully during the pending API request
+    const stepInterval = setInterval(() => {
+      setSleepPhaseIndex(prev => {
+        if (prev < 2) return prev + 1;
+        return prev;
+      });
+    }, 1000);
 
     try {
       const res = await apiFetch('/api/v1/sleep', { method: 'POST' });
       const data = await res.json();
+      
+      clearInterval(stepInterval);
+      setSleepPhaseIndex(2); // Mark all checklists as complete
+
       setSleepSummary({
-        linked: data.graph_relations_extracted || 12,
-        consolidated: 28,
-        pruned: data.messages_pruned || 17,
-        strengthened: 34
+        linked: data.graph_relations_extracted || 0,
+        consolidated: data.summaries_created || 0,
+        pruned: data.messages_pruned || 0
       });
     } catch (error) {
-      setSleepSummary({ linked: 12, consolidated: 28, pruned: 17, strengthened: 34 });
+      clearInterval(stepInterval);
+      console.error("Sleep cycle failed:", error);
+      setSleepSummary({ linked: 0, consolidated: 0, pruned: 0 });
     } finally {
-      setTimeout(() => setActivePage('sleep-summary'), 3600);
+      setCognitiveState(COGNITIVE_PHASES.IDLE);
+      fetchVitals(); // Instantly update vitals to reflect pruned/cleared working queue
     }
   };
 
@@ -211,10 +220,10 @@ function App() {
   if (!username) return <AuthScreen onAuth={setUsername} />;
 
   const stats = [
-    { label: 'Working Memory', value: vitals?.working_memory_pct?.toFixed(0) || '36', icon: 'neurology' },
-    { label: 'Sensory Memory', value: vitals?.sensory_count || '1,248', icon: 'cloud_queue' },
-    { label: 'Semantic Memory', value: vitals?.graph_node_count || '3,562', icon: 'device_hub' },
-    { label: 'Neural Sparks', value: vitals?.recent_sparks || '24', icon: 'hub' },
+    { label: 'Working Memory', value: vitals?.working || '0', icon: 'psychology' },
+    { label: 'Sensory Memory', value: vitals?.sensory || '0', icon: 'cloud' },
+    { label: 'Semantic Memory', value: vitals?.semantic?.nodes || '0', icon: 'account_tree' },
+    { label: 'Neural Sparks', value: vitals?.semantic?.edges || '0', icon: 'auto_awesome' },
   ];
 
   return (
@@ -241,6 +250,16 @@ function App() {
               <span>{item.label}</span>
             </button>
           ))}
+          
+          <button 
+            className="sidebar-link theme-toggle-btn"
+            onClick={() => setDarkMode(!darkMode)}
+            style={{marginTop: '16px', borderTop: '1px solid rgba(0,0,0,0.03)', paddingTop: '16px'}}
+            title="Toggle Dark/Light Mode"
+          >
+            <span className="material-icons">{darkMode ? 'light_mode' : 'dark_mode'}</span>
+            <span>{darkMode ? 'Light UI' : 'Dark UI'}</span>
+          </button>
         </nav>
 
         <div className="sidebar-footer">
@@ -250,7 +269,7 @@ function App() {
             </div>
             <div className="session-copy">
               <strong>{username}</strong>
-              <span>Session: GUEST-7F3A</span>
+              <span>GUEST-7F3A</span>
             </div>
             <button style={{marginLeft: 'auto', color: '#999', background: 'transparent'}} onClick={handleLogout}>
               <span className="material-icons" style={{fontSize: '18px'}}>logout</span>
@@ -262,26 +281,29 @@ function App() {
       <main className="soma-main-panel">
         {activePage === 'console' && (
           <section className="page-canvas fade-in">
-            <div className="page-header">
-              <h2>1. Console (Chat)</h2>
-              <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
-                <div className="status-pill">
-                  <span className="label">Status</span>
-                  <div className="value">
-                    <div className={`status-dot ${cognitiveState !== COGNITIVE_PHASES.IDLE ? 'pulse' : ''}`} />
-                    <span style={{textTransform: 'capitalize'}}>{cognitiveState}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="page-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <h2>Cognitive Console</h2>
+              <button 
+                className={`telemetry-trigger ${showStatus ? 'active' : ''}`}
+                onClick={() => setShowStatus(!showStatus)}
+                title="Toggle System Telemetry"
+              >
+                <span className="material-icons">analytics</span>
+              </button>
             </div>
             
-            <div style={{display: 'flex', gap: '48px', flex: 1, position: 'relative', minHeight: 0}}>
-              {/* Interaction Layer (Utility) */}
-              <div style={{flex: 1.2, display: 'flex', flexDirection: 'column', zIndex: 50}}>
+            <div className="canvas-body" style={{display: 'flex', flex: 1, gap: '40px', minHeight: 0}}>
+              {/* Interaction Layer (The Chat) */}
+              <div className="chat-container" style={{flex: 0.7, display: 'flex', flexDirection: 'column'}}>
                 <ChatPanel 
                   messages={messages} 
                   onSendMessage={handleSendMessage} 
-                  isTyping={[COGNITIVE_PHASES.PERCEPTION, COGNITIVE_PHASES.ATTENTION, COGNITIVE_PHASES.RECALL, COGNITIVE_PHASES.REASONING, COGNITIVE_PHASES.RESPONDING].includes(cognitiveState)} 
+                  onNewChat={() => {
+                    setMessages([]);
+                    setTrace([]);
+                  }}
+                  userAvatar={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`}
+                  isTyping={cognitiveState !== COGNITIVE_PHASES.IDLE && cognitiveState !== COGNITIVE_PHASES.LISTENING}
                   onInputStateChange={(isTyping) => {
                     if (cognitiveState === COGNITIVE_PHASES.IDLE && isTyping) setCognitiveState(COGNITIVE_PHASES.LISTENING);
                     if (cognitiveState === COGNITIVE_PHASES.LISTENING && !isTyping) setCognitiveState(COGNITIVE_PHASES.IDLE);
@@ -290,8 +312,23 @@ function App() {
               </div>
 
               {/* Cognitive Layer (The Brain) */}
-              <div style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingBottom: '80px'}}>
+              <div className="cognitive-container" style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative'}}>
                 <CognitiveBrainImageScene state={cognitiveState} />
+                <div className="status-pill" style={{marginTop: '32px'}}>
+                  <span className="label">Status</span>
+                  <div className="value">
+                    <div className={`status-dot ${cognitiveState !== COGNITIVE_PHASES.IDLE ? 'pulse' : ''}`} />
+                    <span style={{textTransform: 'capitalize'}}>{cognitiveState}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Activity Layer (The Timeline) */}
+              <div className="activity-feed-wrapper" style={{flex: 0.6, maxWidth: '280px', display: 'flex', flexDirection: 'column', padding: '0', margin: '-50px 0 0 0', height: 'calc(100% + 50px)'}}>
+                 <h3 style={{fontSize: '0.7rem', textTransform: 'uppercase', color: '#999', marginTop: 0, marginBottom: '8px', letterSpacing: '0.1em', fontWeight: 700}}>Activity Feed</h3>
+                 <div style={{flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingRight: '8px'}}>
+                   <CognitiveTimeline trace={trace} />
+                 </div>
               </div>
             </div>
           </section>
@@ -300,7 +337,7 @@ function App() {
         {activePage === 'activity' && (
           <section className="page-canvas fade-in">
             <div className="page-header">
-              <h2>2. Brain Activity</h2>
+              <h2>Neural Activity</h2>
               <button className="sidebar-link" style={{background: 'white'}} onClick={() => setActivePage('console')}>
                 Back to Console
               </button>
@@ -317,23 +354,32 @@ function App() {
           </section>
         )}
 
-        {activePage === 'status' && (
-          <section className="page-canvas fade-in">
-            <div className="page-header"><h2>3. Status</h2></div>
-            <CognitiveDashboard statusText={cognitiveState} stats={stats} />
-          </section>
+        {showStatus && (
+          <div className="telemetry-overlay" onClick={() => setShowStatus(false)}>
+            <div className="telemetry-modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>System Telemetry</h3>
+                <button className="modal-close" onClick={() => setShowStatus(false)}>
+                  <span className="material-icons">close</span>
+                </button>
+              </div>
+              <div className="modal-scroll-area">
+                <CognitiveDashboard statusText={cognitiveState} stats={stats} />
+              </div>
+            </div>
+          </div>
         )}
 
         {activePage === 'memory' && (
           <section className="page-canvas fade-in">
-            <div className="page-header"><h2>4. Memory View</h2></div>
+            <div className="page-header"><h2>Neural Memory</h2></div>
             <MemoryExplorer />
           </section>
         )}
 
         {activePage === 'graph' && (
           <section className="page-canvas fade-in">
-            <div className="page-header"><h2>5. Graph View</h2></div>
+            <div className="page-header"><h2>Knowledge Graph</h2></div>
             <KnowledgeGraph refreshTick={refreshTick} />
           </section>
         )}
@@ -341,27 +387,26 @@ function App() {
         {activePage === 'knowledge' && (
           <section className="page-canvas fade-in">
             <div className="page-header">
-              <h2>6. Knowledge Input</h2>
-              <button className="sidebar-link" style={{background: 'white'}} onClick={handleSleepCycle}>
-                Run Sleep Cycle
-              </button>
+              <h2>Neural Inscription</h2>
             </div>
             <KnowledgeInput onKnowledgeSubmit={handleKnowledgeSubmit} isBusy={knowledgeStatus.includes('Adding')} status={knowledgeStatus} />
           </section>
         )}
 
         {activePage === 'sleep' && (
-          <section className="page-canvas fade-in">
-            <div className="page-header"><h2>7. Sleep (Consolidation)</h2></div>
-            <SleepProgress phaseIndex={sleepPhaseIndex} />
-          </section>
-        )}
-
-        {activePage === 'sleep-summary' && (
-          <section className="page-canvas fade-in">
-            <div className="page-header"><h2>8. Consolidation Summary</h2></div>
-            <SleepSummary summary={sleepSummary} onClose={() => setActivePage('knowledge')} />
-          </section>
+          <SleepProgress 
+            phaseIndex={sleepPhaseIndex} 
+            isConsolidating={cognitiveState === 'consolidating'} 
+            onStart={handleSleepCycle} 
+            summary={sleepSummary}
+            vitals={vitals}
+            onClose={() => {
+              setCognitiveState(COGNITIVE_PHASES.IDLE);
+              setSleepPhaseIndex(0);
+              setSleepSummary(null);
+              setActivePage('console');
+            }}
+          />
         )}
       </main>
     </div>

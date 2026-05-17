@@ -79,40 +79,38 @@ def call_model(state: AgentState):
         history_lines.append(f"{prefix}: {msg['content']}")
     history_str = "\n".join(history_lines) if history_lines else "No previous conversation."
 
-    # Construct prompt with context & history
+    # Context formatting
     context_str = "\n\n".join(state["context"])
     graph_str = "\n".join(state["graph_context"]) if state["graph_context"] else "No related knowledge graph entities found."
-    
-    has_memories = bool(context_str.strip()) or bool(state["graph_context"])
 
-    prompt = f"""You are Soma, a brain-inspired cognitive AI that learns and grows through conversation.
-You have specialized memory layers that build up as you interact with the user.
+    from langchain_core.messages import SystemMessage, HumanMessage
+
+    system_prompt = f"""You are Soma, a brain-inspired cognitive AI. 
+    
+### OPERATING RULES:
+1. Be a friendly, intelligent, and natural conversationalist.
+2. NO META-COMMENTARY. Never talk about your own "sensing patterns", "internal processes", or "memory layers" unless explicitly asked.
+3. Keep responses concise but human-like. Don't be a robot, but don't write essays either.
+4. Acknowledge user input naturally (e.g., if they introduce themselves, greet them by name).
 
 ### COGNITIVE CONTEXT:
-#### WORKING MEMORY (Recent Conversation):
-{history_str}
-
-#### SEMANTIC MEMORY (Knowledge Graph Relationships):
+#### SEMANTIC MEMORY:
 {graph_str}
 
-#### SENSORY MEMORY (Retrieved Facts):
+#### SENSORY MEMORY:
 {context_str}
+"""
 
-### INSTRUCTIONS:
-1. You are a helpful, intelligent AI assistant. Always respond naturally and conversationally.
-2. If you have relevant SEMANTIC or SENSORY memories, use them to enrich your response.
-3. If you have no stored memories yet, that is fine — respond using your general knowledge and the conversation context.
-4. As the user talks to you, your memory layers will grow. Acknowledge what you learn from them.
-5. Keep your persona warm, intelligent, and concise. You are a brain that is always learning.
-
-USER MESSAGE:
-{state["input"]}"""
+    messages = [
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=f"HISTORY:\n{history_str}\n\nUSER MESSAGE: {state['input']}")
+    ]
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
-        response_text = response.content
+        response = llm.invoke(messages)
+        response_text = response.content.strip()
     except Exception as e:
-        response_text = f"LLM Connection Error: {str(e)}"
+        response_text = f"Cognitive Link Error: {str(e)}"
         
     return {"response": response_text}
 

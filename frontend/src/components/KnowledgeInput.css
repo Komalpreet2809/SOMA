@@ -1,115 +1,382 @@
-/* KnowledgeInput.css - Refined for Page 6 */
+/* KnowledgeInput.css - Neural Inscription Workspace */
 
-.knowledge-layout {
+.inscription-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  flex: 1;
+  min-height: 0;
+  padding: 0 40px 40px 40px;
+  overflow: hidden;
+}
+
+.inscription-main {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100%;
+  gap: 24px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.knowledge-icon-large {
-  width: 88px;
-  height: 88px;
-  background-color: #eee;
-  border-radius: 24px;
+.inscription-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.inscription-icon {
+  width: 56px;
+  height: 56px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
 }
 
-.knowledge-icon-large .material-icons {
-  font-size: 44px;
-  color: #1a1a1a;
+.inscription-icon .material-icons {
+  color: #ff6b35;
+  font-size: 24px;
 }
 
-.knowledge-layout h3 {
+.inscription-title h3 {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 1.2rem;
+  font-weight: 800;
   color: #1a1a1a;
+  margin-bottom: 2px;
 }
 
-.knowledge-layout p {
-  font-size: 1.1rem;
-  color: #888;
-  margin-bottom: 48px;
-  max-width: 500px;
-}
-
-.knowledge-composer {
-  width: 100%;
-  max-width: 760px;
-  background-color: white;
-  border-radius: 32px;
-  padding: 40px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.02);
-}
-
-.knowledge-composer textarea {
-  width: 100%;
-  min-height: 280px;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 1.15rem;
-  color: #1a1a1a;
-  resize: none;
-  line-height: 1.6;
+.inscription-title p {
+  font-size: 0.75rem;
+  color: #999;
   font-weight: 500;
 }
 
-.knowledge-composer textarea::placeholder {
-  color: #ccc;
+.inscription-composer {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.04);
+  max-height: 600px;
 }
 
-.knowledge-composer-footer {
+.inscription-composer textarea {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+  resize: none;
+  font-weight: 500;
+}
+
+.inscription-footer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f8f8f8;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+}
+
+.inscription-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .char-count {
-  font-size: 0.85rem;
+  font-size: 0.65rem;
+  font-weight: 800;
   color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.busy-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #ff6b35;
+  text-transform: uppercase;
+}
+
+.inscription-btn {
+  background: #ff6b35;
+  color: white;
+  padding: 12px 28px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
+}
+
+.inscription-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(255, 107, 53, 0.3);
+}
+
+.inscription-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+  color: #059669;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+}
+
+/* ── Analysis Sidebar ── */
+.inscription-sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.inscription-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.inscription-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.inscription-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+}
+
+.analysis-panel {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
+
+.panel-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analysis-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.analysis-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-section label,
+.analysis-metric label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #999;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.mini-meter {
+  height: 6px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 10px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.mini-fill {
+  height: 100%;
+  background: #ff6b35;
+  transition: width 0.3s;
+}
+
+.link-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.link-tag {
+  background: white;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #555;
+  border: 1px solid rgba(0,0,0,0.03);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-tag .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ff6b35;
+}
+
+.empty-tag {
+  font-size: 0.7rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
   font-weight: 600;
+  color: #666;
+}
+
+.layer-item .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.metric-sub {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.impact-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.impact-item {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.impact-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  font-family: var(--font-display);
+}
+
+.impact-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #aaa;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.add-memory-btn {
-  background-color: #ff6b35;
-  color: white;
-  padding: 16px 36px;
-  border-radius: 18px;
+.link-tag.reinforced {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.reinforced-icon {
+  font-size: 12px !important;
+  color: #10b981;
+  margin-left: 2px;
+}
+
+.existing-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.existing-link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.existing-link-item .material-icons {
+  font-size: 18px;
+  color: #10b981;
+}
+
+.link-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.link-info strong {
+  font-size: 0.75rem;
   font-weight: 700;
-  font-size: 1rem;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+  color: #1a1a1a;
 }
 
-.add-memory-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(255, 107, 53, 0.3);
+.link-info span {
+  font-size: 0.6rem;
+  color: #999;
 }
 
-.add-memory-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.5);
+.panel-footer {
+  font-size: 0.65rem;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  margin-top: auto;
 }
 
-.knowledge-status-text {
-  margin-top: 32px;
-  font-size: 0.95rem;
-  color: #ff6b35;
-  font-weight: 700;
-  animation: fadeIn 0.4s ease;
+@keyframes pulse-blue {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.busy-tag.pulse {
+  animation: pulse-blue 1.5s infinite ease-in-out;
 }

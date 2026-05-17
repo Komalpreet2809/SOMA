@@ -74,7 +74,7 @@ def init_session_db():
 
     # Test Postgres connection if configured
     if _db_backend == "postgres" and not _test_postgres_connection():
-        print("⚠️  Postgres connection failed. Falling back to SQLite.")
+        print("[!] Postgres connection failed. Falling back to SQLite.")
         _db_backend = "sqlite"
 
     with get_conn() as conn:
