@@ -206,7 +206,7 @@
 }
 
 /* ── Mobile Responsive Overrides for iPhone 14 ── */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .brain-core {
     width: 240px !important;
     height: 240px !important;

@@ -612,6 +612,7 @@
     flex: none !important;
     height: 320px !important;
     min-height: auto !important;
+    overflow: hidden !important;
   }
   
   .activity-feed-wrapper[style] {
