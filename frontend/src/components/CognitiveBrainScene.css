@@ -205,6 +205,14 @@
   to { opacity: 0.3; transform: scale(1.05); }
 }
 
+@media (max-width: 768px) {
+  .brain-core {
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
 /* ── Mobile Responsive Overrides for iPhone 14 ── */
 @media (max-width: 480px) {
   .brain-core {

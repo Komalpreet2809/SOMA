@@ -393,6 +393,8 @@
 @media (max-width: 1024px) {
   .graph-stage {
     padding: 0 0 16px 0 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   
   .graph-toolbar {
@@ -402,16 +404,27 @@
   }
   
   .graph-actions {
-    width: 100% !important;
-    justify-content: flex-start !important;
-    flex-wrap: wrap !important;
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 100 !important;
+    display: flex !important;
+    justify-content: center !important;
+    background: rgba(18, 18, 18, 0.75) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 100px !important;
+    padding: 6px 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    width: auto !important;
   }
   
   .graph-network-container {
     padding-left: 0 !important; /* Remove shifted padding */
     border-radius: 16px !important;
-    height: 460px !important;
-    min-height: 460px !important;
+    height: 600px !important;
+    min-height: 600px !important;
     width: 100% !important;
     flex: none !important;
   }
@@ -420,15 +433,17 @@
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    padding: 16px !important;
+    right: auto !important;
+    padding: 8px !important;
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 16px !important;
+    gap: 8px !important;
   }
   
   .hud-panel {
     width: 100% !important;
     box-sizing: border-box !important;
+    padding: 12px !important;
   }
   
   /* On very small screens stack the HUD panels */

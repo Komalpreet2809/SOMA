@@ -43,6 +43,7 @@ function KnowledgeGraph({ refreshTick }) {
   const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [stats, setStats] = useState({ node_count: 0, edge_count: 0, top_entities: [] });
   const [physicsActive, setPhysicsActive] = useState(true);
+  const [hudCollapsed, setHudCollapsed] = useState(false);
   
   const containerRef = useRef(null);
   const fgRef = useRef();
@@ -53,7 +54,9 @@ function KnowledgeGraph({ refreshTick }) {
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         const { width, height } = entry.contentRect;
-        setDimensions({ width: width || 800, height: height || 500 });
+        const isMobile = window.innerWidth < 768;
+        const adjustedHeight = isMobile ? Math.max(height - 100, 300) : height;
+        setDimensions({ width: width || 800, height: adjustedHeight || 500 });
       }
     });
     resizeObserver.observe(containerRef.current);
@@ -129,13 +132,35 @@ function KnowledgeGraph({ refreshTick }) {
     if (fgRef.current) {
       const d3Force = fgRef.current.d3Force;
       if (d3Force) {
-        d3Force('charge').strength(-50);   // Gentle repulsion for an ultra-compact molecular look
-        d3Force('link').distance(30);      // Extremely tight connection paths to pull nodes together
+        d3Force('charge').strength(-20).distanceMax(100);
+        d3Force('link').distance(30);
+        
+        // Custom gravity force to pull unconnected clusters to the upper center
+        d3Force('gravity', (alpha) => {
+          graphData.nodes.forEach(node => {
+            node.vx = (node.vx || 0) + (0 - node.x) * 0.05 * alpha;
+            node.vy = (node.vy || 0) + (150 - node.y) * 0.05 * alpha; // Pull up to Y=150
+            node.vz = (node.vz || 0) + (0 - node.z) * 0.05 * alpha;
+          });
+        });
       }
       
-      // Auto-fit camera with very tight padding to zoom in close and eliminate empty workspace
+      // Auto-fit camera with appropriate padding to ensure complete visibility
       setTimeout(() => {
-        fgRef.current.zoomToFit(800, 20);
+        const padding = window.innerWidth < 768 ? 120 : 20;
+        fgRef.current.zoomToFit(800, padding);
+        
+        // Shift camera down on mobile to pull the graph content up
+        if (window.innerWidth < 768) {
+          setTimeout(() => {
+            const currentPos = fgRef.current.cameraPosition();
+            fgRef.current.cameraPosition(
+              { x: currentPos.x, y: currentPos.y - 100, z: currentPos.z },
+              null,
+              300
+            );
+          }, 900); // Wait for zoomToFit to complete
+        }
       }, 600);
     }
   }, [graphData]);
@@ -265,25 +290,34 @@ function KnowledgeGraph({ refreshTick }) {
         {/* Live Telemetry HUD Overlay */}
         <div className="graph-hud-overlay">
           <div className="hud-panel">
-            <div className="hud-header">
-              <span className="material-icons">analytics</span>
-              <span>Semantic Telemetry</span>
+            <div className="hud-header" style={{display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <span className="material-icons">analytics</span>
+                <span>Semantic Telemetry</span>
+              </div>
+              <span className="material-icons" style={{cursor: 'pointer', fontSize: '20px', color: '#ff6b35'}} onClick={() => setHudCollapsed(!hudCollapsed)}>
+                {hudCollapsed ? 'expand_more' : 'expand_less'}
+              </span>
             </div>
-            <div className="hud-row">
-              <span className="hud-label">Nodes:</span>
-              <span className="hud-value">{dbStatus === 'online' ? stats.node_count : graphData.nodes.length}</span>
-            </div>
-            <div className="hud-row">
-              <span className="hud-label">Synapses:</span>
-              <span className="hud-value">{dbStatus === 'online' ? stats.edge_count : graphData.links.length}</span>
-            </div>
-            <div className="hud-row">
-              <span className="hud-label">Storage:</span>
-              <span className="hud-value status-glow">{dbStatus === 'online' ? 'LTM (Neo4j)' : 'STM (Cache)'}</span>
-            </div>
+            {!hudCollapsed && (
+              <>
+                <div className="hud-row">
+                  <span className="hud-label">Nodes:</span>
+                  <span className="hud-value">{dbStatus === 'online' ? stats.node_count : graphData.nodes.length}</span>
+                </div>
+                <div className="hud-row">
+                  <span className="hud-label">Synapses:</span>
+                  <span className="hud-value">{dbStatus === 'online' ? stats.edge_count : graphData.links.length}</span>
+                </div>
+                <div className="hud-row">
+                  <span className="hud-label">Storage:</span>
+                  <span className="hud-value status-glow">{dbStatus === 'online' ? 'LTM (Neo4j)' : 'STM (Cache)'}</span>
+                </div>
+              </>
+            )}
           </div>
           
-          {dbStatus === 'online' && stats.top_entities && stats.top_entities.length > 0 && (
+          {!hudCollapsed && dbStatus === 'online' && stats.top_entities && stats.top_entities.length > 0 && (
             <div className="hud-panel top-entities">
               <div className="hud-header">
                 <span className="material-icons">star</span>

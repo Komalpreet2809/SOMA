@@ -12,7 +12,7 @@ export function SleepProgress({ phaseIndex, isConsolidating, onStart, summary, v
   return (
     <div className="sleep-page-container fade-in">
       <div className="sleep-page-header">
-        <h2>7. Sleep (Consolidation)</h2>
+        <h2>Sleep (Consolidation)</h2>
       </div>
 
       <div className="sleep-split-layout">

@@ -392,6 +392,8 @@
   
   .inscription-main {
     padding-right: 0 !important;
+    overflow-y: visible !important;
+    height: auto !important;
   }
   
   .inscription-sidebar {

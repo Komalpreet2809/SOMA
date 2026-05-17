@@ -610,8 +610,9 @@
   
   .cognitive-container[style] {
     flex: none !important;
-    height: 320px !important;
+    height: auto !important;
     min-height: auto !important;
+    padding: 20px 0 !important;
   }
   
   .activity-feed-wrapper[style] {

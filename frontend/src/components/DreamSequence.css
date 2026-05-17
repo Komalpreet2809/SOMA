@@ -25,7 +25,7 @@
   font-family: var(--font-display), 'Inter', sans-serif;
   font-size: 1.2rem; /* Exact page header font-size as Console */
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-main, #1a1a1a);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -79,7 +79,7 @@
   font-family: var(--font-display), 'Inter', sans-serif;
   font-size: 1.15rem; /* Exact block header font-size as Console */
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-main, #1a1a1a);
   margin: 0 0 8px 0;
   letter-spacing: -0.01em;
 }
@@ -517,10 +517,12 @@
 /* ── Mobile Responsive Overrides ── */
 @media (max-width: 1024px) {
   .sleep-page-container {
-    padding: 20px 16px !important;
+    padding: 20px 16px 16px 16px !important;
     min-height: auto !important;
     height: auto !important;
     border-radius: 20px !important;
+    justify-content: flex-start !important;
+    overflow-y: auto !important;
   }
   
   .sleep-page-header, 
@@ -529,7 +531,7 @@
     top: auto !important;
     left: auto !important;
     margin-bottom: 24px !important;
-    text-align: center !important;
+    text-align: left !important;
     width: 100% !important;
   }
   
@@ -575,6 +577,7 @@
     gap: 16px !important;
     margin-top: 32px !important;
     width: 100% !important;
+    margin-bottom: 16px !important;
   }
   
   .sleep-telemetry-card {
@@ -590,5 +593,12 @@
   .summary-card-combined {
     max-width: 100% !important;
     width: 100% !important;
+  }
+  
+  .sleep-trigger-btn {
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
