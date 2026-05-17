@@ -380,3 +380,42 @@
 .busy-tag.pulse {
   animation: pulse-blue 1.5s infinite ease-in-out;
 }
+
+/* ── Responsive Overrides ── */
+@media (max-width: 1024px) {
+  .inscription-grid {
+    grid-template-columns: 1fr !important;
+    padding: 0 20px 20px 20px !important;
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+  
+  .inscription-main {
+    padding-right: 0 !important;
+  }
+  
+  .inscription-sidebar {
+    padding-right: 0 !important;
+    overflow-y: visible !important;
+  }
+  
+  .analysis-panel {
+    height: auto !important;
+  }
+  
+  .inscription-composer {
+    min-height: 300px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .inscription-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  
+  .inscription-btn {
+    justify-content: center !important;
+  }
+}

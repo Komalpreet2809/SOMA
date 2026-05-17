@@ -107,8 +107,8 @@
 .graph-icon-button:hover {
   transform: translateY(-1px);
   background: white;
-  color: #4f46e5;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  color: #ff6b35;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
 }
 
 /* ── Network Container ── */
@@ -143,7 +143,7 @@
 /* Tooltip micro-HUD */
 .graph-tooltip {
   background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  border: 1px solid rgba(255, 107, 53, 0.2) !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
   border-radius: 10px !important;
   padding: 10px 14px !important;
@@ -156,7 +156,7 @@
 .graph-tooltip strong {
   display: block;
   font-size: 0.8rem;
-  color: #4f46e5;
+  color: #ff6b35;
   margin-bottom: 6px;
   border-bottom: 1px solid rgba(0,0,0,0.06);
   padding-bottom: 4px;
@@ -177,7 +177,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  color: #4f46e5;
+  color: #ff6b35;
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -187,7 +187,7 @@
   background: rgba(255, 255, 255, 0.85);
   padding: 24px 36px;
   border-radius: 16px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(255, 107, 53, 0.2);
   backdrop-filter: blur(10px);
 }
 
@@ -233,17 +233,17 @@
   box-shadow: 0 0 8px currentColor;
 }
 
-.legend-item.core { color: #6366f1; }
-.legend-item.core::before { background-color: #6366f1; }
+.legend-item.core { color: #ff6b35; }
+.legend-item.core::before { background-color: #ff6b35; }
 
-.legend-item.high { color: #ec4899; }
-.legend-item.high::before { background-color: #ec4899; }
+.legend-item.high { color: #ff6b35; }
+.legend-item.high::before { background-color: #ff6b35; }
 
-.legend-item.medium { color: #f59e0b; }
-.legend-item.medium::before { background-color: #f59e0b; }
+.legend-item.medium { color: #ff9c7a; }
+.legend-item.medium::before { background-color: #ff9c7a; }
 
-.legend-item.entity { color: #0891b2; }
-.legend-item.entity::before { background-color: #0891b2; }
+.legend-item.entity { color: #a3a3a3; }
+.legend-item.entity::before { background-color: #a3a3a3; }
 
 /* ── Live Telemetry HUD Overlay ── */
 .graph-hud-overlay {
@@ -280,7 +280,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #4f46e5;
+  color: #ff6b35;
   border-bottom: 1px solid rgba(0,0,0,0.04);
   padding-bottom: 6px;
 }
@@ -345,10 +345,10 @@
 }
 
 .entity-connections {
-  color: #6366f1;
+  color: #ff6b35;
   font-weight: 800;
   font-family: var(--font-mono), monospace;
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(255, 107, 53, 0.08);
   padding: 1px 4px;
   border-radius: 4px;
 }
@@ -387,4 +387,50 @@
 
 .graph-tooltip strong {
   font-weight: 800 !important;
+}
+
+/* ── Responsive Overrides ── */
+@media (max-width: 1024px) {
+  .graph-stage {
+    padding: 0 0 16px 0 !important;
+  }
+  
+  .graph-toolbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 0 16px !important;
+  }
+  
+  .graph-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .graph-network-container {
+    padding-left: 0 !important; /* Remove shifted padding */
+    border-radius: 16px !important;
+  }
+  
+  .graph-hud-overlay {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    padding: 16px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .hud-panel {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* On very small screens stack the HUD panels */
+  @media (max-width: 600px) {
+    .graph-hud-overlay {
+      grid-template-columns: 1fr !important;
+    }
+  }
 }

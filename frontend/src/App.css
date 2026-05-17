@@ -470,3 +470,156 @@
   color: #999;
   letter-spacing: 0.02em;
 }
+
+/* ── Responsive Overrides ── */
+@media (max-width: 1024px) {
+  .soma-shell {
+    flex-direction: column !important;
+  }
+  
+  .soma-sidebar {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow-x: auto !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  body.dark-theme .soma-sidebar {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .brand-block {
+    margin-bottom: 0 !important;
+    margin-right: 24px !important;
+  }
+  
+  .brand-mark {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .brand-mark .material-icons {
+    font-size: 20px !important;
+  }
+  
+  .brand-copy {
+    display: none !important;
+  }
+  
+  .sidebar-nav {
+    flex-direction: row !important;
+    flex: 1 !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+  }
+  
+  .sidebar-link {
+    height: 40px !important;
+    padding: 0 12px !important;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-link span:not(.material-icons) {
+    display: none !important;
+  }
+
+  .theme-toggle-btn {
+    margin-top: 0 !important;
+    border-top: none !important;
+    padding-top: 0 !important;
+    border-left: 1px solid rgba(0,0,0,0.05) !important;
+    margin-left: 8px !important;
+    padding-left: 16px !important;
+    border-radius: 0 !important;
+  }
+  
+  body.dark-theme .theme-toggle-btn {
+    border-left-color: rgba(255,255,255,0.05) !important;
+  }
+  
+  .sidebar-footer {
+    margin-top: 0 !important;
+    margin-left: 16px !important;
+  }
+  
+  .session-card {
+    padding: 4px !important;
+    border-radius: 50% !important;
+  }
+  
+  .session-copy, 
+  .session-card button {
+    display: none !important;
+  }
+  
+  .soma-main-panel {
+    padding: 12px !important;
+    overflow-y: auto !important;
+  }
+  
+  .page-canvas {
+    padding: 20px !important;
+    border-radius: 24px !important;
+    overflow-y: auto !important;
+    min-height: 100%;
+  }
+  
+  .page-header {
+    margin-bottom: 24px !important;
+  }
+  
+  /* Overriding inline layout styles with !important */
+  .canvas-body[style] {
+    flex-direction: column !important;
+    gap: 24px !important;
+    overflow-y: visible !important;
+  }
+  
+  .chat-container[style] {
+    flex: none !important;
+    height: 60vh !important;
+    min-height: 400px !important;
+  }
+  
+  .cognitive-container[style] {
+    flex: none !important;
+    height: 40vh !important;
+    min-height: 250px !important;
+  }
+  
+  .activity-feed-wrapper[style] {
+    flex: none !important;
+    max-width: 100% !important;
+    height: 40vh !important;
+    margin: 0 !important;
+  }
+  
+  /* Grid overrides */
+  div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  
+  .status-card[style] {
+    height: 50vh !important;
+    min-height: 300px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .telemetry-modal {
+    max-height: 90vh !important;
+    border-radius: 24px !important;
+  }
+  
+  .modal-header {
+    padding: 20px 20px 12px 20px !important;
+  }
+  
+  .modal-scroll-area {
+    padding: 0 20px 20px 20px !important;
+  }
+}

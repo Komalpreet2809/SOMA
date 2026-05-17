@@ -325,3 +325,29 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
+
+/* ── Responsive Overrides ── */
+@media (max-width: 768px) {
+  .chat-bubble-group {
+    max-width: 95% !important;
+    gap: 12px !important;
+  }
+  
+  .bubble-body {
+    padding: 12px 16px !important;
+  }
+  
+  .chat-input-row {
+    margin-top: 16px !important;
+  }
+  
+  .input-field-wrap {
+    padding: 0 12px !important;
+    height: 44px !important;
+  }
+  
+  .new-chat-btn, .send-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}

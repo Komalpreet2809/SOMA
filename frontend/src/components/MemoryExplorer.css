@@ -89,6 +89,18 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+.density-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  color: #999;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
 .memory-list {
   flex: 1;
   overflow-y: auto;
@@ -350,7 +362,7 @@
 }
 
 .memory-content-box {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   line-height: 1.6;
   color: #333;
   margin-bottom: 40px;
@@ -507,5 +519,47 @@
   0% { opacity: 0.4; }
   50% { opacity: 1; }
   100% { opacity: 0.4; }
+}
+
+/* ── Responsive Overrides ── */
+@media (max-width: 1024px) {
+  .memory-view-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    padding: 0 !important;
+  }
+  
+  .list-surface {
+    height: 400px !important;
+    min-height: 400px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .detail-surface {
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+  
+  .instrument-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .neighborhood-grid, .metadata-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .memory-header-meta {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  
+  .memory-id-badge {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
 }
 

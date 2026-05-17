@@ -147,24 +147,24 @@ function KnowledgeGraph({ refreshTick }) {
 
   // Color mapper based on node type & degree
   const getNodeColor = (node) => {
-    if (node.id === 'SOMA') return '#6366f1'; // Core Hub (Deep Indigo) is always SOMA!
+    if (node.id === 'SOMA') return '#ff6b35'; // Core Hub is SOMA Orange
     
     // For offline/mock mode, retain the pre-assigned structural category colors
     if (dbStatus !== 'online') {
-      if (node.type === 'core') return '#6366f1';
-      if (node.type === 'method') return '#10b981'; // Green
-      if (node.type === 'concept') return '#3b82f6'; // Blue
-      if (node.type === 'metric') return '#f59e0b'; // Amber
-      return '#0891b2'; // Cyan
+      if (node.type === 'core') return '#ff6b35'; // Orange
+      if (node.type === 'method') return '#ff8b54'; // Soft Orange
+      if (node.type === 'concept') return '#ffa67c'; // Pale Orange
+      if (node.type === 'metric') return '#a3a3a3'; // Neutral Grey
+      return '#737373'; // Darker Grey
     }
     
     // For live Neo4j data, dynamically scale colors based on relative synaptic density!
     const connections = node.connections || 1;
     const ratio = connections / maxConnections;
     
-    if (ratio >= 0.8) return '#ec4899'; // High centrality (Hot pink)
-    if (ratio >= 0.4) return '#f59e0b'; // Medium centrality (Orange)
-    return '#0891b2'; // Low centrality (Cyan)
+    if (ratio >= 0.8) return '#ff6b35'; // High centrality (Orange)
+    if (ratio >= 0.4) return '#ff9c7a'; // Medium centrality (Soft Orange)
+    return '#a3a3a3'; // Low centrality (Silver/Grey)
   };
 
   return (
@@ -332,33 +332,27 @@ function KnowledgeGraph({ refreshTick }) {
           
           // Outlined relationship tag rendered on link hover (100% stable!)
           linkLabel={link => `
-            <span style="color: #6366f1; font-size: 16px; font-weight: 800;">
+            <span style="color: #ff6b35; font-size: 16px; font-weight: 800;">
               ${link.label || 'RELATED_TO'}
             </span>
           `}
           
           nodeRelSize={3}
-          linkColor={() => 'rgba(99, 102, 241, 0.25)'} // Soft, clean axon link fibers
+          linkColor={() => 'rgba(255, 107, 53, 0.25)'} // Soft, clean axon link fibers
           linkWidth={1.8} // Sleek link line thickness
           
           // Glowing Thought Flows (sliding directional particles along axons)
           linkDirectionalParticles={3}
           linkDirectionalParticleSpeed={0.006}
           linkDirectionalParticleWidth={1.5}
-          linkDirectionalParticleColor={() => '#6366f1'}
+          linkDirectionalParticleColor={() => '#ff6b35'}
           
           showNavInfo={false}
           enablePointerInteraction={true}
           enableNodeDrag={true}
         />
         
-        {/* Beautiful Glassmorphic Legend HUD */}
-        <div className="graph-legend">
-          <div className="legend-item core">Core Hub</div>
-          <div className="legend-item high">High Density</div>
-          <div className="legend-item medium">Medium Density</div>
-          <div className="legend-item entity">Low Density</div>
-        </div>
+        {/* Legend removed per user request */}
 
         {loading && (
           <div className="graph-loading">
