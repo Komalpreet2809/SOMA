@@ -475,12 +475,11 @@
 @media (max-width: 1024px) {
   .soma-shell {
     flex-direction: column !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: auto !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
     width: 100% !important;
     max-width: 100vw !important;
-    overflow-x: hidden !important;
     box-sizing: border-box !important;
   }
   
@@ -492,6 +491,7 @@
     justify-content: space-between !important;
     overflow-x: auto !important;
     border-bottom: 1px solid rgba(0,0,0,0.05);
+    flex-shrink: 0 !important;
   }
   
   body.dark-theme .soma-sidebar {
@@ -564,9 +564,8 @@
   
   .soma-main-panel {
     padding: 12px !important;
-    overflow-y: visible !important;
-    height: auto !important;
-    flex: none !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
     width: 100% !important;
     max-width: 100vw !important;
     box-sizing: border-box !important;
