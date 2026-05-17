@@ -443,6 +443,34 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+body.dark-theme .telemetry-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark-theme .telemetry-modal {
+  background: rgba(25, 25, 25, 0.85);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+body.dark-theme .modal-header {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+body.dark-theme .modal-header h3 {
+  color: #ccc;
+}
+
+body.dark-theme .modal-header button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+
+body.dark-theme .modal-header button:hover {
+  background: #ff6b35;
+  color: white;
+}
+
 @keyframes feedItemIn {
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }

@@ -154,3 +154,35 @@
   letter-spacing: -0.05em;
   margin-left: auto;
 }
+
+/* ── Dark Mode Overrides ── */
+body.dark-theme .status-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .status-card h3 {
+  color: #bbb;
+}
+
+body.dark-theme .system-chart {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .current-state span {
+  color: #aaa;
+}
+
+body.dark-theme .metric-item {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .metric-item strong {
+  color: #fff;
+}
+
+body.dark-theme .metric-info label {
+  color: #aaa;
+}

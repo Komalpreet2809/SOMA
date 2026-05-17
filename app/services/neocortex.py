@@ -16,18 +16,25 @@ def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
     api_key = settings.GROQ_API_KEY if settings.GROQ_API_KEY else "dummy_key"
     llm = ChatGroq(model="llama-3.1-8b-instant", api_key=api_key)
     
-    prompt = f"""
-You are the semantic logic center of a brain. Extract major factual entities and their relationships from the text.
+    # Skip extraction for very short inputs (e.g. just a name) — not enough
+    # content to contain meaningful relationships.
+    if len(text.strip().split()) < 4:
+        print(f"Neocortex: Input too short for extraction ({len(text.strip().split())} words), skipping.")
+        return 0
+
+    prompt = f"""You are the semantic logic center of a brain. Extract factual entities and their relationships from the text below.
 Return ONLY a valid JSON array of objects. Each object must have "subject", "relation", and "object" keys.
-Aim for concise, capitalized entity names (e.g., "ALEX", "PYTHON", "BAXTER").
+Use concise, CAPITALIZED entity names.
+
+RULES:
+1. ONLY extract facts that are EXPLICITLY stated in the text. Do NOT invent, guess, or assume anything.
+2. If the text does not contain clear factual relationships, return an empty array: []
+3. Do NOT use any example data. Every triple you return must come directly from the text.
 
 Text: {text}
 
-Example output:
-[
-  {{"subject": "BAXTER", "relation": "IS_A", "object": "DOG"}},
-  {{"subject": "BAXTER", "relation": "LIKES", "object": "TENNIS BALLS"}}
-]
+Return format: [{{"subject": "ENTITY_A", "relation": "RELATION_TYPE", "object": "ENTITY_B"}}]
+If no relationships exist, return: []
 """
     try:
         response = llm.invoke([HumanMessage(content=prompt)])
