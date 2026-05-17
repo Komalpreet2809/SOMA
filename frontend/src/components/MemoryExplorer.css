@@ -528,6 +528,13 @@
     height: auto !important;
     overflow-y: visible !important;
     padding: 0 !important;
+    width: 100% !important;
+  }
+  
+  .memory-surface {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .list-surface {

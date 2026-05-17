@@ -521,6 +521,7 @@
     flex: 1 !important;
     overflow-x: auto !important;
     gap: 8px !important;
+    justify-content: space-around !important;
   }
   
   .sidebar-link {
