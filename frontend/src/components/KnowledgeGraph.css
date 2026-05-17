@@ -443,8 +443,8 @@
   .graph-network-container {
     padding-left: 0 !important;
     border-radius: 16px !important;
-    height: 500px !important;
-    min-height: 500px !important;
+    height: 600px !important;
+    min-height: 600px !important;
     width: 100% !important;
     flex: none !important;
     position: relative !important;
