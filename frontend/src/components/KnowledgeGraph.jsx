@@ -56,7 +56,7 @@ function KnowledgeGraph({ refreshTick }) {
         const { width, height } = entry.contentRect;
         const isMobile = window.innerWidth < 768;
         const adjustedWidth = isMobile ? (window.innerWidth - 32) : width;
-        const adjustedHeight = isMobile ? 400 : height;
+        const adjustedHeight = isMobile ? 500 : height;
         setDimensions({ width: adjustedWidth || 800, height: adjustedHeight || 500 });
       }
     });
