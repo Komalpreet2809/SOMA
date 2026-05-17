@@ -539,6 +539,7 @@
   .detail-surface {
     height: auto !important;
     overflow-y: visible !important;
+    padding: 16px !important;
   }
   
   .instrument-grid {
@@ -560,6 +561,38 @@
   .memory-id-badge {
     width: 100% !important;
     justify-content: space-between !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .memory-detail-title {
+    font-size: 1.2rem !important;
+  }
+  
+  .memory-content-box {
+    padding: 16px !important;
+  }
+  
+  .list-surface {
+    height: 300px !important;
+    min-height: 300px !important;
+  }
+  
+  .instrument-card {
+    padding: 16px !important;
+  }
+  
+  .memory-toolbar {
+    gap: 8px !important;
+  }
+  
+  .filter-tabs {
+    flex-wrap: wrap !important;
+  }
+  
+  .filter-tab {
+    font-size: 0.55rem !important;
+    padding: 4px 0 !important;
   }
 }
 

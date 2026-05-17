@@ -419,3 +419,29 @@
     justify-content: center !important;
   }
 }
+
+@media (max-width: 480px) {
+  .inscription-composer {
+    padding: 16px !important;
+    min-height: 250px !important;
+  }
+  
+  .inscription-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  
+  .inscription-icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+  
+  .inscription-title h3 {
+    font-size: 1rem !important;
+  }
+  
+  .analysis-panel {
+    padding: 16px !important;
+  }
+}
