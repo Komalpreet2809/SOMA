@@ -149,8 +149,8 @@ function KnowledgeGraph({ refreshTick }) {
       // Auto-fit camera with appropriate padding to ensure complete visibility
       setTimeout(() => {
         if (window.innerWidth < 768) {
-          // Shift camera down on mobile to make objects at (0,0,0) appear higher
-          fgRef.current.cameraPosition({ x: 0, y: -150, z: 300 }, { x: 0, y: -150, z: 0 }, 600);
+          // Shift camera down on mobile to make objects at (0,0,0) appear higher (reduced shift)
+          fgRef.current.cameraPosition({ x: 0, y: -80, z: 300 }, { x: 0, y: -80, z: 0 }, 600);
         } else {
           const padding = 20;
           fgRef.current.zoomToFit(800, padding);
