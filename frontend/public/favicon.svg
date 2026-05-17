@@ -14,13 +14,14 @@
     .dot-cyan { fill: #00f3ff; opacity: 0.8; }
     .dot-red { fill: #ff3366; opacity: 0.8; }
     .dot-white { fill: #ffffff; filter: url(#glow); }
+    .squircle { fill: #111111; stroke: #222222; stroke-width: 1.5; }
   </style>
 
-  <!-- Background container for visibility in light/dark tabs -->
-  <rect width="100" height="100" fill="none" />
+  <!-- 1. Premium squircle card container matching your exact layout design -->
+  <rect x="5" y="5" width="90" height="90" rx="28" ry="28" class="squircle" />
 
   <g transform="translate(0, 0)">
-    <!-- 1. Cyan Chromatic Shift Layer (Shifted Left & Up) -->
+    <!-- 2. Cyan Chromatic Shift Layer (Shifted Left & Up) -->
     <g transform="translate(-1.5, -1)">
       <!-- Top-Left -->
       <circle cx="38" cy="22" r="4.2" class="dot-cyan" />
@@ -55,7 +56,7 @@
       <circle cx="62" cy="82" r="4.2" class="dot-cyan" />
     </g>
 
-    <!-- 2. Red/Orange Chromatic Shift Layer (Shifted Right & Down) -->
+    <!-- 3. Red/Orange Chromatic Shift Layer (Shifted Right & Down) -->
     <g transform="translate(1.5, 1)">
       <!-- Top-Left -->
       <circle cx="38" cy="22" r="4.2" class="dot-red" />
@@ -90,7 +91,7 @@
       <circle cx="62" cy="82" r="4.2" class="dot-red" />
     </g>
 
-    <!-- 3. White Core Layer (Center Glow) -->
+    <!-- 4. White Core Layer (Center Glow) -->
     <g>
       <!-- Top-Left -->
       <circle cx="38" cy="22" r="4" class="dot-white" />
