@@ -613,6 +613,7 @@
     height: 320px !important;
     min-height: auto !important;
     overflow: hidden !important;
+    order: -1 !important; /* Put brain above chat on mobile */
   }
   
   .activity-feed-wrapper[style] {
