@@ -128,7 +128,8 @@ async def process_consolidation(current_user: str = Depends(get_current_user)):
         chunks, msg = consolidate_memory(current_user)
         if chunks > 0:
             history = get_recent_messages(current_user, exchanges=50)
-            doc = "\n".join([f"{m['role']}: {m['content']}" for m in history])
+            user_msgs = [m['content'] for m in history if m['role'] == 'user']
+            doc = "\n".join(user_msgs)
             triples = extract_and_store_knowledge(doc, current_user)
             msg += f" Extracted {triples} graph relations."
         return IngestResponse(message=msg, chunks=chunks)
@@ -453,7 +454,7 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                                 "phase": "graph",
                                 "message": "Extracting relationships for semantic memory."
                             })
-                            triples = await asyncio.to_thread(extract_and_store_knowledge, exchange_text, current_user)
+                            triples = await asyncio.to_thread(extract_and_store_knowledge, request.text, current_user)
                             yield sse_event("brain_trace", build_brain_event(
                                 "graph",
                                 71,
