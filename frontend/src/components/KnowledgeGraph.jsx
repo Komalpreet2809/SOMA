@@ -140,7 +140,7 @@ function KnowledgeGraph({ refreshTick }) {
         d3Force('gravity', (alpha) => {
           graphData.nodes.forEach(node => {
             node.vx = (node.vx || 0) + (0 - node.x) * 0.05 * alpha;
-            node.vy = (node.vy || 0) + (150 - node.y) * 0.05 * alpha; // Pull up to Y=150
+            node.vy = (node.vy || 0) + (250 - node.y) * 0.05 * alpha; // Pull up to Y=250
             node.vz = (node.vz || 0) + (0 - node.z) * 0.05 * alpha;
           });
         });
