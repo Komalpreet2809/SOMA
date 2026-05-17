@@ -91,16 +91,14 @@
 .graph-icon-button {
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid transparent;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #555;
+  color: #666;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
   cursor: pointer;
 }
 
@@ -110,9 +108,8 @@
 
 .graph-icon-button:hover {
   transform: translateY(-1px);
-  background: white;
+  background: rgba(0, 0, 0, 0.06);
   color: #ff6b35;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
 }
 
 .graph-actions {
@@ -121,13 +118,13 @@
   right: 20px;
   z-index: 100;
   display: flex;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.65);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 100px;
   padding: 6px 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Network Container ── */
@@ -432,12 +429,13 @@
     z-index: 100 !important;
     display: flex !important;
     justify-content: center !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     border-radius: 100px !important;
     padding: 6px 12px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
     width: auto !important;
   }
   
