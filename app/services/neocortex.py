@@ -1,10 +1,11 @@
 import json
 import re
+from typing import List
+from pydantic import BaseModel, Field
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 from app.core.config import settings
 from app.db.neo4j_driver import neo4j_db
-
 
 # ── Blocked meta-nodes that should never become graph entities ──
 BLOCKED_NODES = {
@@ -14,6 +15,15 @@ BLOCKED_NODES = {
     "CONVERSATION", "HELLO", "HI", "HEY", "THANKS", "THANK YOU",
     "YES", "NO", "OK", "OKAY",
 }
+
+# ── Pydantic Models for Structured LLM Output ──
+class RelationshipTriple(BaseModel):
+    subject: str = Field(description="The subject entity (1-3 words, short CAPITALIZED concept, e.g. KOMAL, BAXTER, CRICKET)")
+    relation: str = Field(description="The relationship verb/action, e.g. LIKES, LIVES_IN, PLAYS, HAS, OWNS")
+    object: str = Field(description="The object entity (1-3 words, short CAPITALIZED concept, e.g. DELHI, DOG, CRICKET)")
+
+class KnowledgeGraphExtraction(BaseModel):
+    triples: List[RelationshipTriple] = Field(description="List of simple extracted concept relationships")
 
 
 def _clean_text(text: str) -> str:
@@ -74,13 +84,10 @@ def _sanitize_relation(rel: str) -> str:
 
 def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
     """
-    Child-brain knowledge extraction.
+    Child-brain knowledge extraction with 100% structurally guaranteed JSON output.
     
     Reads a conversation and extracts simple, clean concept associations —
     the way a child's brain naturally builds connections between ideas.
-    
-    "I play cricket on Sundays" → KOMAL --PLAYS--> CRICKET, CRICKET --PLAYED_ON--> SUNDAY
-    "My dog Baxter loves the park" → BAXTER --IS_A--> DOG, BAXTER --LOVES--> PARK
     """
     if not neo4j_db.driver:
         print("Knowledge Graph disabled (No DB connection).")
@@ -96,8 +103,10 @@ def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
         print(f"Neocortex: Input too short ({len(clean.split())} words), skipping.")
         return 0
 
-    # The user's name is the identity anchor — capitalize for consistency
     owner = user_id.upper()
+
+    # Bind the structured Pydantic model to the Groq LLM
+    structured_llm = llm.with_structured_output(KnowledgeGraphExtraction)
 
     prompt = f"""You are a child's brain learning about the world. Read the text and pick out SIMPLE facts as connections between concepts.
 
@@ -111,30 +120,23 @@ RULES:
 2. Relations must be simple verbs: LIKES, IS_A, LIVES_IN, PLAYS, WORKS_AT, HAS, KNOWS, STUDIES, etc.
 3. "I" or "my" in the text refers to "{owner}" — always use "{owner}" as the node name for the speaker.
 4. DO NOT create nodes named "USER", "SOMA", "AI", "ASSISTANT", or any chat/bot terms.
-5. If the text is just greetings or small talk with zero factual content, return: []
+5. If the text is just greetings or small talk with zero factual content, return an empty triples list.
 
 Text:
-{clean}
-
-Return ONLY a JSON array of simple connections: [{{"subject": "NODE", "relation": "VERB", "object": "NODE"}}]
-No facts? Return: []"""
+{clean}"""
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
-        content = response.content.strip()
-        
-        match = re.search(r'\[.*\]', content, re.DOTALL)
-        if not match:
-            print("Neocortex: No JSON array in LLM response.")
+        result = structured_llm.invoke([HumanMessage(content=prompt)])
+        if not result or not result.triples:
+            print("Neocortex: No triples extracted.")
             return 0
             
-        triples = json.loads(match.group(0))
         stored_count = 0
         
-        for t in triples:
-            subj = str(t.get("subject", "")).strip().upper()
-            rel  = _sanitize_relation(str(t.get("relation", "")))
-            obj  = str(t.get("object", "")).strip().upper()
+        for t in result.triples:
+            subj = str(t.subject).strip().upper()
+            rel  = _sanitize_relation(str(t.relation))
+            obj  = str(t.object).strip().upper()
             
             # Validate both nodes
             if not _is_valid_node(subj) or not _is_valid_node(obj):
@@ -164,7 +166,6 @@ def retrieve_graph_context(query: str, user_id: str = "default_user"):
     if not neo4j_db.driver:
         return [], []
         
-    # Naive keyword matching: if any node name is in the query, pull its connections.
     cypher = """
     MATCH (n:Entity)-[r]->(m:Entity)
     WHERE (n.user_id = $user_id)
