@@ -513,3 +513,82 @@
   50% { opacity: 1; transform: scale(1.02); }
   100% { opacity: 0.8; }
 }
+
+/* ── Mobile Responsive Overrides ── */
+@media (max-width: 1024px) {
+  .sleep-page-container {
+    padding: 20px 16px !important;
+    min-height: auto !important;
+    height: auto !important;
+    border-radius: 20px !important;
+  }
+  
+  .sleep-page-header, 
+  .sleep-page-header-summary {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin-bottom: 24px !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .sleep-split-layout {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    margin-top: 16px !important;
+    width: 100% !important;
+  }
+  
+  .sleep-brain-image-asset {
+    max-width: 220px !important;
+  }
+  
+  .sleep-right-panel {
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .sleep-copy-combined {
+    margin-bottom: 24px !important;
+    text-align: center !important;
+    align-items: center !important;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sleep-steps-vertical {
+    align-items: center !important;
+    gap: 20px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .sleep-step-item-vertical {
+    width: 100% !important;
+    max-width: 280px !important;
+    justify-content: flex-start !important;
+  }
+  
+  .sleep-telemetry-grid {
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-top: 32px !important;
+    width: 100% !important;
+  }
+  
+  .sleep-telemetry-card {
+    width: 100% !important;
+  }
+  
+  .summary-overlay-combined {
+    padding: 20px 16px !important;
+    position: fixed !important;
+    z-index: 9999 !important;
+  }
+  
+  .summary-card-combined {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}

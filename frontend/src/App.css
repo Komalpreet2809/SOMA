@@ -478,6 +478,10 @@
     height: auto !important;
     min-height: 100vh !important;
     overflow: auto !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
   
   .soma-sidebar {
@@ -563,6 +567,10 @@
     overflow-y: visible !important;
     height: auto !important;
     flex: none !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
   
   .page-canvas {
@@ -572,10 +580,16 @@
     height: auto !important;
     flex: none !important;
     min-height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
   
   .page-header {
     margin-bottom: 24px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   /* Overriding inline layout styles with !important */
@@ -583,6 +597,9 @@
     flex-direction: column !important;
     gap: 24px !important;
     overflow-y: visible !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
   
   .chat-container[style] {

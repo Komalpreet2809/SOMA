@@ -17,7 +17,7 @@ const NAV_ITEMS = [
   { id: 'memory', label: 'Memory', icon: 'layers' },
   { id: 'graph', label: 'Graph', icon: 'share' },
   { id: 'knowledge', label: 'Inscription', icon: 'auto_awesome' },
-  { id: 'sleep', label: 'Sleep', icon: 'bedtime' },
+  { id: 'sleep', label: 'Sleep', icon: 'hotel' },
 ];
 
 const COGNITIVE_PHASES = {

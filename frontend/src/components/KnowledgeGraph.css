@@ -410,6 +410,10 @@
   .graph-network-container {
     padding-left: 0 !important; /* Remove shifted padding */
     border-radius: 16px !important;
+    height: 460px !important;
+    min-height: 460px !important;
+    width: 100% !important;
+    flex: none !important;
   }
   
   .graph-hud-overlay {
