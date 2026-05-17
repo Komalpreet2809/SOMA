@@ -354,63 +354,75 @@
   transition: all 0.5s ease-in-out;
 }
 
-/* ── Mobile Responsive Overrides for iPhone 14 ── */
-@media (max-width: 480px) {
+/* ── Mobile Responsive Overrides ── */
+@media (max-width: 768px) {
   .landing {
-    align-items: flex-start !important;
-    padding: 30px 16px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 24px 16px !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
   
   .splash-content, .name-content {
-    margin: 20px auto 60px auto !important;
-    padding: 36px 20px !important;
+    margin: 20px 0 30px 0 !important;
+    padding: 40px 24px !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 24px !important;
+    border-radius: 28px !important;
+    flex-shrink: 0;
   }
   
   .hero-orb {
-    width: 60px !important;
-    height: 60px !important;
+    width: 64px !important;
+    height: 64px !important;
     margin-bottom: 24px !important;
   }
   
   .hero-title {
-    font-size: 2.6rem !important;
+    font-size: 3.2rem !important;
   }
   
   .hero-tagline {
-    font-size: 0.58rem !important;
-    letter-spacing: 0.3em !important;
-    margin-bottom: 18px !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.2em !important;
+    margin-bottom: 20px !important;
+    line-height: 1.4 !important;
   }
   
   .hero-desc {
-    font-size: 0.8rem !important;
-    margin-bottom: 24px !important;
-    line-height: 1.5 !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 32px !important;
   }
   
   .splash-features {
-    gap: 8px !important;
-    margin-bottom: 28px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 32px !important;
+    width: 100%;
   }
   
   .splash-feature {
-    padding: 4px 10px !important;
-    font-size: 0.62rem !important;
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px !important;
+    font-size: 0.75rem !important;
   }
   
   .enter-btn, .name-submit {
-    padding: 10px 24px !important;
-    font-size: 0.8rem !important;
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px !important;
+    font-size: 0.9rem !important;
   }
   
   .landing-footer {
     position: relative !important;
     bottom: auto !important;
-    margin: 20px auto 40px auto !important;
+    margin: auto auto 20px auto !important;
     justify-content: center !important;
+    flex-shrink: 0;
   }
 }
