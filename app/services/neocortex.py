@@ -91,8 +91,8 @@ def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
     
     clean = _clean_text(text)
 
-    # Need at least a few words to extract anything meaningful
-    if len(clean.split()) < 5:
+    # Need at least 3 words to extract a relationship (e.g., "I like apples")
+    if len(clean.split()) < 3:
         print(f"Neocortex: Input too short ({len(clean.split())} words), skipping.")
         return 0
 
