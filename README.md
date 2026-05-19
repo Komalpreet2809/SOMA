@@ -1,11 +1,3 @@
----
-title: Soma
-emoji: 🧠
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
----
 
 # <p align="center">🧠 SOMA: Cognitive Architecture for AI</p>
 
