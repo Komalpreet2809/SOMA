@@ -47,7 +47,7 @@ function VisitorAnalytics({ onClose }) {
           <div className="analytics-header-row">
             <div className="analytics-title-area">
               <h3>Visitor Insights</h3>
-              <p>Real-time website traffic metrics.</p>
+              <p>Real-time visitor insights powered by Redis + CDN caching.</p>
             </div>
             <div className="analytics-db-status">
               {stats.status === 'online' && (
@@ -137,6 +137,13 @@ function VisitorAnalytics({ onClose }) {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="analytics-action-row">
+            <button className="analytics-sync-btn" onClick={fetchStats} disabled={loading}>
+              <span className="material-icons">sync</span>
+              <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
           </div>
         </div>
       </div>
