@@ -75,35 +75,34 @@ function KnowledgeGraph({ refreshTick }) {
       
       const data = await res.json();
       
-      if (data.status === 'offline' || data.status === 'error' || !data.nodes || data.nodes.length === 0) {
+      if (data.status === 'offline' || data.status === 'error') {
         setDbStatus(data.status || 'offline');
-        const nodes = MOCK_GRAPH.nodes.map(n => ({ ...n }));
-        const links = MOCK_GRAPH.links.map(l => ({ ...l }));
-        setGraphData({ nodes, links });
+        setGraphData({ nodes: [], links: [] });
       } else {
         setDbStatus('online');
-        const nodes = data.nodes.map(n => ({
-          id: n.id,
-          label: n.label || n.id,
-          connections: n.connections || 1,
-          type: 'entity'
-        }));
-        
-        const links = data.edges.map(e => ({
-          source: e.source,
-          target: e.target,
-          label: e.label || 'RELATED_TO'
-        }));
-        
-        setGraphData({ nodes, links });
+        if (!data.nodes || data.nodes.length === 0) {
+          setGraphData({ nodes: [], links: [] });
+        } else {
+          const nodes = data.nodes.map(n => ({
+            id: n.id,
+            label: n.label || n.id,
+            connections: n.connections || 1,
+            type: 'entity'
+          }));
+          
+          const links = data.edges.map(e => ({
+            source: e.source,
+            target: e.target,
+            label: e.label || 'RELATED_TO'
+          }));
+          
+          setGraphData({ nodes, links });
+        }
       }
     } catch (error) {
       console.error('Graph fetch failed', error);
       setDbStatus('offline');
-      setGraphData({
-        nodes: MOCK_GRAPH.nodes.map(n => ({ ...n })),
-        links: MOCK_GRAPH.links.map(l => ({ ...l }))
-      });
+      setGraphData({ nodes: [], links: [] });
     } finally {
       setLoading(false);
     }
@@ -192,12 +191,12 @@ function KnowledgeGraph({ refreshTick }) {
         <div className="graph-title-block">
           <button className="graph-select">
             <span className="material-icons">hub</span>
-            <span>{dbStatus === 'online' ? 'Real-time 3D Neo4j Graph' : '3D SOMA Cognitive Architecture Model'}</span>
+            <span>{dbStatus === 'online' ? 'Real-time 3D Neo4j Graph' : '3D SOMA Cognitive Memory Mesh'}</span>
           </button>
           {dbStatus !== 'online' && (
             <span className="db-status-badge warning pulse">
               <span className="dot" />
-              Neo4j Offline - Displaying Interactive System Concept
+              Neo4j Database Offline
             </span>
           )}
           {dbStatus === 'online' && (
@@ -311,6 +310,16 @@ function KnowledgeGraph({ refreshTick }) {
           enableNodeDrag={true}
         />
         
+        {graphData.nodes.length === 0 && !loading && (
+          <div className="graph-empty-state">
+            <span className="material-icons empty-icon pulse">bubble_chart</span>
+            <h3>Neural Mesh Empty</h3>
+            <p>
+              Your cognitive space is completely clean. Start chatting with SOMA or submit a sensory inscription to build your memory graph!
+            </p>
+          </div>
+        )}
+
         {/* Legend removed per user request */}
 
         {loading && (
