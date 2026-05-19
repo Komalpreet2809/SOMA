@@ -124,6 +124,16 @@
   color: #ff6b35;
 }
 
+.sidebar-link.visitors-btn {
+  margin-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  padding-top: 16px !important;
+}
+
+body.dark-theme .sidebar-link.visitors-btn {
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
 .sidebar-footer {
   margin-top: auto;
 }
@@ -574,6 +584,12 @@ body.dark-theme .modal-header button:hover {
   
   body.dark-theme .theme-toggle-btn {
     border-left-color: rgba(255,255,255,0.05) !important;
+  }
+  
+  .visitors-btn {
+    margin-top: 0 !important;
+    border-top: none !important;
+    padding-top: 0 !important;
   }
   
   .sidebar-footer {

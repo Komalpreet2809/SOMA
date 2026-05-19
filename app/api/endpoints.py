@@ -551,3 +551,28 @@ async def fetch_chat_history(current_user: str = Depends(get_current_user)):
         return {"messages": history}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Visitor Analytics ─────────────────────────────────────────────
+
+class HitRequest(BaseModel):
+    visitor_id: str
+
+@router.post("/analytics/hit")
+async def record_visitor_hit(request: HitRequest, current_user: str = Depends(get_current_user)):
+    try:
+        from app.services.analytics import analytics_manager
+        success = analytics_manager.record_hit(request.visitor_id)
+        return {"success": success, "message": "Hit recorded successfully" if success else "Hit recorded in local simulation fallback."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/analytics/stats")
+async def get_visitor_stats(current_user: str = Depends(get_current_user)):
+    try:
+        from app.services.analytics import analytics_manager
+        stats = analytics_manager.get_stats()
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

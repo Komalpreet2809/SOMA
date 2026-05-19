@@ -105,9 +105,6 @@ def extract_and_store_knowledge(text: str, user_id: str = "default_user"):
 
     owner = user_id.upper()
 
-    # Bind the structured Pydantic model to the Groq LLM
-    structured_llm = llm.with_structured_output(KnowledgeGraphExtraction)
-
     prompt = f"""You are a child's brain learning about the world. Read the text and pick out SIMPLE facts as connections between concepts.
 
 Think like a child drawing a mind-map:
@@ -123,20 +120,45 @@ RULES:
 5. If the text is just greetings or small talk with zero factual content, return an empty triples list.
 
 Text:
-{clean}"""
+{clean}
+
+Return the extracted facts ONLY as a valid JSON block in this exact format:
+{{
+  "triples": [
+    {{"subject": "SUBJECT", "relation": "RELATION", "object": "OBJECT"}}
+  ]
+}}
+Do not write any other explanation or thoughts outside the JSON block. If there are no facts, return: {{"triples": []}}"""
 
     try:
-        result = structured_llm.invoke([HumanMessage(content=prompt)])
-        if not result or not result.triples:
+        response = llm.invoke([HumanMessage(content=prompt)])
+        content = response.content.strip()
+        
+        # Robustly extract the JSON block
+        triples_data = []
+        match = re.search(r'\{.*\}', content, re.DOTALL)
+        if match:
+            json_str = match.group(0)
+            try:
+                data = json.loads(json_str)
+                triples_data = data.get("triples", [])
+            except Exception as e:
+                print(f"Neocortex: Failed to parse JSON block: {e}")
+                return 0
+        else:
+            print("Neocortex: No JSON block found in LLM response.")
+            return 0
+            
+        if not triples_data:
             print("Neocortex: No triples extracted.")
             return 0
             
         stored_count = 0
         
-        for t in result.triples:
-            subj = str(t.subject).strip().upper()
-            rel  = _sanitize_relation(str(t.relation))
-            obj  = str(t.object).strip().upper()
+        for t in triples_data:
+            subj = str(t.get("subject", "")).strip().upper()
+            rel  = _sanitize_relation(str(t.get("relation", "")))
+            obj  = str(t.get("object", "")).strip().upper()
             
             # Validate both nodes
             if not _is_valid_node(subj) or not _is_valid_node(obj):

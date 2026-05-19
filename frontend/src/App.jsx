@@ -9,6 +9,7 @@ import CognitiveDashboard from './components/CognitiveDashboard';
 import KnowledgeInput from './components/KnowledgeInput';
 import { SleepProgress } from './components/DreamSequence';
 import AuthScreen from './components/AuthScreen';
+import VisitorAnalytics from './components/VisitorAnalytics';
 import { apiFetch } from './api';
 import './App.css';
 
@@ -43,6 +44,7 @@ function App() {
   const [sleepSummary, setSleepSummary] = useState(null);
   const [showStatus, setShowStatus] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('soma_dark') === 'true');
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -60,6 +62,36 @@ function App() {
     fetchVitals();
     const interval = setInterval(fetchVitals, 10000);
     return () => clearInterval(interval);
+  }, [username]);
+
+  useEffect(() => {
+    if (!username) return;
+    
+    // Verify if session hit is already registered to protect Upstash limits
+    if (sessionStorage.getItem('soma_hit_registered') === 'true') return;
+    
+    // Get or create unique persistent visitor ID
+    let visitorId = localStorage.getItem('soma_visitor_id');
+    if (!visitorId) {
+      visitorId = 'visitor_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+      localStorage.setItem('soma_visitor_id', visitorId);
+    }
+    
+    const registerHit = async () => {
+      try {
+        const res = await apiFetch('/api/v1/analytics/hit', {
+          method: 'POST',
+          body: JSON.stringify({ visitor_id: visitorId })
+        });
+        if (res.ok) {
+          sessionStorage.setItem('soma_hit_registered', 'true');
+        }
+      } catch (error) {
+        console.error("Failed to register visitor telemetry hit:", error);
+      }
+    };
+    
+    registerHit();
   }, [username]);
 
   const fetchHistory = async () => {
@@ -253,9 +285,17 @@ function App() {
           ))}
           
           <button 
+            className={`sidebar-link visitors-btn ${showAnalyticsModal ? 'active' : ''}`}
+            onClick={() => setShowAnalyticsModal(true)}
+          >
+            <span className="material-icons">analytics</span>
+            <span>Visitors</span>
+          </button>
+
+          <button 
             className="sidebar-link theme-toggle-btn"
             onClick={() => setDarkMode(!darkMode)}
-            style={{marginTop: '16px', borderTop: '1px solid rgba(0,0,0,0.03)', paddingTop: '16px'}}
+            style={{marginTop: '8px'}}
             title="Toggle Dark/Light Mode"
           >
             <span className="material-icons">{darkMode ? 'light_mode' : 'dark_mode'}</span>
@@ -410,6 +450,10 @@ function App() {
           />
         )}
       </main>
+
+      {showAnalyticsModal && (
+        <VisitorAnalytics onClose={() => setShowAnalyticsModal(false)} />
+      )}
     </div>
   );
 }
