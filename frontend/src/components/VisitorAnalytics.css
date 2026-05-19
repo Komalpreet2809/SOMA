@@ -17,6 +17,7 @@
   gap: 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding-bottom: 12px;
+  padding-right: 36px; /* Prevent overlap with the absolute positioned close button */
   transition: border-color 0.3s ease;
 }
 
@@ -105,7 +106,7 @@ body.dark-theme .analytics-db-status .status-badge.error {
 /* Metrics Grid - Adjusted column wrapping to fit beautifully in modal viewport */
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
@@ -430,7 +431,7 @@ body.dark-theme .analytics-modal-backdrop {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1), 0 0 40px rgba(255, 107, 53, 0.02);
   border-radius: 20px;
   width: 90%;
-  max-width: 620px;
+  max-width: 480px; /* Reduced from 620px */
   padding: 20px 24px;
   position: relative;
   backdrop-filter: blur(25px);

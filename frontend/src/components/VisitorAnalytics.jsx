@@ -138,13 +138,6 @@ function VisitorAnalytics({ onClose }) {
               </div>
             </div>
           </div>
-
-          <div className="analytics-action-row">
-            <button className="analytics-sync-btn" onClick={fetchStats} disabled={loading}>
-              <span className="material-icons">sync</span>
-              <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
