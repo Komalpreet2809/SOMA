@@ -396,12 +396,21 @@
   }
   
   .splash-content, .name-content {
-    margin: 20px 0 30px 0 !important;
+    margin: 72px 0 30px 0 !important;
     padding: 40px 24px !important;
     width: 100% !important;
     max-width: 100% !important;
     border-radius: 28px !important;
     flex-shrink: 0;
+  }
+
+  .landing-theme-toggle {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
   }
   
   .hero-orb {
