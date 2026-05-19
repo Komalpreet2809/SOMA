@@ -405,7 +405,7 @@
   }
 
   .landing-theme-toggle {
-    position: fixed !important;
+    position: absolute !important;
     top: 16px !important;
     right: 16px !important;
     width: 40px !important;
