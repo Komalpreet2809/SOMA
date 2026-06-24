@@ -13,7 +13,7 @@
 
 ---
 
-## 🌌 Introduction
+##  Introduction
 
 **Soma** is a state-of-the-art, brain-inspired cognitive system designed to simulate human-like mental processes through a multi-layered, interactive memory architecture. Engineered with a premium **Neural Gloss** aesthetic and a pure-black deep workspace layout, it maps conversation streams directly into physical concepts, associations, and permanent memory.
 
@@ -21,7 +21,7 @@ Unlike naive RAG systems, **Soma acts like a child's brain learning about the wo
 
 ---
 
-## 🏗️ The 4 Cognitive Memory Layers
+##  The 4 Cognitive Memory Layers
 
 Soma's intelligence is organized into four distinct biological-style memory sectors:
 
@@ -53,7 +53,7 @@ Soma's intelligence is organized into four distinct biological-style memory sect
 
 ---
 
-## 💤 The Sleep Cycle (Cognitive Consolidation)
+##  The Sleep Cycle (Cognitive Consolidation)
 
 To maintain an organized mind, Soma features an automated **Sleep Engine**. When triggered:
 * **Pattern Consolidation:** Recent episodic experiences are summarized into long-term memories.
@@ -62,7 +62,7 @@ To maintain an organized mind, Soma features an automated **Sleep Engine**. When
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Sci-Fi Neural Console:** Premium pure-black visual design featuring neon-accented borders, micro-animations, glowing diagnostic widgets, and customizable dark/light theme options.
 - **Child-like Association Engine:** Sturdy 3-layer extraction guard ensuring zero chat-log clutter. Validates concepts for short lengths (1-3 words), blocks meta-talk, and filters punctuation.
@@ -72,7 +72,7 @@ To maintain an organized mind, Soma features an automated **Sleep Engine**. When
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Backend
 * **Core Framework:** FastAPI (Python 3.10+)
@@ -92,7 +92,7 @@ To maintain an organized mind, Soma features an automated **Sleep Engine**. When
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Environment Set Up
 Create a `.env` file in the root directory:
@@ -131,7 +131,7 @@ npm run dev
 
 ---
 
-## 📂 Project Anatomy
+##  Project Anatomy
 
 ```text
 .
@@ -152,7 +152,7 @@ npm run dev
 
 ---
 
-## 🧪 Testing System
+##  Testing System
 Run the system pipeline suite to verify semantic cortex extraction, database connections, and sleep cycle algorithms:
 ```bash
 $env:PYTHONPATH="."; pytest tests/
