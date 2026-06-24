@@ -1,5 +1,5 @@
 
-# <p align="center">🧠 SOMA: Cognitive Architecture for AI</p>
+# <p align="center"> SOMA: Cognitive Architecture for AI</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Aesthetics-Neural%20Gloss%20%26%20Pure%20Black-ff6b35?style=for-the-badge" alt="Neural Gloss Theme">
