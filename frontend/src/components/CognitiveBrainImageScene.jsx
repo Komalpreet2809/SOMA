@@ -1,4 +1,4 @@
-import brainImg from '../assets/Brain_nobg.webp';
+import brainImg from '../assets/Brain_nobg.b64.js';
 import './CognitiveBrainScene.css';
 
 /**

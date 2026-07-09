@@ -1,4 +1,4 @@
-import sleepImg from '../assets/sleep_nobg.webp';
+import sleepImg from '../assets/sleep_nobg.b64.js';
 import './DreamSequence.css';
 
 export function SleepProgress({ phaseIndex, isConsolidating, onStart, summary, vitals, onClose }) {
