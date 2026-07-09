@@ -1,0 +1,37 @@
+name: Neo4j Aura Keepalive
+
+# Neo4j Aura Free pauses instances after 3 days of inactivity.
+# This workflow runs a trivial query every day so the instance
+# always shows recent activity and never gets paused.
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # every day at 06:00 UTC
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Neo4j driver
+        run: pip install neo4j
+
+      - name: Ping Aura instance
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        run: |
+          python - <<'EOF'
+          import os
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver(
+              os.environ["NEO4J_URI"],
+              auth=(os.environ["NEO4J_USER"], os.environ["NEO4J_PASSWORD"]),
+          )
+          with driver.session() as session:
+              count = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]
+          driver.close()
+          print(f"Keepalive OK - {count} nodes in graph.")
+          EOF
