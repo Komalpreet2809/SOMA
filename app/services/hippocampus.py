@@ -33,6 +33,6 @@ def consolidate_memory(user_id: str, limit: int = 50):
     }
     
     # 4. Ingest into ChromaDB
-    chunks_created = ingest_text(episodic_document, metadata=metadata)
+    chunks_created = ingest_text(episodic_document, metadata=metadata, user_id=user_id)
     
     return chunks_created, "Memory consolidated successfully."

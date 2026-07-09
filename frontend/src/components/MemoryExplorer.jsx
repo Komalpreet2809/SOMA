@@ -256,16 +256,6 @@ function MemoryExplorer() {
                 <div className="metric-value">{linkedEntities.length} Links</div>
               </div>
 
-              <div className="instrument-card">
-                <h4>Entropy Score</h4>
-                <div className="meter-track">
-                  <div className="meter-fill" style={{ 
-                    width: '42%',
-                    backgroundColor: '#10b981'
-                  }} />
-                </div>
-                <div className="metric-value">0.4281</div>
-              </div>
             </div>
 
             {/* Knowledge Links */}

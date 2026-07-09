@@ -94,17 +94,18 @@ def run_sleep_cycle(keep_recent: int = 10):
 
         # --- Phase 3: STORE ---
         # 3a. Save summary as an episodic memory in ChromaDB
+        # Sessions are keyed by username, so session_id doubles as the owner.
         summary_doc = f"Sleep Cycle Summary ({timestamp}) for session {session_id}:\n{summary}"
         metadata = {
             "type": "sleep_summary",
             "session_id": session_id,
             "timestamp": timestamp,
         }
-        chunks = ingest_text(summary_doc, metadata=metadata)
+        chunks = ingest_text(summary_doc, metadata=metadata, user_id=session_id)
         report["summaries_created"] += 1
 
         # 3b. Extract knowledge graph triples from the summary
-        triples = extract_and_store_knowledge(summary)
+        triples = extract_and_store_knowledge(summary, user_id=session_id)
         report["graph_relations_extracted"] += triples
 
         # --- Phase 4: PRUNE ---

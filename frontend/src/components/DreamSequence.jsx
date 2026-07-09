@@ -1,4 +1,4 @@
-const sleepImg = "https://raw.githubusercontent.com/Komalpreet2809/Soma-Assets/master/sleep_nobg.png";
+import sleepImg from '../assets/sleep_nobg.webp';
 import './DreamSequence.css';
 
 export function SleepProgress({ phaseIndex, isConsolidating, onStart, summary, vitals, onClose }) {

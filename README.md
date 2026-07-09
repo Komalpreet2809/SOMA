@@ -95,22 +95,24 @@ To maintain an organized mind, Soma features an automated **Sleep Engine**. When
 ##  Quick Start
 
 ### 1. Environment Set Up
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory (see `.env.example` for the full template):
 ```env
 GROQ_API_KEY=gsk_your_groq_key_here
-NEO4J_URI=neo4j+ssc://your-aura-db-uri.databases.neo4j.io
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your_password_here
-NEO4J_DATABASE=neo4j
+NEO4J_PASSWORD=choose_a_password_for_the_local_neo4j
 ```
 
+> **Using Neo4j Aura (cloud) instead?** Set `NEO4J_URI=neo4j+ssc://<instance-id>.databases.neo4j.io` plus `NEO4J_USER` / `NEO4J_DATABASE`. Note: on newer Aura instances the database **username is the instance ID** (e.g. `d65ff6c7`), not `neo4j` — check your downloaded credentials file.
+
 ### 2. Run Local Environment (Docker Compose)
-To compile and launch the entire cognitive stack:
+To compile and launch the entire cognitive stack (frontend, backend, and a local Neo4j graph database):
 ```bash
 docker-compose up --build
 ```
 * **Frontend console:** `http://localhost:80`
 * **FastAPI documentation:** `http://localhost:8000/docs`
+* **Neo4j browser:** `http://localhost:7474` (user `neo4j`, password from your `.env`)
+
+The compose file provisions its own `neo4j` container and points the backend at it (`bolt://neo4j:7687`) — no external database needed for local development.
 
 ### 3. Run Manually (Local Development)
 
@@ -145,10 +147,18 @@ npm run dev
 │   │   ├── components/       # UI elements (ChatPanel, KnowledgeGraph, Welcome pages)
 │   │   └── App.jsx           # Main client state & proxy router controller
 ├── scratch/                  # Diagnostic scripts & model testing grounds
+├── .github/workflows/        # CI — daily Neo4j Aura keepalive ping
 ├── Dockerfile                # Root multi-stage Docker build config
-├── docker-compose.yml        # Multi-container local orchestrator
+├── docker-compose.yml        # Multi-container local orchestrator (incl. local Neo4j)
 └── requirements.txt          # Python environments manifest
 ```
+
+---
+
+## Cloud Deployment Notes
+
+* The live deployment runs on **HuggingFace Spaces** (Docker SDK) using the root `Dockerfile`; database credentials are provided via Space secrets (`GROQ_API_KEY`, `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`).
+* The knowledge graph lives on **Neo4j AuraDB Free**, which pauses instances after 3 idle days. The GitHub Actions workflow `.github/workflows/neo4j-keepalive.yml` runs a trivial query once a day to keep it awake (requires the same `NEO4J_*` values as repository Action secrets).
 
 ---
 

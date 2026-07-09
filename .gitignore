@@ -16,3 +16,4 @@ chroma_db/
 data/
 *.db
 .claude/
+chroma_db_docker/

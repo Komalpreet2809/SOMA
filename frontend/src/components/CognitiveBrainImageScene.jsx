@@ -1,4 +1,4 @@
-const brainImg = "https://raw.githubusercontent.com/Komalpreet2809/Soma-Assets/master/Brain_nobg.png";
+import brainImg from '../assets/Brain_nobg.webp';
 import './CognitiveBrainScene.css';
 
 /**
