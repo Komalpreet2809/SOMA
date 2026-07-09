@@ -1,0 +1,45 @@
+name: Deploy to HuggingFace Space
+
+# Deploys every push on main to the HF Space (komalsohal/Soma).
+# HF Spaces requires YAML frontmatter at the top of README.md, but that
+# renders as an ugly table on GitHub — so the frontmatter lives only here
+# and is prepended just before pushing to the Space.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Prepend HF Spaces frontmatter to README
+        run: |
+          cat > /tmp/readme_hf.md <<'EOF'
+          ---
+          title: Soma
+          emoji: 🧠
+          colorFrom: blue
+          colorTo: indigo
+          sdk: docker
+          pinned: false
+          ---
+          EOF
+          cat README.md >> /tmp/readme_hf.md
+          mv /tmp/readme_hf.md README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: add HF Spaces frontmatter [auto-deploy]"
+
+      - name: Push to Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git push --force "https://komalsohal:${HF_TOKEN}@huggingface.co/spaces/komalsohal/Soma" HEAD:main
