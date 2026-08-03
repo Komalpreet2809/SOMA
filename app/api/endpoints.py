@@ -454,7 +454,16 @@ async def process_query_stream(request: QueryRequest, current_user: str = Depend
                                 "phase": "graph",
                                 "message": "Extracting relationships for semantic memory."
                             })
-                            triples = await asyncio.to_thread(extract_and_store_knowledge, request.text, current_user)
+                            # Short replies ("umm tomato") only carry meaning
+                            # alongside the question Soma asked, so pass the
+                            # last assistant message as extraction context.
+                            last_soma_msg = next(
+                                (m["content"] for m in reversed(history) if m["role"] == "assistant"),
+                                ""
+                            )
+                            triples = await asyncio.to_thread(
+                                extract_and_store_knowledge, request.text, current_user, last_soma_msg
+                            )
                             yield sse_event("brain_trace", build_brain_event(
                                 "graph",
                                 71,

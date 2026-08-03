@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
+import SpriteText from 'three-spritetext';
 import { apiFetch } from '../api';
 import './KnowledgeGraph.css';
 
@@ -278,22 +279,45 @@ function KnowledgeGraph({ refreshTick }) {
               emissive: getNodeColor(node),
               emissiveIntensity: 0.45
             });
-            return new THREE.Mesh(geom, mat);
+            const sphere = new THREE.Mesh(geom, mat);
+
+            // Always-visible name tag floating above the sphere
+            const tag = new SpriteText((node.label || node.id).toUpperCase());
+            tag.color = getNodeColor(node);
+            tag.textHeight = 3.2;
+            tag.fontWeight = '700';
+            tag.backgroundColor = 'rgba(10, 10, 10, 0.55)';
+            tag.padding = 1.2;
+            tag.borderRadius = 2;
+            tag.position.y = size + 4;
+            tag.material.depthWrite = false; // keep tag readable through overlapping geometry
+
+            const group = new THREE.Group();
+            group.add(sphere);
+            group.add(tag);
+            return group;
           }}
           
-          // Outlined holographic label rendered natively floating beside cursor on hover (100% stable!)
-          nodeLabel={node => `
-            <span style="color: ${getNodeColor(node)}; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              ${node.label || node.id}
-            </span>
-          `}
-          
-          // Outlined relationship tag rendered on link hover (100% stable!)
-          linkLabel={link => `
-            <span style="color: #ff6b35; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              ${link.label || 'RELATED_TO'}
-            </span>
-          `}
+          // Always-visible relationship tag floating at the middle of each link
+          linkThreeObjectExtend={true}
+          linkThreeObject={link => {
+            const tag = new SpriteText((link.label || 'RELATED_TO').toUpperCase());
+            tag.color = '#ff9c7a';
+            tag.textHeight = 2.2;
+            tag.fontWeight = '700';
+            tag.backgroundColor = 'rgba(10, 10, 10, 0.45)';
+            tag.padding = 1;
+            tag.borderRadius = 2;
+            tag.material.depthWrite = false;
+            return tag;
+          }}
+          linkPositionUpdate={(sprite, { start, end }) => {
+            sprite.position.set(
+              start.x + (end.x - start.x) / 2,
+              start.y + (end.y - start.y) / 2,
+              start.z + (end.z - start.z) / 2
+            );
+          }}
           
           nodeRelSize={3}
           linkColor={() => 'rgba(255, 107, 53, 0.25)'} // Soft, clean axon link fibers

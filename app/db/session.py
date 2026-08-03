@@ -201,12 +201,12 @@ def get_recent_messages(session_id: str, exchanges: int = 5):
         cur = _cursor(conn)
         if _db_backend == "postgres":
             cur.execute(
-                'SELECT role, content FROM messages WHERE session_id = %s ORDER BY timestamp DESC LIMIT %s',
+                'SELECT role, content FROM messages WHERE session_id = %s ORDER BY timestamp DESC, id DESC LIMIT %s',
                 (session_id, exchanges * 2)
             )
         else:
             cur.execute(
-                'SELECT role, content FROM messages WHERE session_id = ? ORDER BY timestamp DESC LIMIT ?',
+                'SELECT role, content FROM messages WHERE session_id = ? ORDER BY timestamp DESC, id DESC LIMIT ?',
                 (session_id, exchanges * 2)
             )
         rows = cur.fetchall()
@@ -248,14 +248,14 @@ def prune_old_messages(session_id: str, keep_recent: int = 10):
             cur.execute('''
                 DELETE FROM messages WHERE session_id = %s AND id NOT IN (
                     SELECT id FROM messages WHERE session_id = %s
-                    ORDER BY timestamp DESC LIMIT %s
+                    ORDER BY timestamp DESC, id DESC LIMIT %s
                 )
             ''', (session_id, session_id, keep_recent))
         else:
             cur.execute('''
                 DELETE FROM messages WHERE session_id = ? AND id NOT IN (
                     SELECT id FROM messages WHERE session_id = ?
-                    ORDER BY timestamp DESC LIMIT ?
+                    ORDER BY timestamp DESC, id DESC LIMIT ?
                 )
             ''', (session_id, session_id, keep_recent))
     return get_message_count(session_id)
@@ -295,12 +295,12 @@ def get_recent_sparks(user_id: str = "default_user", limit: int = 5):
         cur = _cursor(conn)
         if _db_backend == "postgres":
             cur.execute(
-                'SELECT content, entities, timestamp FROM neural_sparks WHERE user_id = %s ORDER BY timestamp DESC LIMIT %s',
+                'SELECT content, entities, timestamp FROM neural_sparks WHERE user_id = %s ORDER BY timestamp DESC, id DESC LIMIT %s',
                 (user_id, limit)
             )
         else:
             cur.execute(
-                'SELECT content, entities, timestamp FROM neural_sparks WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?',
+                'SELECT content, entities, timestamp FROM neural_sparks WHERE user_id = ? ORDER BY timestamp DESC, id DESC LIMIT ?',
                 (user_id, limit)
             )
         rows = cur.fetchall()
